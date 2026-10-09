@@ -10,10 +10,6 @@ public static class VB6BlockParser
         @"^\s*(?:(?:Public|Private|Friend|Static)\s+)?(?:(Sub|Function)\s+([a-zA-Z0-9_]+)|(Property)\s+(?:Get|Let|Set)\s+([a-zA-Z0-9_]+))",
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-    private static readonly Regex TypeOrEnumStartRegex = new(
-        @"^\s*(?:(?:Public|Private)\s+)?(Type|Enum)\s+([a-zA-Z0-9_]+)",
-        RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
     public static List<VB6Block> ParseBlocks(string code)
     {
         var result = new List<VB6Block>();
@@ -32,7 +28,6 @@ public static class VB6BlockParser
             if (string.IsNullOrWhiteSpace(trimmed))
                 continue;
 
-            // Quitar comentarios y cadenas para analizar tokens
             string cleanLine = StripCommentsAndStrings(rawLine);
             string cleanTrimmed = cleanLine.Trim();
 
@@ -41,33 +36,63 @@ public static class VB6BlockParser
 
             int column = GetIndentColumn(rawLine);
 
-            // 1. Detectar cierres de bloques
-            if (TryMatchBlockClose(cleanTrimmed, out string closeType))
+            // 1. Detectar si inicia un nuevo procedimiento (Sub, Function, Property)
+            if (TryMatchProcedureOpen(rawLine, cleanTrimmed, column, lineNumber, out VB6Block? procBlock) && procBlock != null)
             {
+                // VB6 no permite procedimientos anidados. Si había un procedimiento abierto sin cerrar, lo descartamos
                 if (blockStack.Count > 0)
                 {
-                    // Buscar en el stack si el tipo coincide o cerrar hasta el más cercano coincidente
-                    if (CanClose(blockStack.Peek().BlockType, closeType))
+                    blockStack.Clear();
+                }
+                blockStack.Push(procBlock);
+                continue;
+            }
+
+            // Si no estamos dentro de un procedimiento, no procesamos bloques (las declaraciones generales no llevan guías)
+            if (blockStack.Count == 0)
+                continue;
+
+            // 2. Detectar cierres de bloques
+            if (TryMatchBlockClose(cleanTrimmed, out string closeType))
+            {
+                if (IsProcedureType(closeType))
+                {
+                    // Cierre del procedimiento raíz: desenrollar bloques internos y cerrar el procedimiento
+                    while (blockStack.Count > 1)
                     {
-                        var block = blockStack.Pop();
-                        block.EndLine = lineNumber;
-                        if (block.Parent == null)
-                        {
-                            result.Add(block);
-                        }
+                        blockStack.Pop();
+                    }
+
+                    if (blockStack.Count == 1 && CanClose(blockStack.Peek().BlockType, closeType))
+                    {
+                        var rootProc = blockStack.Pop();
+                        rootProc.EndLine = lineNumber;
+                        result.Add(rootProc);
                     }
                     else
                     {
-                        // Intentar desenrollar si hubo un bloque no cerrado previamente
+                        blockStack.Clear();
+                    }
+                }
+                else
+                {
+                    // Cierre de bloque interno (If, Select, For, Do, While, With)
+                    if (blockStack.Count > 1 && CanClose(blockStack.Peek().BlockType, closeType))
+                    {
+                        var innerBlock = blockStack.Pop();
+                        innerBlock.EndLine = lineNumber;
+                    }
+                    else if (blockStack.Count > 2)
+                    {
+                        // Intentar desenrollar si hubo un bloque anidado no cerrado, pero sin desapilar el procedimiento raíz
                         var tempStack = new Stack<VB6Block>();
                         bool found = false;
-                        while (blockStack.Count > 0)
+                        while (blockStack.Count > 1)
                         {
                             var top = blockStack.Pop();
                             if (CanClose(top.BlockType, closeType))
                             {
                                 top.EndLine = lineNumber;
-                                if (top.Parent == null) result.Add(top);
                                 found = true;
                                 break;
                             }
@@ -84,50 +109,82 @@ public static class VB6BlockParser
                 continue;
             }
 
-            // 2. Detectar ramas intermedias (Else, ElseIf, Case)
-            if (blockStack.Count > 0 && TryMatchBlockIntermediate(cleanTrimmed, blockStack.Peek().BlockType))
+            // 3. Detectar ramas intermedias (Else, ElseIf, Case)
+            if (blockStack.Count > 1 && TryMatchBlockIntermediate(cleanTrimmed, blockStack.Peek().BlockType))
             {
                 blockStack.Peek().IntermediateLines.Add(lineNumber);
                 continue;
             }
 
-            // 3. Detectar aperturas de bloques
-            if (TryMatchBlockOpen(rawLine, cleanTrimmed, column, lineNumber, out VB6Block? newBlock) && newBlock != null)
+            // 4. Detectar aperturas de bloques internos (If, Select, For, Do, While, With)
+            if (TryMatchInternalBlockOpen(rawLines, i, column, lineNumber, out VB6Block? innerOpenBlock) && innerOpenBlock != null)
             {
-                if (blockStack.Count > 0)
-                {
-                    var parent = blockStack.Peek();
-                    newBlock.Parent = parent;
-                    parent.Children.Add(newBlock);
-                }
-                blockStack.Push(newBlock);
+                var parent = blockStack.Peek();
+                innerOpenBlock.Parent = parent;
+                parent.Children.Add(innerOpenBlock);
+                blockStack.Push(innerOpenBlock);
             }
         }
 
-        // Si quedaron bloques abiertos al final del archivo, asignarles EndLine = total líneas
-        while (blockStack.Count > 0)
-        {
-            var unclosed = blockStack.Pop();
-            unclosed.EndLine = rawLines.Length;
-            if (unclosed.Parent == null)
-            {
-                result.Add(unclosed);
-            }
-        }
-
+        // Bloques sin cerrar al final del archivo NO se agregan (evita líneas infinitas hasta el final del documento)
         return result;
     }
 
-    private static bool TryMatchBlockOpen(string rawLine, string cleanLine, int column, int lineNumber, out VB6Block? block)
+    private static bool IsProcedureType(string type) =>
+        string.Equals(type, "Sub", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(type, "Function", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(type, "Property", StringComparison.OrdinalIgnoreCase);
+
+    private static bool TryMatchProcedureOpen(string rawLine, string cleanLine, int column, int lineNumber, out VB6Block? block)
     {
         block = null;
         string upper = cleanLine.ToUpperInvariant();
 
-        // A. Multi-line If ... Then
+        // Evitar declaraciones de API: 'Declare Sub ...' o 'Declare Function ...'
+        if (upper.Contains("DECLARE"))
+            return false;
+
+        var procMatch = ProcedureStartRegex.Match(rawLine);
+        if (procMatch.Success)
+        {
+            string bType = !string.IsNullOrEmpty(procMatch.Groups[1].Value)
+                ? procMatch.Groups[1].Value
+                : "Property";
+
+            block = new VB6Block
+            {
+                StartLine = lineNumber,
+                StartColumn = column,
+                BlockType = char.ToUpperInvariant(bType[0]) + bType[1..].ToLowerInvariant(),
+                Header = rawLine.Trim()
+            };
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool TryMatchInternalBlockOpen(string[] rawLines, int lineIndex, int column, int lineNumber, out VB6Block? block)
+    {
+        block = null;
+        string rawLine = rawLines[lineIndex];
+        string cleanLine = StripCommentsAndStrings(rawLine).Trim();
+        string upper = cleanLine.ToUpperInvariant();
+
+        // A. Multi-line If ... Then (puede continuar con '_' en las siguientes líneas)
         if (upper.StartsWith("IF ", StringComparison.Ordinal) || upper == "IF")
         {
-            // Solo es multi-line If si 'Then' es lo último en cleanLine
-            if (upper.EndsWith(" THEN", StringComparison.Ordinal) || upper.EndsWith("THEN", StringComparison.Ordinal))
+            string combined = cleanLine;
+            int nextIdx = lineIndex;
+            while (combined.EndsWith('_') && nextIdx + 1 < rawLines.Length)
+            {
+                nextIdx++;
+                string nextClean = StripCommentsAndStrings(rawLines[nextIdx]).Trim();
+                combined = combined[..^1].TrimEnd() + " " + nextClean;
+            }
+
+            string combinedUpper = combined.ToUpperInvariant();
+            if (combinedUpper.EndsWith(" THEN", StringComparison.Ordinal) || combinedUpper == "THEN" || combinedUpper.EndsWith("\tTHEN", StringComparison.Ordinal))
             {
                 block = new VB6Block
                 {
@@ -206,43 +263,6 @@ public static class VB6BlockParser
             return true;
         }
 
-        // G. Procedimientos: Sub, Function, Property
-        var procMatch = ProcedureStartRegex.Match(rawLine);
-        if (procMatch.Success)
-        {
-            // Evitar 'Declare Sub' o 'Declare Function'
-            if (!upper.Contains("DECLARE "))
-            {
-                string bType = !string.IsNullOrEmpty(procMatch.Groups[1].Value)
-                    ? procMatch.Groups[1].Value
-                    : "Property";
-
-                block = new VB6Block
-                {
-                    StartLine = lineNumber,
-                    StartColumn = column,
-                    BlockType = char.ToUpperInvariant(bType[0]) + bType[1..].ToLowerInvariant(),
-                    Header = rawLine.Trim()
-                };
-                return true;
-            }
-        }
-
-        // H. Type y Enum
-        var typeMatch = TypeOrEnumStartRegex.Match(rawLine);
-        if (typeMatch.Success)
-        {
-            string bType = typeMatch.Groups[1].Value;
-            block = new VB6Block
-            {
-                StartLine = lineNumber,
-                StartColumn = column,
-                BlockType = char.ToUpperInvariant(bType[0]) + bType[1..].ToLowerInvariant(),
-                Header = rawLine.Trim()
-            };
-            return true;
-        }
-
         return false;
     }
 
@@ -294,16 +314,6 @@ public static class VB6BlockParser
         if (upper == "END PROPERTY")
         {
             closeType = "Property";
-            return true;
-        }
-        if (upper == "END TYPE")
-        {
-            closeType = "Type";
-            return true;
-        }
-        if (upper == "END ENUM")
-        {
-            closeType = "Enum";
             return true;
         }
 
@@ -369,7 +379,6 @@ public static class VB6BlockParser
             }
             else if (c == '\'')
             {
-                // El resto es comentario
                 return new string(chars, 0, i);
             }
             else if ((i == 0 || char.IsWhiteSpace(chars[i - 1])) &&

@@ -9,7 +9,7 @@ using VB7x64.ProjectModel.Advanced;
 namespace VB7x64.IDE.Editor;
 
 /// <summary>
-/// Renderiza las guías de estructura de bloques de VB6 (Branch Lines).
+/// Renderiza las guías de estructura de bloques de VB6 (Branch Lines) dentro de TextView.
 /// Dibuja una línea vertical estilizada posicionada un espacio antes de las palabras clave (If, End If, For, etc.)
 /// con conectores en ángulo recto (┌ y └) en la apertura y cierre del bloque, y ramificaciones (├──)
 /// en sentencias intermedias (Else, ElseIf, Case).
@@ -19,11 +19,21 @@ public class BranchLinesRenderer : IBackgroundRenderer
     private readonly TextEditor _editor;
     private List<VB6Block> _blocks = [];
     private bool _needsParse = true;
+    private BranchLinesMargin? _margin;
 
     public KnownLayer Layer => KnownLayer.Background;
 
     public Pen LinePen { get; set; }
     public bool IsEnabled { get; set; } = true;
+
+    public List<VB6Block> Blocks
+    {
+        get
+        {
+            EnsureBlocks();
+            return _blocks;
+        }
+    }
 
     public BranchLinesRenderer(TextEditor editor)
     {
@@ -41,8 +51,14 @@ public class BranchLinesRenderer : IBackgroundRenderer
             if (IsEnabled && _editor.TextArea?.TextView != null)
             {
                 _editor.TextArea.TextView.InvalidateLayer(KnownLayer.Background);
+                _margin?.InvalidateVisual();
             }
         };
+    }
+
+    public void SetMargin(BranchLinesMargin margin)
+    {
+        _margin = margin;
     }
 
     public void UpdateColor(Color color)
@@ -54,22 +70,18 @@ public class BranchLinesRenderer : IBackgroundRenderer
         LinePen = pen;
 
         _editor.TextArea?.TextView?.InvalidateLayer(KnownLayer.Background);
+        _margin?.InvalidateVisual();
     }
 
     public void InvalidateBlocks()
     {
         _needsParse = true;
         _editor.TextArea?.TextView?.InvalidateLayer(KnownLayer.Background);
+        _margin?.InvalidateVisual();
     }
 
-    public void Draw(TextView textView, DrawingContext drawingContext)
+    private void EnsureBlocks()
     {
-        if (!IsEnabled || _editor.Document == null || _editor.TextArea == null)
-            return;
-
-        if (textView.VisualLines.Count == 0)
-            return;
-
         if (_needsParse)
         {
             try
@@ -82,6 +94,17 @@ public class BranchLinesRenderer : IBackgroundRenderer
             }
             _needsParse = false;
         }
+    }
+
+    public void Draw(TextView textView, DrawingContext drawingContext)
+    {
+        if (!IsEnabled || _editor.Document == null || _editor.TextArea == null)
+            return;
+
+        if (textView.VisualLines.Count == 0)
+            return;
+
+        EnsureBlocks();
 
         if (_blocks.Count == 0)
             return;
@@ -91,11 +114,23 @@ public class BranchLinesRenderer : IBackgroundRenderer
 
         double charWidth = textView.WideSpaceWidth > 0 ? textView.WideSpaceWidth : 8.0;
 
-        // Renderizar bloques jerárquicos
-        RenderBlockList(_blocks, textView, drawingContext, firstVisibleLine, lastVisibleLine, charWidth);
+        foreach (var rootBlock in _blocks)
+        {
+            // Si el bloque raíz tiene indentación (columna > 0), se dibuja aquí en TextView
+            if (rootBlock.StartColumn > 0 && rootBlock.EndLine >= firstVisibleLine && rootBlock.StartLine <= lastVisibleLine)
+            {
+                DrawSingleBlockGuide(rootBlock, textView, drawingContext, firstVisibleLine, lastVisibleLine, charWidth);
+            }
+
+            // Los bloques hijos (If, Select, For, Do, While, With) se dibujan siempre dentro de TextView
+            if (rootBlock.Children.Count > 0)
+            {
+                RenderChildBlocks(rootBlock.Children, textView, drawingContext, firstVisibleLine, lastVisibleLine, charWidth);
+            }
+        }
     }
 
-    private void RenderBlockList(
+    private void RenderChildBlocks(
         List<VB6Block> blocks,
         TextView textView,
         DrawingContext drawingContext,
@@ -115,7 +150,7 @@ public class BranchLinesRenderer : IBackgroundRenderer
 
             if (block.Children.Count > 0)
             {
-                RenderBlockList(block.Children, textView, drawingContext, firstVisibleLine, lastVisibleLine, charWidth);
+                RenderChildBlocks(block.Children, textView, drawingContext, firstVisibleLine, lastVisibleLine, charWidth);
             }
         }
     }
@@ -131,22 +166,17 @@ public class BranchLinesRenderer : IBackgroundRenderer
         var startVLine = textView.GetVisualLine(block.StartLine);
         var endVLine = textView.GetVisualLine(block.EndLine);
 
-        // 1. Determinar coordenada X de la palabra clave en pantalla
+        // 1. Determinar coordenada X de la palabra clave en pantalla (restando HorizontalOffset para soportar desplazamiento)
         double keywordX;
         if (startVLine != null)
         {
             int col = Math.Min(block.StartColumn, Math.Max(0, startVLine.VisualLength));
-            keywordX = startVLine.GetVisualPosition(col, VisualYPosition.LineMiddle).X;
+            keywordX = startVLine.GetVisualPosition(col, VisualYPosition.LineMiddle).X - textView.HorizontalOffset;
         }
         else if (endVLine != null)
         {
             int col = Math.Min(block.StartColumn, Math.Max(0, endVLine.VisualLength));
-            keywordX = endVLine.GetVisualPosition(col, VisualYPosition.LineMiddle).X;
-        }
-        else if (textView.VisualLines.Count > 0)
-        {
-            int col = Math.Min(block.StartColumn, Math.Max(0, textView.VisualLines[0].VisualLength));
-            keywordX = textView.VisualLines[0].GetVisualPosition(col, VisualYPosition.LineMiddle).X;
+            keywordX = endVLine.GetVisualPosition(col, VisualYPosition.LineMiddle).X - textView.HorizontalOffset;
         }
         else
         {
@@ -168,13 +198,11 @@ public class BranchLinesRenderer : IBackgroundRenderer
             snapKeywordX = snapGuideX + 4.0;
         }
 
-        // 2. Límites verticales y esquinas en ángulo recto
+        // 2. Límites verticales y esquinas en ángulo recto calculados con VisualTop y VerticalOffset
         double topY;
         if (startVLine != null)
         {
-            int col = Math.Min(block.StartColumn, Math.Max(0, startVLine.VisualLength));
-            topY = Math.Floor(startVLine.GetVisualPosition(col, VisualYPosition.LineMiddle).Y) + 0.5;
-
+            topY = Math.Floor(startVLine.VisualTop - textView.VerticalOffset + (startVLine.Height / 2.0)) + 0.5;
             // Pequeña línea horizontal que forma ángulo recto superior (┌)
             drawingContext.DrawLine(LinePen, new Point(snapGuideX, topY), new Point(snapKeywordX, topY));
         }
@@ -186,9 +214,7 @@ public class BranchLinesRenderer : IBackgroundRenderer
         double bottomY;
         if (endVLine != null)
         {
-            int col = Math.Min(block.StartColumn, Math.Max(0, endVLine.VisualLength));
-            bottomY = Math.Floor(endVLine.GetVisualPosition(col, VisualYPosition.LineMiddle).Y) + 0.5;
-
+            bottomY = Math.Floor(endVLine.VisualTop - textView.VerticalOffset + (endVLine.Height / 2.0)) + 0.5;
             // Pequeña línea horizontal que forma ángulo recto inferior (└)
             drawingContext.DrawLine(LinePen, new Point(snapGuideX, bottomY), new Point(snapKeywordX, bottomY));
         }
@@ -207,8 +233,7 @@ public class BranchLinesRenderer : IBackgroundRenderer
                     var interVLine = textView.GetVisualLine(interLine);
                     if (interVLine != null)
                     {
-                        int interCol = Math.Min(block.StartColumn, Math.Max(0, interVLine.VisualLength));
-                        double interY = Math.Floor(interVLine.GetVisualPosition(interCol, VisualYPosition.LineMiddle).Y) + 0.5;
+                        double interY = Math.Floor(interVLine.VisualTop - textView.VerticalOffset + (interVLine.Height / 2.0)) + 0.5;
                         if (interY >= topY && interY <= bottomY)
                         {
                             drawingContext.DrawLine(LinePen, new Point(snapGuideX, interY), new Point(snapKeywordX, interY));

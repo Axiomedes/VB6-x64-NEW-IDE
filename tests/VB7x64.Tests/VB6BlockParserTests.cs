@@ -101,4 +101,72 @@ public class VB6BlockParserTests
         Assert.Equal(4, ifBlock.IntermediateLines[0]); // ElseIf
         Assert.Equal(6, ifBlock.IntermediateLines[1]); // Else
     }
+
+    [Fact]
+    public void ParseBlocks_IgnoresDeclarationsAndTypeEnum()
+    {
+        string code = """
+            Option Explicit
+            Private Type Customer
+                ID As Long
+                Name As String
+            End Type
+            Private Enum Status
+                Pending = 0
+                Active = 1
+            End Enum
+            Private Declare Sub Sleep Lib "kernel32" (ByVal ms As Long)
+
+            Public Sub DoWork()
+                If True Then
+                    ' code
+                End If
+            End Sub
+            """;
+
+        var blocks = VB6BlockParser.ParseBlocks(code);
+
+        // Solo debe retornar el procedimiento 'DoWork', nada de Type, Enum o declaraciones
+        Assert.Single(blocks);
+        Assert.Equal("Sub", blocks[0].BlockType);
+        Assert.Equal(12, blocks[0].StartLine);
+        Assert.Equal(16, blocks[0].EndLine);
+    }
+
+    [Fact]
+    public void ParseBlocks_DiscardsUnclosedProcedureAtEOF()
+    {
+        string code = """
+            Public Sub Incomplete()
+                Dim x As Integer
+                If x > 0 Then
+                    MsgBox "Test"
+            """;
+
+        var blocks = VB6BlockParser.ParseBlocks(code);
+
+        // No debe retornar ningún bloque incompleto que se extienda indefinidamente
+        Assert.Empty(blocks);
+    }
+
+    [Fact]
+    public void ParseBlocks_SupportsMultilineIfWithUnderscore()
+    {
+        string code = """
+            Public Sub Test()
+                If x > 10 And _
+                   y > 20 Then
+                    MsgBox "Multi-line If"
+                End If
+            End Sub
+            """;
+
+        var blocks = VB6BlockParser.ParseBlocks(code);
+
+        Assert.Single(blocks);
+        Assert.Single(blocks[0].Children);
+        Assert.Equal("If", blocks[0].Children[0].BlockType);
+        Assert.Equal(2, blocks[0].Children[0].StartLine);
+        Assert.Equal(5, blocks[0].Children[0].EndLine);
+    }
 }

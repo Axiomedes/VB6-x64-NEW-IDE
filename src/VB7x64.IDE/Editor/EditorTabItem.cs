@@ -18,6 +18,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
     public TextEditor Editor { get; }
     public CurrentLineHighlighter CurrentLineHighlighter { get; }
     public BranchLinesRenderer BranchLinesRenderer { get; }
+    public BranchLinesMargin BranchLinesMargin { get; }
     private readonly ComboBox _cmbProcedures;
 
     public event Action<int, int>? CaretPositionChanged;
@@ -61,9 +62,11 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
 
         CurrentLineHighlighter = new CurrentLineHighlighter(Editor);
         BranchLinesRenderer = new BranchLinesRenderer(Editor);
+        BranchLinesMargin = new BranchLinesMargin(Editor, BranchLinesRenderer);
 
         Editor.TextArea.TextView.BackgroundRenderers.Add(CurrentLineHighlighter);
         Editor.TextArea.TextView.BackgroundRenderers.Add(BranchLinesRenderer);
+        EnsureLeftMargins();
 
         ApplyThemeSettings(settings);
 
@@ -257,6 +260,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         Editor.FontFamily = new FontFamily(settings.FontFamily);
         Editor.FontSize = settings.FontSize;
         Editor.ShowLineNumbers = settings.ShowLineNumbers;
+        EnsureLeftMargins();
         Editor.Options.IndentationSize = settings.TabSize;
 
         try
@@ -308,7 +312,27 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         }
         catch { }
 
+        BranchLinesMargin.InvalidateVisual();
         Editor.TextArea?.TextView?.Redraw();
+    }
+
+    public void EnsureLeftMargins()
+    {
+        if (Editor.TextArea != null && BranchLinesMargin != null)
+        {
+            if (!Editor.TextArea.LeftMargins.Contains(BranchLinesMargin))
+            {
+                Editor.TextArea.LeftMargins.Add(BranchLinesMargin);
+            }
+
+            foreach (var margin in Editor.TextArea.LeftMargins)
+            {
+                if (margin is ICSharpCode.AvalonEdit.Editing.LineNumberMargin lnm)
+                {
+                    lnm.Margin = new Thickness(0, 0, 4, 0);
+                }
+            }
+        }
     }
 
     public void SetCurrentLineHighlightEnabled(bool enabled)
@@ -321,6 +345,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
     {
         BranchLinesRenderer.IsEnabled = enabled;
         Editor.TextArea?.TextView?.InvalidateLayer(ICSharpCode.AvalonEdit.Rendering.KnownLayer.Background);
+        BranchLinesMargin.InvalidateVisual();
     }
 
     protected void OnPropertyChanged(string propertyName)

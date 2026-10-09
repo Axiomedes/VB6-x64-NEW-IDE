@@ -12,6 +12,7 @@ using VB7x64.IDE.Editor;
 using VB7x64.IDE.Logging;
 using VB7x64.IDE.Settings;
 using VB7x64.ProjectModel.Documents;
+using VB7x64.ProjectModel.Navigation;
 using VB7x64.ProjectModel.Settings;
 using VB7x64.ProjectModel.Vbp;
 
@@ -75,6 +76,10 @@ public partial class MainWindow : Window
         BtnToolbarToggleLineHighlight.IsChecked = _settings.EnableCurrentLineHighlight;
         MenuToggleBranchLines.IsChecked = _settings.EnableBranchLines;
         BtnToolbarToggleBranchLines.IsChecked = _settings.EnableBranchLines;
+        MenuToggleEndOfLineDetails.IsChecked = _settings.EnableEndOfLineDetails;
+        BtnToolbarToggleEndOfLineDetails.IsChecked = _settings.EnableEndOfLineDetails;
+
+        UpdateExplorerModeUI();
 
         PreviewKeyDown += MainWindow_PreviewKeyDown;
 
@@ -320,23 +325,7 @@ public partial class MainWindow : Window
             _currentProjectGroup = group;
             _currentProject = group.StartupProject ?? group.Projects.FirstOrDefault();
 
-            ProjectTreeView.Items.Clear();
-
-            var groupRoot = new TreeViewItem
-            {
-                Header = $"💼 Grupo de Proyectos: {group.Name} ({Path.GetFileName(group.GroupFilePath)})",
-                IsExpanded = true,
-                FontWeight = FontWeights.Bold
-            };
-
-            foreach (var project in group.Projects)
-            {
-                bool isStartup = project == group.StartupProject;
-                var prjNode = CreateProjectNode(project, isStartup);
-                groupRoot.Items.Add(prjNode);
-            }
-
-            ProjectTreeView.Items.Add(groupRoot);
+            RefreshProjectTree();
             SetStatusMessage($"Grupo de proyectos '{group.Name}' cargado con {group.Projects.Count} proyectos.");
             Title = $"VB7-x64 IDE - [Grupo] {group.Name} ({Path.GetFileName(group.GroupFilePath)})";
 
@@ -360,10 +349,7 @@ public partial class MainWindow : Window
             _currentProject = project;
             _currentProjectGroup = null;
 
-            ProjectTreeView.Items.Clear();
-            var prjNode = CreateProjectNode(project, false);
-            ProjectTreeView.Items.Add(prjNode);
-
+            RefreshProjectTree();
             SetStatusMessage($"Proyecto '{project.Name}' cargado exitosamente.");
             Title = $"VB7-x64 IDE - {project.Name} ({Path.GetFileName(project.ProjectFilePath)})";
 
@@ -379,8 +365,78 @@ public partial class MainWindow : Window
         }
     }
 
-    private static TreeViewItem CreateProjectNode(VB6Project project, bool isStartup)
+    public void RefreshProjectTree()
     {
+        string filter = TxtProjectSearch?.Text.Trim() ?? "";
+
+        if (_currentProjectGroup != null)
+        {
+            ProjectTreeView.Items.Clear();
+            var groupRoot = new TreeViewItem
+            {
+                Header = $"💼 Grupo de Proyectos: {_currentProjectGroup.Name} ({Path.GetFileName(_currentProjectGroup.GroupFilePath)})",
+                IsExpanded = true,
+                FontWeight = FontWeights.Bold
+            };
+
+            foreach (var project in _currentProjectGroup.Projects)
+            {
+                bool isStartup = project == _currentProjectGroup.StartupProject;
+                var prjNode = CreateProjectNode(project, isStartup, filter, _settings.ProjectExplorerMode);
+                if (prjNode != null)
+                {
+                    groupRoot.Items.Add(prjNode);
+                }
+            }
+
+            if (groupRoot.Items.Count > 0)
+            {
+                ProjectTreeView.Items.Add(groupRoot);
+            }
+            else
+            {
+                ProjectTreeView.Items.Add(new TreeViewItem
+                {
+                    Header = "No se encontraron coincidencias para la búsqueda",
+                    Foreground = Brushes.Gray,
+                    FontStyle = FontStyles.Italic
+                });
+            }
+        }
+        else if (_currentProject != null)
+        {
+            ProjectTreeView.Items.Clear();
+            var prjNode = CreateProjectNode(_currentProject, false, filter, _settings.ProjectExplorerMode);
+            if (prjNode != null)
+            {
+                ProjectTreeView.Items.Add(prjNode);
+            }
+            else
+            {
+                ProjectTreeView.Items.Add(new TreeViewItem
+                {
+                    Header = "No se encontraron coincidencias para la búsqueda",
+                    Foreground = Brushes.Gray,
+                    FontStyle = FontStyles.Italic
+                });
+            }
+        }
+        else
+        {
+            ProjectTreeView.Items.Clear();
+            ProjectTreeView.Items.Add(new TreeViewItem
+            {
+                Header = "Ningún proyecto abierto",
+                IsSelected = true,
+                Foreground = Brushes.Gray,
+                FontStyle = FontStyles.Italic
+            });
+        }
+    }
+
+    private TreeViewItem? CreateProjectNode(VB6Project project, bool isStartup, string filter, ProjectExplorerMode mode)
+    {
+        bool hasFilter = !string.IsNullOrEmpty(filter);
         string title = isStartup
             ? $"📁 {project.Name} ({Path.GetFileName(project.ProjectFilePath)}) [Inicio]"
             : $"📁 {project.Name} ({Path.GetFileName(project.ProjectFilePath)})";
@@ -392,87 +448,169 @@ public partial class MainWindow : Window
             FontWeight = isStartup ? FontWeights.Bold : FontWeights.SemiBold
         };
 
-        // Formularios
-        if (project.Forms.Any())
+        int totalMatches = 0;
+
+        void AddCategory(string headerTitle, IEnumerable<ProjectItem> items)
         {
-            var formsFolder = new TreeViewItem { Header = $"🗔 Formularios ({project.Forms.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
-            foreach (var form in project.Forms)
+            var itemList = items.ToList();
+            if (itemList.Count == 0) return;
+
+            var folderItem = new TreeViewItem
             {
-                formsFolder.Items.Add(CreateProjectItemNode(form));
+                Header = $"{headerTitle} ({itemList.Count})",
+                IsExpanded = hasFilter,
+                FontWeight = FontWeights.SemiBold
+            };
+
+            int folderMatches = 0;
+            foreach (var item in itemList)
+            {
+                var itemNode = CreateProjectItemNode(item, filter, mode);
+                if (itemNode != null)
+                {
+                    folderItem.Items.Add(itemNode);
+                    folderMatches++;
+                }
             }
-            rootItem.Items.Add(formsFolder);
+
+            if (folderMatches > 0)
+            {
+                totalMatches += folderMatches;
+                rootItem.Items.Add(folderItem);
+            }
         }
 
-        // Módulos
-        if (project.Modules.Any())
-        {
-            var modulesFolder = new TreeViewItem { Header = $"📜 Módulos ({project.Modules.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
-            foreach (var mod in project.Modules)
-            {
-                modulesFolder.Items.Add(CreateProjectItemNode(mod));
-            }
-            rootItem.Items.Add(modulesFolder);
-        }
-
-        // Clases
-        if (project.Classes.Any())
-        {
-            var classesFolder = new TreeViewItem { Header = $"🧩 Módulos de Clase ({project.Classes.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
-            foreach (var cls in project.Classes)
-            {
-                classesFolder.Items.Add(CreateProjectItemNode(cls));
-            }
-            rootItem.Items.Add(classesFolder);
-        }
-
-        // Controles de Usuario
-        if (project.UserControls.Any())
-        {
-            var ucFolder = new TreeViewItem { Header = $"🎛️ Controles de Usuario ({project.UserControls.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
-            foreach (var uc in project.UserControls)
-            {
-                ucFolder.Items.Add(CreateProjectItemNode(uc));
-            }
-            rootItem.Items.Add(ucFolder);
-        }
+        AddCategory("🗔 Formularios", project.Forms);
+        AddCategory("📜 Módulos", project.Modules);
+        AddCategory("🧩 Módulos de Clase", project.Classes);
+        AddCategory("🎛️ Controles de Usuario", project.UserControls);
 
         // Referencias
         if (project.References.Any())
         {
-            var refFolder = new TreeViewItem { Header = $"🔗 Referencias ({project.References.Count})", IsExpanded = false, FontWeight = FontWeights.Normal };
-            foreach (var r in project.References)
+            var matchingRefs = project.References
+                .Where(r => !hasFilter || r.DisplayTitle.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (matchingRefs.Count > 0)
             {
-                var refNode = new TreeViewItem
+                var refFolder = new TreeViewItem
                 {
-                    Header = $"• {r.DisplayTitle}",
-                    Foreground = Brushes.Gray,
+                    Header = $"🔗 Referencias ({project.References.Count})",
+                    IsExpanded = false,
                     FontWeight = FontWeights.Normal
                 };
-                refFolder.Items.Add(refNode);
+
+                foreach (var r in matchingRefs)
+                {
+                    refFolder.Items.Add(new TreeViewItem
+                    {
+                        Header = $"• {r.DisplayTitle}",
+                        Foreground = Brushes.Gray,
+                        FontWeight = FontWeights.Normal
+                    });
+                }
+                rootItem.Items.Add(refFolder);
+                totalMatches += matchingRefs.Count;
             }
-            rootItem.Items.Add(refFolder);
+        }
+
+        if (hasFilter && totalMatches == 0 && !project.Name.Contains(filter, StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
         }
 
         return rootItem;
     }
 
-    private static TreeViewItem CreateProjectItemNode(ProjectItem item)
+    private TreeViewItem? CreateProjectItemNode(ProjectItem item, string filter, ProjectExplorerMode mode)
     {
+        bool hasFilter = !string.IsNullOrEmpty(filter);
+        bool fileMatches = !hasFilter || item.DisplayTitle.Contains(filter, StringComparison.OrdinalIgnoreCase);
+
         var node = new TreeViewItem
         {
             Header = $"{item.DisplayIcon} {item.DisplayTitle}" + (!item.FileExists ? " (No encontrado)" : ""),
             Tag = item,
-            FontWeight = FontWeights.Normal
+            FontWeight = FontWeights.Normal,
+            IsExpanded = hasFilter
         };
 
         if (!item.FileExists)
         {
             node.Foreground = Brushes.Crimson;
             node.ToolTip = $"El archivo no fue encontrado en: {item.AbsolutePath}";
+            return fileMatches ? node : null;
+        }
+
+        node.ToolTip = item.AbsolutePath;
+
+        // Si estamos en modo Avanzado y es un archivo de código editable, parsear miembros
+        if (mode == ProjectExplorerMode.Advanced && item.IsEditable)
+        {
+            List<CodeMemberSymbol> members = [];
+            try
+            {
+                string text = "";
+                // Si está abierto en un tab, usar el texto en vivo
+                foreach (var tabObj in DocumentsTabControl.Items)
+                {
+                    if (tabObj is EditorTabItem openTab &&
+                        string.Equals(Path.GetFullPath(openTab.Document.FilePath), Path.GetFullPath(item.AbsolutePath), StringComparison.OrdinalIgnoreCase))
+                    {
+                        text = openTab.Editor.Text;
+                        break;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(text))
+                {
+                    text = SafeFileStorage.LoadDocument(item.AbsolutePath).Text;
+                }
+
+                members = CodeStructureParser.ParseMembers(text, item.AbsolutePath);
+            }
+            catch
+            {
+                members = [];
+            }
+
+            int matchingMembers = 0;
+            foreach (var member in members)
+            {
+                bool memberMatches = !hasFilter ||
+                    member.Name.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
+                    member.DisplayText.Contains(filter, StringComparison.OrdinalIgnoreCase);
+
+                if (memberMatches)
+                {
+                    matchingMembers++;
+                    var memberNode = new TreeViewItem
+                    {
+                        Header = member.DisplayText,
+                        Tag = member,
+                        FontWeight = FontWeights.Normal,
+                        ToolTip = $"{member.DisplayText}\nLínea {member.LineNumber}\n{member.SourceFilePath}"
+                    };
+                    node.Items.Add(memberNode);
+                }
+            }
+
+            if (hasFilter)
+            {
+                if (!fileMatches && matchingMembers == 0)
+                {
+                    return null;
+                }
+                node.IsExpanded = true;
+            }
         }
         else
         {
-            node.ToolTip = item.AbsolutePath;
+            if (hasFilter && !fileMatches)
+            {
+                return null;
+            }
         }
 
         return node;
@@ -480,20 +618,77 @@ public partial class MainWindow : Window
 
     private void ProjectTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if (ProjectTreeView.SelectedItem is TreeViewItem { Tag: ProjectItem item })
+        if (ProjectTreeView.SelectedItem is TreeViewItem selItem)
         {
-            if (!item.FileExists)
+            if (selItem.Tag is CodeMemberSymbol sym)
             {
-                MessageBox.Show($"El archivo '{item.DisplayTitle}' no existe en la ruta esperada:\n\n{item.AbsolutePath}",
-                    "Archivo no encontrado", MessageBoxButton.OK, MessageBoxImage.Warning);
+                var tab = OpenFile(sym.SourceFilePath);
+                if (tab != null && sym.LineNumber > 0 && sym.LineNumber <= tab.Editor.Document.LineCount)
+                {
+                    var line = tab.Editor.Document.GetLineByNumber(sym.LineNumber);
+                    tab.Editor.CaretOffset = line.Offset;
+                    tab.Editor.ScrollToLine(sym.LineNumber);
+                    tab.Editor.Focus();
+                }
+                e.Handled = true;
                 return;
             }
 
-            if (item.IsEditable)
+            if (selItem.Tag is ProjectItem item)
             {
-                OpenFile(item.AbsolutePath);
+                if (!item.FileExists)
+                {
+                    MessageBox.Show($"El archivo '{item.DisplayTitle}' no existe en la ruta esperada:\n\n{item.AbsolutePath}",
+                        "Archivo no encontrado", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (item.IsEditable)
+                {
+                    OpenFile(item.AbsolutePath);
+                }
+                e.Handled = true;
             }
         }
+    }
+
+    private void UpdateExplorerModeUI()
+    {
+        bool isAdvanced = _settings.ProjectExplorerMode == ProjectExplorerMode.Advanced;
+        MenuExplorerMode.IsChecked = isAdvanced;
+        MenuExplorerMode.Header = isAdvanced ? "Modo de Explorador: _Avanzado (activo)" : "Modo de Explorador: _Estándar (activo)";
+        TxtExplorerModeIcon.Text = isAdvanced ? "⚡" : "📁";
+        BtnToggleExplorerMode.ToolTip = isAdvanced
+            ? "Modo de Explorador: Avanzado (clic para cambiar a Estándar)"
+            : "Modo de Explorador: Estándar (clic para cambiar a Avanzado)";
+    }
+
+    private void BtnToggleExplorerMode_Click(object sender, RoutedEventArgs e)
+    {
+        _settings.ProjectExplorerMode = _settings.ProjectExplorerMode == ProjectExplorerMode.Advanced
+            ? ProjectExplorerMode.Standard
+            : ProjectExplorerMode.Advanced;
+        _settings.Save();
+        UpdateExplorerModeUI();
+        RefreshProjectTree();
+        SetStatusMessage($"Modo de Explorador cambiado a: {(_settings.ProjectExplorerMode == ProjectExplorerMode.Advanced ? "Avanzado" : "Estándar")}.");
+    }
+
+    private void MenuExplorerMode_Click(object sender, RoutedEventArgs e)
+    {
+        BtnToggleExplorerMode_Click(sender, e);
+    }
+
+    private void TxtProjectSearch_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        string filter = TxtProjectSearch.Text.Trim();
+        BtnClearSearch.Visibility = string.IsNullOrEmpty(filter) ? Visibility.Collapsed : Visibility.Visible;
+        RefreshProjectTree();
+    }
+
+    private void BtnClearSearch_Click(object sender, RoutedEventArgs e)
+    {
+        TxtProjectSearch.Text = string.Empty;
     }
     #endregion
 
@@ -753,6 +948,9 @@ public partial class MainWindow : Window
                     tab.ApplyThemeSettings(_settings);
                 }
             }
+
+            UpdateExplorerModeUI();
+            RefreshProjectTree();
         }
     }
     #endregion
@@ -869,6 +1067,33 @@ public partial class MainWindow : Window
         }
 
         SetStatusMessage(enabled ? "Guías de bloques (Branch Lines) activadas." : "Guías de bloques desactivadas.");
+    }
+
+    private void MenuToggleEndOfLineDetails_Click(object sender, RoutedEventArgs e)
+    {
+        SetEndOfLineDetailsState(MenuToggleEndOfLineDetails.IsChecked);
+    }
+
+    private void BtnToolbarToggleEndOfLineDetails_Click(object sender, RoutedEventArgs e)
+    {
+        SetEndOfLineDetailsState(BtnToolbarToggleEndOfLineDetails.IsChecked == true);
+    }
+
+    private void SetEndOfLineDetailsState(bool enabled)
+    {
+        _settings.EnableEndOfLineDetails = enabled;
+        MenuToggleEndOfLineDetails.IsChecked = enabled;
+        BtnToolbarToggleEndOfLineDetails.IsChecked = enabled;
+
+        foreach (var item in DocumentsTabControl.Items)
+        {
+            if (item is EditorTabItem tab)
+            {
+                tab.SetEndOfLineDetailsEnabled(enabled);
+            }
+        }
+
+        SetStatusMessage(enabled ? "Detalles de fin de bloque (Inlay Hints) activados." : "Detalles de fin de bloque desactivados.");
     }
 
     private void MenuCommentBlock_Click(object sender, RoutedEventArgs e)

@@ -18,6 +18,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
     public TextEditor Editor { get; }
     public CurrentLineHighlighter CurrentLineHighlighter { get; }
     public BranchLinesRenderer BranchLinesRenderer { get; }
+    public EndOfLineDetailsRenderer EndOfLineDetailsRenderer { get; }
     private readonly ComboBox _cmbProcedures;
 
     public event Action<int, int>? CaretPositionChanged;
@@ -61,9 +62,11 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
 
         CurrentLineHighlighter = new CurrentLineHighlighter(Editor);
         BranchLinesRenderer = new BranchLinesRenderer(Editor);
+        EndOfLineDetailsRenderer = new EndOfLineDetailsRenderer(Editor);
 
         Editor.TextArea.TextView.BackgroundRenderers.Add(CurrentLineHighlighter);
         Editor.TextArea.TextView.BackgroundRenderers.Add(BranchLinesRenderer);
+        Editor.TextArea.TextView.BackgroundRenderers.Add(EndOfLineDetailsRenderer);
         EnsureLeftMargins();
 
         ApplyThemeSettings(settings);
@@ -310,6 +313,17 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         }
         catch { }
 
+        EndOfLineDetailsRenderer.IsEnabled = settings.EnableEndOfLineDetails;
+        EndOfLineDetailsRenderer.MinLines = settings.EndOfLineDetailsMinLines;
+        try
+        {
+            if (ColorConverter.ConvertFromString(settings.EndOfLineDetailsColor) is Color eolColor)
+            {
+                EndOfLineDetailsRenderer.UpdateColor(eolColor);
+            }
+        }
+        catch { }
+
         Editor.TextArea?.TextView?.Redraw();
     }
 
@@ -366,6 +380,12 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
     public void SetBranchLinesEnabled(bool enabled)
     {
         BranchLinesRenderer.IsEnabled = enabled;
+        Editor.TextArea?.TextView?.InvalidateLayer(ICSharpCode.AvalonEdit.Rendering.KnownLayer.Background);
+    }
+
+    public void SetEndOfLineDetailsEnabled(bool enabled)
+    {
+        EndOfLineDetailsRenderer.IsEnabled = enabled;
         Editor.TextArea?.TextView?.InvalidateLayer(ICSharpCode.AvalonEdit.Rendering.KnownLayer.Background);
     }
 

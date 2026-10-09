@@ -34,6 +34,12 @@ public class AppSettings
     public string CurrentLineHighlightColor { get; set; } = "#F0F4FA";
     public bool EnableBranchLines { get; set; } = true;
     public string BranchLinesColor { get; set; } = "#D0D0D0";
+    public bool EnableEndOfLineDetails { get; set; } = true;
+    public string EndOfLineDetailsColor { get; set; } = "#8A8A8A";
+    public int EndOfLineDetailsMinLines { get; set; } = 5;
+
+    // Modo del Explorador de Proyectos: Estándar vs Avanzado
+    public ProjectExplorerMode ProjectExplorerMode { get; set; } = ProjectExplorerMode.Advanced;
     
     public double WindowWidth { get; set; } = 1100;
     public double WindowHeight { get; set; } = 720;
@@ -126,6 +132,7 @@ public class AppSettings
                 ConstantColor = "#4FC1FF";
                 CurrentLineHighlightColor = "#2A2D2E";
                 BranchLinesColor = "#454545";
+                EndOfLineDetailsColor = "#6A737D";
                 break;
 
             case "contrast":
@@ -143,6 +150,7 @@ public class AppSettings
                 ConstantColor = "#FF00FF";
                 CurrentLineHighlightColor = "#262626";
                 BranchLinesColor = "#FFFF00";
+                EndOfLineDetailsColor = "#00FFFF";
                 break;
 
             default:
@@ -159,7 +167,14 @@ public class AppSettings
                 ConstantColor = "#000080";
                 CurrentLineHighlightColor = "#F0F4FA";
                 BranchLinesColor = "#D0D0D0";
+                EndOfLineDetailsColor = "#8A8A8A";
                 break;
         }
     }
+}
+
+public enum ProjectExplorerMode
+{
+    Standard,
+    Advanced
 }

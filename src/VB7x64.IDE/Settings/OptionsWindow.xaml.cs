@@ -51,6 +51,8 @@ public partial class OptionsWindow : Window
         ChkCreateBak.IsChecked = _settings.CreateBackupBeforeSave;
         ChkCurrentLineHighlight.IsChecked = _settings.EnableCurrentLineHighlight;
         ChkBranchLines.IsChecked = _settings.EnableBranchLines;
+        ChkEndOfLineDetails.IsChecked = _settings.EnableEndOfLineDetails;
+        CmbProjectExplorerMode.SelectedIndex = _settings.ProjectExplorerMode == ProjectExplorerMode.Standard ? 0 : 1;
 
         // 4. Codificaciones comunes
         CmbEncoding.ItemsSource = new List<string> { "Windows-1252", "ISO-8859-1", "UTF-8", "Unicode (UTF-16)" };
@@ -69,6 +71,7 @@ public partial class OptionsWindow : Window
         TxtLineNumbersColor.Text = _settings.LineNumbersColor;
         TxtCurrentLineColor.Text = _settings.CurrentLineHighlightColor;
         TxtBranchLinesColor.Text = _settings.BranchLinesColor;
+        TxtEndOfLineDetailsColor.Text = _settings.EndOfLineDetailsColor;
 
         _activeTextBox = TxtBgColor;
 
@@ -140,6 +143,7 @@ public partial class OptionsWindow : Window
         var lineNum = TryGetBrush(TxtLineNumbersColor.Text, Brushes.Gray);
         var curLine = TryGetBrush(TxtCurrentLineColor.Text, new SolidColorBrush(Color.FromRgb(240, 244, 250)));
         var branch = TryGetBrush(TxtBranchLinesColor.Text, new SolidColorBrush(Color.FromRgb(208, 208, 208)));
+        var eol = TryGetBrush(TxtEndOfLineDetailsColor.Text, new SolidColorBrush(Color.FromRgb(138, 138, 138)));
 
         SwatchBg.Background = bg;
         SwatchFg.Background = fg;
@@ -153,6 +157,7 @@ public partial class OptionsWindow : Window
         SwatchLineNumbers.Background = lineNum;
         SwatchCurrentLine.Background = curLine;
         SwatchBranchLines.Background = branch;
+        SwatchEndOfLineDetails.Background = eol;
 
         // Actualizar vista previa en tiempo real
         PreviewBorder.Background = bg;
@@ -202,7 +207,11 @@ public partial class OptionsWindow : Window
             PreviewTextBlock.Inlines.Add(new Run("vbInformation") { Foreground = constant });
             PreviewTextBlock.Inlines.Add(new Run(")") { Foreground = fg });
         });
-        AddLine(8, () => PreviewTextBlock.Inlines.Add(new Run("End Sub") { Foreground = kw, FontWeight = FontWeights.Bold }));
+        AddLine(8, () =>
+        {
+            PreviewTextBlock.Inlines.Add(new Run("End Sub") { Foreground = kw, FontWeight = FontWeights.Bold });
+            PreviewTextBlock.Inlines.Add(new Run("  ' [Public Sub CalcularTotal]") { Foreground = eol, FontStyle = FontStyles.Italic });
+        });
     }
 
     private static SolidColorBrush TryGetBrush(string hex, Brush fallback)
@@ -239,7 +248,8 @@ public partial class OptionsWindow : Window
             num: "#000000",
             lineNum: "#2B91AF",
             curLine: "#F0F4FA",
-            branch: "#D0D0D0"
+            branch: "#D0D0D0",
+            eol: "#8A8A8A"
         );
     }
 
@@ -257,7 +267,8 @@ public partial class OptionsWindow : Window
             num: "#B5CEA8",
             lineNum: "#858585",
             curLine: "#2A2D2E",
-            branch: "#454545"
+            branch: "#454545",
+            eol: "#6A737D"
         );
     }
 
@@ -275,11 +286,12 @@ public partial class OptionsWindow : Window
             num: "#FFFF80",
             lineNum: "#FFFF00",
             curLine: "#262626",
-            branch: "#FFFF00"
+            branch: "#FFFF00",
+            eol: "#00FFFF"
         );
     }
 
-    private void SetThemeValues(string bg, string fg, string kw, string method, string comment, string str, string type, string constant, string num, string lineNum, string curLine, string branch)
+    private void SetThemeValues(string bg, string fg, string kw, string method, string comment, string str, string type, string constant, string num, string lineNum, string curLine, string branch, string eol)
     {
         _isInitializing = true;
         TxtBgColor.Text = bg;
@@ -294,6 +306,7 @@ public partial class OptionsWindow : Window
         TxtLineNumbersColor.Text = lineNum;
         TxtCurrentLineColor.Text = curLine;
         TxtBranchLinesColor.Text = branch;
+        TxtEndOfLineDetailsColor.Text = eol;
         _isInitializing = false;
 
         UpdateSwatchesAndPreview();
@@ -308,6 +321,8 @@ public partial class OptionsWindow : Window
         _settings.CreateBackupBeforeSave = ChkCreateBak.IsChecked == true;
         _settings.EnableCurrentLineHighlight = ChkCurrentLineHighlight.IsChecked == true;
         _settings.EnableBranchLines = ChkBranchLines.IsChecked == true;
+        _settings.EnableEndOfLineDetails = ChkEndOfLineDetails.IsChecked == true;
+        _settings.ProjectExplorerMode = CmbProjectExplorerMode.SelectedIndex == 0 ? ProjectExplorerMode.Standard : ProjectExplorerMode.Advanced;
         if (CmbEncoding.SelectedItem is string enc) _settings.DefaultEncoding = enc;
 
         // Guardar configuración de colores
@@ -323,6 +338,7 @@ public partial class OptionsWindow : Window
         _settings.LineNumbersColor = TxtLineNumbersColor.Text.Trim();
         _settings.CurrentLineHighlightColor = TxtCurrentLineColor.Text.Trim();
         _settings.BranchLinesColor = TxtBranchLinesColor.Text.Trim();
+        _settings.EndOfLineDetailsColor = TxtEndOfLineDetailsColor.Text.Trim();
 
         _settings.Save();
         DialogResult = true;

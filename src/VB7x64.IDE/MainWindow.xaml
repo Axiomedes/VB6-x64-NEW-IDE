@@ -56,6 +56,7 @@
             </MenuItem>
             <MenuItem Header="_Ver">
                 <MenuItem x:Name="MenuToggleProjectExplorer" Header="_Explorador de Proyectos" IsCheckable="True" IsChecked="True" Click="MenuToggleProjectExplorer_Click"/>
+                <MenuItem x:Name="MenuExplorerMode" Header="Modo de Explorador: _Avanzado" IsCheckable="True" IsChecked="True" Click="MenuExplorerMode_Click"/>
                 <MenuItem x:Name="MenuToggleOutput" Header="Panel de _Salida / Logs" IsCheckable="True" IsChecked="False" Click="MenuToggleOutput_Click"/>
                 <MenuItem x:Name="MenuToggleStatusBar" Header="_Barra de Estado" IsCheckable="True" IsChecked="True" Click="MenuToggleStatusBar_Click"/>
                 <Separator/>
@@ -64,6 +65,7 @@
             <MenuItem Header="_Funciones Avanzadas VB7">
                 <MenuItem x:Name="MenuToggleLineHighlight" Header="Resaltar _Línea Activa" IsCheckable="True" IsChecked="True" Click="MenuToggleLineHighlight_Click"/>
                 <MenuItem x:Name="MenuToggleBranchLines" Header="Guías de _Estructura (Branch Lines)" IsCheckable="True" IsChecked="True" Click="MenuToggleBranchLines_Click"/>
+                <MenuItem x:Name="MenuToggleEndOfLineDetails" Header="Detalles de _Fin de Bloque (Inlay Hints)" IsCheckable="True" IsChecked="True" Click="MenuToggleEndOfLineDetails_Click"/>
                 <Separator/>
                 <MenuItem Header="_Comentar Bloque" InputGestureText="Ctrl+K, Ctrl+C" Click="MenuCommentBlock_Click"/>
                 <MenuItem Header="_Descomentar Bloque" InputGestureText="Ctrl+K, Ctrl+U" Click="MenuUncommentBlock_Click"/>
@@ -145,6 +147,9 @@
                 <ToggleButton x:Name="BtnToolbarToggleBranchLines" ToolTip="Alternar Guías de Estructura de Bloques (Branch Lines)" IsChecked="True" Click="BtnToolbarToggleBranchLines_Click" Width="28" Height="24" Padding="0">
                     <TextBlock Text="🌿" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </ToggleButton>
+                <ToggleButton x:Name="BtnToolbarToggleEndOfLineDetails" ToolTip="Alternar Detalles de Fin de Bloque (Inlay Hints)" IsChecked="True" Click="BtnToolbarToggleEndOfLineDetails_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="🏷️" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </ToggleButton>
                 <Separator/>
                 <Menu Background="Transparent" VerticalAlignment="Center">
                     <MenuItem ToolTip="Cambiar Mayúsculas / Minúsculas" Header="🔤" Padding="4,2" FontSize="13">
@@ -177,16 +182,35 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         
                         <Border Grid.Row="0" Background="#E8EEF5" BorderBrush="#C5D3E8" BorderThickness="0,0,0,1" Padding="6,4">
-                            <DockPanel>
+                            <DockPanel LastChildFill="True">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button x:Name="BtnToggleExplorerMode" ToolTip="Alternar Modo de Explorador (Estándar / Avanzado)" Width="22" Height="22" Padding="0" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="BtnToggleExplorerMode_Click">
+                                        <TextBlock x:Name="TxtExplorerModeIcon" Text="⚡" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Button>
+                                </StackPanel>
                                 <TextBlock Text="Explorador de Proyectos" FontWeight="SemiBold" FontSize="12" Foreground="#102A45" VerticalAlignment="Center"/>
                             </DockPanel>
                         </Border>
 
-                        <TreeView x:Name="ProjectTreeView" Grid.Row="1" BorderThickness="0" Padding="4" MouseDoubleClick="ProjectTreeView_MouseDoubleClick">
+                        <Border Grid.Row="1" Background="#F4F7FA" BorderBrush="#DCE4EC" BorderThickness="0,0,0,1" Padding="4,3">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="🔍" FontSize="11" Foreground="#888888" VerticalAlignment="Center" Margin="2,0,4,0"/>
+                                <TextBox x:Name="TxtProjectSearch" Grid.Column="1" Height="22" FontSize="11.5" VerticalContentAlignment="Center" BorderThickness="1" BorderBrush="#C0CAD4" Padding="3,1" ToolTip="Buscar archivos, módulos o procedimientos en tiempo real" TextChanged="TxtProjectSearch_TextChanged"/>
+                                <Button x:Name="BtnClearSearch" Grid.Column="2" Content="✕" Width="18" Height="20" Margin="2,0,0,0" FontSize="10" Background="Transparent" BorderThickness="0" Cursor="Hand" ToolTip="Limpiar búsqueda" Click="BtnClearSearch_Click" Visibility="Collapsed"/>
+                            </Grid>
+                        </Border>
+
+                        <TreeView x:Name="ProjectTreeView" Grid.Row="2" BorderThickness="0" Padding="4" MouseDoubleClick="ProjectTreeView_MouseDoubleClick">
                             <TreeViewItem Header="Ningún proyecto abierto" IsSelected="True" Foreground="#777777" FontStyle="Italic"/>
                         </TreeView>
                     </Grid>

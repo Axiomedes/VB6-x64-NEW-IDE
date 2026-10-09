@@ -49,6 +49,20 @@
                     <TextBlock Text="Funciones Avanzadas VB7:" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6" Foreground="#004488"/>
                     <CheckBox x:Name="ChkCurrentLineHighlight" Content="Habilitar resaltado de línea activa" Margin="0,0,0,8" FontSize="12"/>
                     <CheckBox x:Name="ChkBranchLines" Content="Habilitar guías de estructura de bloques (Branch Lines)" Margin="0,0,0,8" FontSize="12"/>
+                    <CheckBox x:Name="ChkEndOfLineDetails" Content="Habilitar detalles de fin de bloque (Inlay Hints)" Margin="0,0,0,8" FontSize="12"/>
+                    <Separator Margin="0,6,0,10"/>
+                    <TextBlock Text="Explorador de Proyectos:" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6" Foreground="#004488"/>
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Modo de Visualización:" VerticalAlignment="Center" FontSize="12"/>
+                        <ComboBox x:Name="CmbProjectExplorerMode" Grid.Column="1" Height="24">
+                            <ComboBoxItem Content="Estándar (Árbol clásico VB6 por tipos de archivo)"/>
+                            <ComboBoxItem Content="Avanzado (Árbol con miembros de código e inspección)"/>
+                        </ComboBox>
+                    </Grid>
                 </StackPanel>
             </TabItem>
             
@@ -204,6 +218,16 @@
                                     </Grid.ColumnDefinitions>
                                     <Border x:Name="SwatchBranchLines" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
                                     <TextBox x:Name="TxtBranchLinesColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+
+                                <TextBlock Text="Detalles Fin Bloque (Inlay Hints):" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchEndOfLineDetails" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtEndOfLineDetailsColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
                                 </Grid>
                             </StackPanel>
                         </Grid>

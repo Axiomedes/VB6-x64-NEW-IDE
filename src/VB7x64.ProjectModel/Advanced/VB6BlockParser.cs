@@ -350,11 +350,9 @@ public static class VB6BlockParser
     private static int GetIndentColumn(string rawLine)
     {
         int col = 0;
-        foreach (char c in rawLine)
+        while (col < rawLine.Length && char.IsWhiteSpace(rawLine[col]))
         {
-            if (c == ' ') col++;
-            else if (c == '\t') col += 4;
-            else break;
+            col++;
         }
         return col;
     }

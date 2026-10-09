@@ -169,4 +169,18 @@ public class VB6BlockParserTests
         Assert.Equal(2, blocks[0].Children[0].StartLine);
         Assert.Equal(5, blocks[0].Children[0].EndLine);
     }
+
+    [Fact]
+    public void ParseBlocks_SupportsTabIndentation()
+    {
+        string code = "Public Sub Test()\r\n\tIf x > 0 Then\r\n\t\tMsgBox \"Tab\"\r\n\tEnd If\r\nEnd Sub";
+
+        var blocks = VB6BlockParser.ParseBlocks(code);
+
+        Assert.Single(blocks);
+        Assert.Single(blocks[0].Children);
+        var ifBlock = blocks[0].Children[0];
+        Assert.Equal("If", ifBlock.BlockType);
+        Assert.Equal(1, ifBlock.StartColumn);
+    }
 }

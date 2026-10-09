@@ -321,6 +321,17 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         {
             Editor.TextArea.TextView.ClipToBounds = false;
 
+            // Eliminar la línea separadora punteada/continua que AvalonEdit inserta por defecto (DottedLineMargin / Line)
+            // para que no quede superpuesta con las líneas guía de bloques
+            for (int i = Editor.TextArea.LeftMargins.Count - 1; i >= 0; i--)
+            {
+                var m = Editor.TextArea.LeftMargins[i];
+                if (m is System.Windows.Shapes.Line || m.GetType().Name.Contains("DottedLine"))
+                {
+                    Editor.TextArea.LeftMargins.RemoveAt(i);
+                }
+            }
+
             bool hasLineNumbers = false;
             foreach (var margin in Editor.TextArea.LeftMargins)
             {

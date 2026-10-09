@@ -84,70 +84,70 @@
         <!-- 2. Barra de Herramientas Inicial -->
         <ToolBarTray Grid.Row="1" Background="#F0F0F0">
             <ToolBar Band="0" BandIndex="0">
-                <Button ToolTip="Abrir Proyecto o Grupo (Ctrl+O)" Click="MenuOpenProject_Click" Padding="4,2">
-                    <TextBlock Text="📂 Abrir Proy./Grupo" FontSize="12"/>
+                <Button ToolTip="Abrir Proyecto o Grupo (Ctrl+O)" Click="MenuOpenProject_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="📂" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
-                <Button ToolTip="Abrir Archivo" Click="MenuOpenFile_Click" Padding="4,2">
-                    <TextBlock Text="📄 Abrir Archivo" FontSize="12"/>
-                </Button>
-                <Separator/>
-                <Button x:Name="BtnSaveToolbar" ToolTip="Guardar (Ctrl+S)" Click="MenuSave_Click" Padding="4,2">
-                    <TextBlock Text="💾 Guardar" FontSize="12"/>
-                </Button>
-                <Button x:Name="BtnSaveAllToolbar" ToolTip="Guardar Todo (Ctrl+Shift+S)" Click="MenuSaveAll_Click" Padding="4,2">
-                    <TextBlock Text="💾 Guardar Todo" FontSize="12"/>
+                <Button ToolTip="Abrir Archivo" Click="MenuOpenFile_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="📄" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
                 <Separator/>
-                <Button ToolTip="Deshacer (Ctrl+Z)" Click="MenuUndo_Click" Padding="4,2">
-                    <TextBlock Text="↩ Deshacer" FontSize="12"/>
+                <Button x:Name="BtnSaveToolbar" ToolTip="Guardar (Ctrl+S)" Click="MenuSave_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="💾" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
-                <Button ToolTip="Rehacer (Ctrl+Y)" Click="MenuRedo_Click" Padding="4,2">
-                    <TextBlock Text="↪ Rehacer" FontSize="12"/>
-                </Button>
-                <Separator/>
-                <Button ToolTip="Cortar (Ctrl+X)" Click="MenuCut_Click" Padding="4,2">
-                    <TextBlock Text="✂ Cortar" FontSize="12"/>
-                </Button>
-                <Button ToolTip="Copiar (Ctrl+C)" Click="MenuCopy_Click" Padding="4,2">
-                    <TextBlock Text="📋 Copiar" FontSize="12"/>
-                </Button>
-                <Button ToolTip="Pegar (Ctrl+V)" Click="MenuPaste_Click" Padding="4,2">
-                    <TextBlock Text="📑 Pegar" FontSize="12"/>
+                <Button x:Name="BtnSaveAllToolbar" ToolTip="Guardar Todo (Ctrl+Shift+S)" Click="MenuSaveAll_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="🗄️" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
                 <Separator/>
-                <Button ToolTip="Buscar (Ctrl+F)" Click="MenuFind_Click" Padding="4,2">
-                    <TextBlock Text="🔍 Buscar" FontSize="12"/>
+                <Button ToolTip="Deshacer (Ctrl+Z)" Click="MenuUndo_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="↩" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
-                <Button ToolTip="Buscar en Proyecto (Ctrl+Shift+F)" Click="MenuFindInProject_Click" Padding="4,2">
-                    <TextBlock Text="🔎 Buscar en Proy." FontSize="12"/>
+                <Button ToolTip="Rehacer (Ctrl+Y)" Click="MenuRedo_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="↪" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Separator/>
+                <Button ToolTip="Cortar (Ctrl+X)" Click="MenuCut_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="✂" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button ToolTip="Copiar (Ctrl+C)" Click="MenuCopy_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="📋" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button ToolTip="Pegar (Ctrl+V)" Click="MenuPaste_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="📑" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Separator/>
+                <Button ToolTip="Buscar (Ctrl+F)" Click="MenuFind_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="🔍" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button ToolTip="Buscar en Todo el Proyecto (Ctrl+Shift+F)" Click="MenuFindInProject_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="🔎" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
             </ToolBar>
 
             <!-- Barra de Herramientas: Funciones Avanzadas VB7 -->
             <ToolBar Band="1" BandIndex="0">
-                <Border Background="#E6EEF8" CornerRadius="3" Padding="5,2" Margin="0,0,4,0" VerticalAlignment="Center">
-                    <TextBlock Text="⚡ Funciones Avanzadas VB7:" FontWeight="SemiBold" FontSize="11" Foreground="#004488"/>
+                <Border ToolTip="Funciones Avanzadas VB7" Background="#E6EEF8" CornerRadius="3" Padding="5,2" Margin="0,0,4,0" VerticalAlignment="Center">
+                    <TextBlock Text="⚡" FontWeight="Bold" FontSize="13" Foreground="#004488"/>
                 </Border>
-                <Button x:Name="BtnToolbarComment" ToolTip="Comentar Bloque Seleccionado (Ctrl+K, Ctrl+C)" Click="MenuCommentBlock_Click" Padding="4,2">
-                    <TextBlock Text="💬+ Comentar" FontSize="12"/>
+                <Button x:Name="BtnToolbarComment" ToolTip="Comentar Bloque Seleccionado (Ctrl+K, Ctrl+C)" Click="MenuCommentBlock_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="💬⁺" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
-                <Button x:Name="BtnToolbarUncomment" ToolTip="Descomentar Bloque Seleccionado (Ctrl+K, Ctrl+U)" Click="MenuUncommentBlock_Click" Padding="4,2">
-                    <TextBlock Text="💬- Descomentar" FontSize="12"/>
-                </Button>
-                <Separator/>
-                <Button x:Name="BtnToolbarSwitchAssignment" ToolTip="Invertir Asignaciones A = B ⇄ B = A (Ctrl+Shift+R)" Click="MenuSwitchAssignment_Click" Padding="4,2">
-                    <TextBlock Text="⇄ Invertir Asignación" FontSize="12"/>
+                <Button x:Name="BtnToolbarUncomment" ToolTip="Descomentar Bloque Seleccionado (Ctrl+K, Ctrl+U)" Click="MenuUncommentBlock_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="💬⁻" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
                 <Separator/>
-                <ToggleButton x:Name="BtnToolbarToggleLineHighlight" ToolTip="Alternar Resaltado de Línea Activa" IsChecked="True" Click="BtnToolbarToggleLineHighlight_Click" Padding="4,2">
-                    <TextBlock Text="💡 Línea Activa" FontSize="12"/>
+                <Button x:Name="BtnToolbarSwitchAssignment" ToolTip="Invertir Asignaciones A = B ⇄ B = A (Ctrl+Shift+R)" Click="MenuSwitchAssignment_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="⇄" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Separator/>
+                <ToggleButton x:Name="BtnToolbarToggleLineHighlight" ToolTip="Alternar Resaltado de Línea Activa" IsChecked="True" Click="BtnToolbarToggleLineHighlight_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="💡" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </ToggleButton>
-                <ToggleButton x:Name="BtnToolbarToggleBranchLines" ToolTip="Alternar Guías de Estructura de Bloques (Branch Lines)" IsChecked="True" Click="BtnToolbarToggleBranchLines_Click" Padding="4,2">
-                    <TextBlock Text="🌿 Guías de Bloques" FontSize="12"/>
+                <ToggleButton x:Name="BtnToolbarToggleBranchLines" ToolTip="Alternar Guías de Estructura de Bloques (Branch Lines)" IsChecked="True" Click="BtnToolbarToggleBranchLines_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="🌿" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </ToggleButton>
                 <Separator/>
                 <Menu Background="Transparent" VerticalAlignment="Center">
-                    <MenuItem Header="🔤 Mayús/Minúsculas" Padding="4,2" FontSize="12">
+                    <MenuItem ToolTip="Cambiar Mayúsculas / Minúsculas" Header="🔤" Padding="4,2" FontSize="13">
                         <MenuItem Header="Convertir a MAYÚSCULAS" Click="MenuCaseUpper_Click"/>
                         <MenuItem Header="Convertir a minúsculas" Click="MenuCaseLower_Click"/>
                         <MenuItem Header="Convertir a Tipo Título" Click="MenuCaseTitle_Click"/>

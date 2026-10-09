@@ -74,6 +74,11 @@
                 <MenuItem Header="Convertir a _MAYÚSCULAS" Click="MenuCaseUpper_Click"/>
                 <MenuItem Header="Convertir a m_inúsculas" Click="MenuCaseLower_Click"/>
                 <MenuItem Header="Convertir a Tipo _Título" Click="MenuCaseTitle_Click"/>
+                <Separator/>
+                <MenuItem Header="Asistente de _Propiedades (Property Builder)..." Click="MenuPropertyBuilder_Click"/>
+                <MenuItem Header="Asistente de _Procedimientos (Sub / Function Builder)..." Click="MenuProcedureBuilder_Click"/>
+                <MenuItem Header="_Insertar Snippet (AutoText)..." Click="MenuInsertSnippet_Click"/>
+                <MenuItem Header="_Historial del Portapapeles (Clipboard Ring)..." InputGestureText="Ctrl+Shift+V" Click="MenuClipboardRing_Click"/>
             </MenuItem>
             <MenuItem Header="_Herramientas">
                 <MenuItem Header="_Opciones..." Click="MenuOptions_Click"/>
@@ -158,6 +163,19 @@
                         <MenuItem Header="Convertir a Tipo Título" Click="MenuCaseTitle_Click"/>
                     </MenuItem>
                 </Menu>
+                <Separator/>
+                <Button x:Name="BtnToolbarPropertyBuilder" ToolTip="Asistente de Propiedades (Property Builder)" Click="MenuPropertyBuilder_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="🔧⁺" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button x:Name="BtnToolbarProcedureBuilder" ToolTip="Asistente de Procedimientos (Sub / Function Builder)" Click="MenuProcedureBuilder_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="⚡⁺" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button x:Name="BtnToolbarInsertSnippet" ToolTip="Insertar Snippet (AutoText)" Click="MenuInsertSnippet_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="📑⁺" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button x:Name="BtnToolbarClipboardRing" ToolTip="Historial del Portapapeles (Ctrl+Shift+V)" Click="MenuClipboardRing_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="📋°" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
             </ToolBar>
         </ToolBarTray>
 

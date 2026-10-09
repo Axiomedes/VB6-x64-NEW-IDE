@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using ICSharpCode.AvalonEdit;
 using VB7x64.IDE.SyntaxHighlighting;
+using VB7x64.ProjectModel.CodeBuilders;
 using VB7x64.ProjectModel.Documents;
 using VB7x64.ProjectModel.Navigation;
 using VB7x64.ProjectModel.Settings;
@@ -123,8 +125,61 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         // Escuchar cambios de edición
         Editor.TextChanged += Editor_TextChanged;
         Editor.TextArea.Caret.PositionChanged += Caret_PositionChanged;
+        Editor.TextArea.PreviewKeyDown += TextArea_PreviewKeyDown;
+
+        DataObject.AddCopyingHandler(Editor, (_, _) =>
+        {
+            string sel = Editor.SelectedText;
+            if (!string.IsNullOrWhiteSpace(sel))
+            {
+                ClipboardRing.Instance.Add(sel);
+            }
+        });
 
         RefreshProcedures();
+    }
+
+    private void TextArea_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Tab && Keyboard.Modifiers == ModifierKeys.None)
+        {
+            if (Editor.SelectionLength == 0 && Editor.Document != null)
+            {
+                int caretOffset = Editor.CaretOffset;
+                var line = Editor.Document.GetLineByOffset(caretOffset);
+                string lineTextBeforeCaret = Editor.Document.GetText(line.Offset, caretOffset - line.Offset);
+
+                int wordStart = lineTextBeforeCaret.Length;
+                while (wordStart > 0 && char.IsLetterOrDigit(lineTextBeforeCaret[wordStart - 1]))
+                {
+                    wordStart--;
+                }
+
+                if (wordStart < lineTextBeforeCaret.Length)
+                {
+                    string shortcut = lineTextBeforeCaret[wordStart..];
+
+                    int indentLen = 0;
+                    while (indentLen < lineTextBeforeCaret.Length && (lineTextBeforeCaret[indentLen] == ' ' || lineTextBeforeCaret[indentLen] == '\t'))
+                    {
+                        indentLen++;
+                    }
+                    string indent = lineTextBeforeCaret[..indentLen];
+
+                    if (SnippetManager.TryExpandSnippet(shortcut, indent, out string expandedText, out int relativeCaret))
+                    {
+                        int replaceStart = line.Offset + wordStart;
+                        int replaceLen = shortcut.Length;
+                        using (Editor.Document.RunUpdate())
+                        {
+                            Editor.Document.Replace(replaceStart, replaceLen, expandedText);
+                        }
+                        Editor.CaretOffset = replaceStart + relativeCaret;
+                        e.Handled = true;
+                    }
+                }
+            }
+        }
     }
 
     private void RefreshProcedures()

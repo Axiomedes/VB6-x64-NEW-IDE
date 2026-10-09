@@ -8,9 +8,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Win32;
 using ICSharpCode.AvalonEdit;
+using VB7x64.IDE.CodeBuilders;
 using VB7x64.IDE.Editor;
 using VB7x64.IDE.Logging;
 using VB7x64.IDE.Settings;
+using VB7x64.ProjectModel.CodeBuilders;
 using VB7x64.ProjectModel.Documents;
 using VB7x64.ProjectModel.Navigation;
 using VB7x64.ProjectModel.Settings;
@@ -804,12 +806,28 @@ public partial class MainWindow : Window
 
     private void MenuCut_Click(object sender, RoutedEventArgs e)
     {
-        ActiveEditor?.Cut();
+        if (ActiveEditor != null)
+        {
+            string sel = ActiveEditor.SelectedText;
+            if (!string.IsNullOrWhiteSpace(sel))
+            {
+                ClipboardRing.Instance.Add(sel);
+            }
+            ActiveEditor.Cut();
+        }
     }
 
     private void MenuCopy_Click(object sender, RoutedEventArgs e)
     {
-        ActiveEditor?.Copy();
+        if (ActiveEditor != null)
+        {
+            string sel = ActiveEditor.SelectedText;
+            if (!string.IsNullOrWhiteSpace(sel))
+            {
+                ClipboardRing.Instance.Add(sel);
+            }
+            ActiveEditor.Copy();
+        }
     }
 
     private void MenuPaste_Click(object sender, RoutedEventArgs e)
@@ -1013,6 +1031,14 @@ public partial class MainWindow : Window
             e.Handled = true;
             return;
         }
+
+        // 3. Portapapeles múltiple: Ctrl+Shift+V
+        if (e.Key == Key.V && (Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Shift)) == (ModifierKeys.Control | ModifierKeys.Shift))
+        {
+            OpenClipboardRingDialog();
+            e.Handled = true;
+            return;
+        }
     }
 
     private void MenuToggleLineHighlight_Click(object sender, RoutedEventArgs e)
@@ -1148,6 +1174,134 @@ public partial class MainWindow : Window
             EditorOperationsHelper.ConvertCase(ActiveEditor, ProjectModel.Advanced.TextCaseMode.Title);
             SetStatusMessage("Texto convertido a Tipo Título.");
         }
+    }
+
+    private void MenuPropertyBuilder_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor == null)
+        {
+            MessageBox.Show("Debes abrir un archivo de código para usar el Asistente de Propiedades.",
+                "Asistente de Propiedades", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        string initialProp = ActiveEditor.SelectedText.Trim();
+        var dlg = new PropertyBuilderDialog(initialProp) { Owner = this };
+        if (dlg.ShowDialog() == true)
+        {
+            InsertCodeAtCaret(dlg.GeneratedCode, "Propiedad");
+        }
+    }
+
+    private void MenuProcedureBuilder_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor == null)
+        {
+            MessageBox.Show("Debes abrir un archivo de código para usar el Asistente de Procedimientos.",
+                "Asistente de Procedimientos", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        string initialName = ActiveEditor.SelectedText.Trim();
+        var dlg = new ProcedureBuilderDialog(initialName) { Owner = this };
+        if (dlg.ShowDialog() == true)
+        {
+            InsertCodeAtCaret(dlg.GeneratedCode, "Procedimiento");
+        }
+    }
+
+    private void MenuInsertSnippet_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor == null)
+        {
+            MessageBox.Show("Debes abrir un archivo de código para insertar snippets.",
+                "Insertar Snippet", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var cm = new ContextMenu();
+        foreach (var snip in SnippetManager.GetAllSnippets())
+        {
+            var mi = new MenuItem
+            {
+                Header = $"{snip.Title}  ({snip.Shortcut})",
+                ToolTip = snip.Description,
+                Tag = snip
+            };
+            mi.Click += (_, _) => InsertSnippetAtCaret(snip);
+            cm.Items.Add(mi);
+        }
+
+        if (sender is FrameworkElement fe)
+        {
+            cm.PlacementTarget = fe;
+            cm.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+        }
+        cm.IsOpen = true;
+    }
+
+    private void InsertSnippetAtCaret(SnippetDefinition snippet)
+    {
+        if (ActiveEditor == null || ActiveEditor.Document == null) return;
+
+        int caretOffset = ActiveEditor.CaretOffset;
+        var line = ActiveEditor.Document.GetLineByOffset(caretOffset);
+        string lineTextBeforeCaret = ActiveEditor.Document.GetText(line.Offset, caretOffset - line.Offset);
+
+        int indentLen = 0;
+        while (indentLen < lineTextBeforeCaret.Length && (lineTextBeforeCaret[indentLen] == ' ' || lineTextBeforeCaret[indentLen] == '\t'))
+        {
+            indentLen++;
+        }
+        string indent = lineTextBeforeCaret[..indentLen];
+
+        if (SnippetManager.TryExpandSnippet(snippet.Shortcut, indent, out string expanded, out int relativeCaret))
+        {
+            ActiveEditor.Document.Insert(caretOffset, expanded);
+            ActiveEditor.CaretOffset = caretOffset + relativeCaret;
+            ActiveEditor.Focus();
+            SetStatusMessage($"Snippet '{snippet.Title}' insertado.");
+        }
+    }
+
+    private void MenuClipboardRing_Click(object sender, RoutedEventArgs e)
+    {
+        OpenClipboardRingDialog();
+    }
+
+    private void OpenClipboardRingDialog()
+    {
+        if (ActiveEditor == null)
+        {
+            MessageBox.Show("Debes abrir un archivo de código para pegar desde el portapapeles.",
+                "Portapapeles Múltiple", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var dlg = new ClipboardRingDialog { Owner = this };
+        if (dlg.ShowDialog() == true && !string.IsNullOrEmpty(dlg.SelectedText))
+        {
+            ActiveEditor.Document.Insert(ActiveEditor.CaretOffset, dlg.SelectedText);
+            ActiveEditor.CaretOffset += dlg.SelectedText.Length;
+            ActiveEditor.Focus();
+            SetStatusMessage("Fragmento del portapapeles pegado.");
+        }
+    }
+
+    private void InsertCodeAtCaret(string codeToInsert, string operationDesc)
+    {
+        if (ActiveEditor == null || ActiveEditor.Document == null || string.IsNullOrWhiteSpace(codeToInsert)) return;
+
+        int caretOffset = ActiveEditor.CaretOffset;
+        var line = ActiveEditor.Document.GetLineByOffset(caretOffset);
+        string lineText = ActiveEditor.Document.GetText(line.Offset, line.Length);
+        string prefix = (!string.IsNullOrWhiteSpace(lineText)) ? "\r\n\r\n" : "";
+        string text = prefix + codeToInsert + "\r\n";
+
+        ActiveEditor.Document.Insert(caretOffset, text);
+        ActiveEditor.CaretOffset = caretOffset + text.Length;
+        ActiveEditor.Focus();
+        SetStatusMessage($"{operationDesc} insertado exitosamente.");
     }
     #endregion
 

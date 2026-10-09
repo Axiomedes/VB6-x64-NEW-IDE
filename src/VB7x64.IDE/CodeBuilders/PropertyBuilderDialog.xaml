@@ -1,0 +1,69 @@
+<Window x:Class="VB7x64.IDE.CodeBuilders.PropertyBuilderDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Asistente de Propiedades (Property Builder)"
+        Height="540" Width="680"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Background="#F4F4F4">
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Formulario Superior -->
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Columna Izquierda: Identificación -->
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Nombre de la Propiedad:" FontSize="11.5" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                <TextBox x:Name="TxtPropertyName" Height="24" VerticalContentAlignment="Center" Margin="0,0,0,10" TextChanged="Inputs_Changed"/>
+
+                <TextBlock Text="Tipo de Dato:" FontSize="11.5" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                <ComboBox x:Name="CmbDataType" Height="24" IsEditable="True" Margin="0,0,0,10" SelectionChanged="CmbDataType_SelectionChanged" TextBoxBase.TextChanged="Inputs_Changed"/>
+
+                <TextBlock Text="Variable Privada de Respaldo:" FontSize="11.5" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                <TextBox x:Name="TxtBackingField" Height="24" VerticalContentAlignment="Center" Margin="0,0,0,10" TextChanged="Inputs_Changed"/>
+
+                <TextBlock Text="Ámbito de Acceso (Scope):" FontSize="11.5" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                <ComboBox x:Name="CmbScope" Height="24" Margin="0,0,0,6" SelectionChanged="Inputs_Changed"/>
+            </StackPanel>
+
+            <!-- Columna Derecha: Opciones y Tipos de Accesores -->
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Procedimientos Accesores a Generar:" FontSize="11.5" FontWeight="SemiBold" Margin="0,0,0,6" Foreground="#004488"/>
+                <CheckBox x:Name="ChkGenerateGet" Content="Property Get (Lectura de valor / objeto)" IsChecked="True" Margin="0,0,0,6" Click="Inputs_Changed"/>
+                <CheckBox x:Name="ChkGenerateLet" Content="Property Let (Asignación por valor / primitivo)" IsChecked="True" Margin="0,0,0,6" Click="Inputs_Changed"/>
+                <CheckBox x:Name="ChkGenerateSet" Content="Property Set (Asignación de referencia de objeto)" IsChecked="False" Margin="0,0,0,10" Click="Inputs_Changed"/>
+
+                <Separator Margin="0,4,0,10"/>
+                <TextBlock Text="Opciones Adicionales:" FontSize="11.5" FontWeight="SemiBold" Margin="0,0,0,6" Foreground="#004488"/>
+                <CheckBox x:Name="ChkGenerateBackingField" Content="Declarar variable miembro privada (m_...)" IsChecked="True" Margin="0,0,0,6" Click="Inputs_Changed"/>
+                <CheckBox x:Name="ChkIncludeComments" Content="Incluir comentarios descriptivos de cabecera" IsChecked="False" Margin="0,0,0,6" Click="Inputs_Changed"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Vista Previa de Código -->
+        <GroupBox Grid.Row="1" Header="Vista previa del código a insertar:" Margin="0,0,0,12" FontSize="11.5" FontWeight="SemiBold">
+            <Border Background="#FFFFFF" BorderBrush="#C0CAD4" BorderThickness="1" CornerRadius="2" Margin="4">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                    <TextBox x:Name="TxtPreview" FontFamily="Consolas" FontSize="12.5" IsReadOnly="True" BorderThickness="0" Background="Transparent" Padding="8" TextWrapping="NoWrap" AcceptsReturn="True"/>
+                </ScrollViewer>
+            </Border>
+        </GroupBox>
+
+        <!-- Botones de Acción -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="BtnInsert" Content="Insertar en Editor" Width="120" Height="26" Margin="0,0,8,0" IsDefault="True" Click="BtnInsert_Click"/>
+            <Button Content="Cancelar" Width="80" Height="26" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

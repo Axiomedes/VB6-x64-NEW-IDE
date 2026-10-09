@@ -45,6 +45,10 @@
 
                     <CheckBox x:Name="ChkLineNumbers" Content="Mostrar números de línea" Margin="0,5,0,8" FontSize="12"/>
                     <CheckBox x:Name="ChkCreateBak" Content="Crear copia de respaldo (.bak) al guardar" Margin="0,0,0,8" FontSize="12"/>
+                    <Separator Margin="0,6,0,10"/>
+                    <TextBlock Text="Funciones Avanzadas VB7:" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6" Foreground="#004488"/>
+                    <CheckBox x:Name="ChkCurrentLineHighlight" Content="Habilitar resaltado de línea activa" Margin="0,0,0,8" FontSize="12"/>
+                    <CheckBox x:Name="ChkBranchLines" Content="Habilitar guías de estructura de bloques (Branch Lines)" Margin="0,0,0,8" FontSize="12"/>
                 </StackPanel>
             </TabItem>
             
@@ -128,6 +132,16 @@
                                     <Border x:Name="SwatchComment" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
                                     <TextBox x:Name="TxtCommentColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
                                 </Grid>
+
+                                <TextBlock Text="Fondo de Línea Activa:" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchCurrentLine" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtCurrentLineColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
                             </StackPanel>
 
                             <!-- Columna 2 -->
@@ -180,6 +194,16 @@
                                     </Grid.ColumnDefinitions>
                                     <Border x:Name="SwatchLineNumbers" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
                                     <TextBox x:Name="TxtLineNumbersColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+
+                                <TextBlock Text="Guías de Bloques (Branch Lines):" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchBranchLines" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtBranchLinesColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
                                 </Grid>
                             </StackPanel>
                         </Grid>

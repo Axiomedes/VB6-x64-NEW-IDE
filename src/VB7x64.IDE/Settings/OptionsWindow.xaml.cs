@@ -49,6 +49,8 @@ public partial class OptionsWindow : Window
 
         ChkLineNumbers.IsChecked = _settings.ShowLineNumbers;
         ChkCreateBak.IsChecked = _settings.CreateBackupBeforeSave;
+        ChkCurrentLineHighlight.IsChecked = _settings.EnableCurrentLineHighlight;
+        ChkBranchLines.IsChecked = _settings.EnableBranchLines;
 
         // 4. Codificaciones comunes
         CmbEncoding.ItemsSource = new List<string> { "Windows-1252", "ISO-8859-1", "UTF-8", "Unicode (UTF-16)" };
@@ -65,6 +67,8 @@ public partial class OptionsWindow : Window
         TxtConstantColor.Text = _settings.ConstantColor;
         TxtNumberColor.Text = _settings.NumberColor;
         TxtLineNumbersColor.Text = _settings.LineNumbersColor;
+        TxtCurrentLineColor.Text = _settings.CurrentLineHighlightColor;
+        TxtBranchLinesColor.Text = _settings.BranchLinesColor;
 
         _activeTextBox = TxtBgColor;
 
@@ -134,6 +138,8 @@ public partial class OptionsWindow : Window
         var constant = TryGetBrush(TxtConstantColor.Text, new SolidColorBrush(Color.FromRgb(0, 0, 128)));
         var num = TryGetBrush(TxtNumberColor.Text, Brushes.Black);
         var lineNum = TryGetBrush(TxtLineNumbersColor.Text, Brushes.Gray);
+        var curLine = TryGetBrush(TxtCurrentLineColor.Text, new SolidColorBrush(Color.FromRgb(240, 244, 250)));
+        var branch = TryGetBrush(TxtBranchLinesColor.Text, new SolidColorBrush(Color.FromRgb(208, 208, 208)));
 
         SwatchBg.Background = bg;
         SwatchFg.Background = fg;
@@ -145,6 +151,8 @@ public partial class OptionsWindow : Window
         SwatchConstant.Background = constant;
         SwatchNumber.Background = num;
         SwatchLineNumbers.Background = lineNum;
+        SwatchCurrentLine.Background = curLine;
+        SwatchBranchLines.Background = branch;
 
         // Actualizar vista previa en tiempo real
         PreviewBorder.Background = bg;
@@ -229,7 +237,9 @@ public partial class OptionsWindow : Window
             type: "#2B91AF",
             constant: "#000080",
             num: "#000000",
-            lineNum: "#2B91AF"
+            lineNum: "#2B91AF",
+            curLine: "#F0F4FA",
+            branch: "#D0D0D0"
         );
     }
 
@@ -245,7 +255,9 @@ public partial class OptionsWindow : Window
             type: "#4EC9B0",
             constant: "#4FC1FF",
             num: "#B5CEA8",
-            lineNum: "#858585"
+            lineNum: "#858585",
+            curLine: "#2A2D2E",
+            branch: "#454545"
         );
     }
 
@@ -261,11 +273,13 @@ public partial class OptionsWindow : Window
             type: "#00FF80",
             constant: "#FF00FF",
             num: "#FFFF80",
-            lineNum: "#FFFF00"
+            lineNum: "#FFFF00",
+            curLine: "#262626",
+            branch: "#FFFF00"
         );
     }
 
-    private void SetThemeValues(string bg, string fg, string kw, string method, string comment, string str, string type, string constant, string num, string lineNum)
+    private void SetThemeValues(string bg, string fg, string kw, string method, string comment, string str, string type, string constant, string num, string lineNum, string curLine, string branch)
     {
         _isInitializing = true;
         TxtBgColor.Text = bg;
@@ -278,6 +292,8 @@ public partial class OptionsWindow : Window
         TxtConstantColor.Text = constant;
         TxtNumberColor.Text = num;
         TxtLineNumbersColor.Text = lineNum;
+        TxtCurrentLineColor.Text = curLine;
+        TxtBranchLinesColor.Text = branch;
         _isInitializing = false;
 
         UpdateSwatchesAndPreview();
@@ -290,6 +306,8 @@ public partial class OptionsWindow : Window
         if (CmbTabSize.SelectedItem is int tab) _settings.TabSize = tab;
         _settings.ShowLineNumbers = ChkLineNumbers.IsChecked == true;
         _settings.CreateBackupBeforeSave = ChkCreateBak.IsChecked == true;
+        _settings.EnableCurrentLineHighlight = ChkCurrentLineHighlight.IsChecked == true;
+        _settings.EnableBranchLines = ChkBranchLines.IsChecked == true;
         if (CmbEncoding.SelectedItem is string enc) _settings.DefaultEncoding = enc;
 
         // Guardar configuración de colores
@@ -303,6 +321,8 @@ public partial class OptionsWindow : Window
         _settings.ConstantColor = TxtConstantColor.Text.Trim();
         _settings.NumberColor = TxtNumberColor.Text.Trim();
         _settings.LineNumbersColor = TxtLineNumbersColor.Text.Trim();
+        _settings.CurrentLineHighlightColor = TxtCurrentLineColor.Text.Trim();
+        _settings.BranchLinesColor = TxtBranchLinesColor.Text.Trim();
 
         _settings.Save();
         DialogResult = true;

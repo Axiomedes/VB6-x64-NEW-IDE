@@ -16,6 +16,8 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
 {
     public EditorDocument Document { get; }
     public TextEditor Editor { get; }
+    public CurrentLineHighlighter CurrentLineHighlighter { get; }
+    public BranchLinesRenderer BranchLinesRenderer { get; }
     private readonly ComboBox _cmbProcedures;
 
     public event Action<int, int>? CaretPositionChanged;
@@ -55,6 +57,12 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         Editor.Options.ConvertTabsToSpaces = false;
         Editor.Options.EnableRectangularSelection = true;
         Editor.Options.EnableVirtualSpace = false;
+
+        CurrentLineHighlighter = new CurrentLineHighlighter(Editor);
+        BranchLinesRenderer = new BranchLinesRenderer(Editor);
+
+        Editor.TextArea.TextView.BackgroundRenderers.Add(CurrentLineHighlighter);
+        Editor.TextArea.TextView.BackgroundRenderers.Add(BranchLinesRenderer);
 
         ApplyThemeSettings(settings);
 
@@ -278,7 +286,40 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         catch { }
 
         Editor.SyntaxHighlighting = VB6SyntaxHighlighting.CreateDefinition(settings);
+
+        CurrentLineHighlighter.IsEnabled = settings.EnableCurrentLineHighlight;
+        try
+        {
+            if (ColorConverter.ConvertFromString(settings.CurrentLineHighlightColor) is Color hlColor)
+            {
+                CurrentLineHighlighter.UpdateBrush(hlColor);
+            }
+        }
+        catch { }
+
+        BranchLinesRenderer.IsEnabled = settings.EnableBranchLines;
+        try
+        {
+            if (ColorConverter.ConvertFromString(settings.BranchLinesColor) is Color brColor)
+            {
+                BranchLinesRenderer.UpdateColor(brColor);
+            }
+        }
+        catch { }
+
         Editor.TextArea?.TextView?.Redraw();
+    }
+
+    public void SetCurrentLineHighlightEnabled(bool enabled)
+    {
+        CurrentLineHighlighter.IsEnabled = enabled;
+        Editor.TextArea?.TextView?.InvalidateLayer(ICSharpCode.AvalonEdit.Rendering.KnownLayer.Background);
+    }
+
+    public void SetBranchLinesEnabled(bool enabled)
+    {
+        BranchLinesRenderer.IsEnabled = enabled;
+        Editor.TextArea?.TextView?.InvalidateLayer(ICSharpCode.AvalonEdit.Rendering.KnownLayer.Background);
     }
 
     protected void OnPropertyChanged(string propertyName)

@@ -28,6 +28,12 @@ public class AppSettings
     public string NumberColor { get; set; } = "#000000";
     public string TypeColor { get; set; } = "#2B91AF";
     public string ConstantColor { get; set; } = "#000080";
+
+    // Funciones Avanzadas VB7
+    public bool EnableCurrentLineHighlight { get; set; } = true;
+    public string CurrentLineHighlightColor { get; set; } = "#F0F4FA";
+    public bool EnableBranchLines { get; set; } = true;
+    public string BranchLinesColor { get; set; } = "#D0D0D0";
     
     public double WindowWidth { get; set; } = 1100;
     public double WindowHeight { get; set; } = 720;
@@ -118,6 +124,8 @@ public class AppSettings
                 NumberColor = "#B5CEA8";
                 TypeColor = "#4EC9B0";
                 ConstantColor = "#4FC1FF";
+                CurrentLineHighlightColor = "#2A2D2E";
+                BranchLinesColor = "#454545";
                 break;
 
             case "contrast":
@@ -133,6 +141,8 @@ public class AppSettings
                 NumberColor = "#FFFF80";
                 TypeColor = "#00FF80";
                 ConstantColor = "#FF00FF";
+                CurrentLineHighlightColor = "#262626";
+                BranchLinesColor = "#FFFF00";
                 break;
 
             default:
@@ -147,6 +157,8 @@ public class AppSettings
                 NumberColor = "#000000";
                 TypeColor = "#2B91AF";
                 ConstantColor = "#000080";
+                CurrentLineHighlightColor = "#F0F4FA";
+                BranchLinesColor = "#D0D0D0";
                 break;
         }
     }

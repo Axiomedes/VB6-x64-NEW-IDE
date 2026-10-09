@@ -61,6 +61,18 @@
                 <Separator/>
                 <MenuItem Header="Abrir Carpeta de _Logs" Click="MenuOpenLogsFolder_Click"/>
             </MenuItem>
+            <MenuItem Header="_Funciones Avanzadas VB7">
+                <MenuItem x:Name="MenuToggleLineHighlight" Header="Resaltar _Línea Activa" IsCheckable="True" IsChecked="True" Click="MenuToggleLineHighlight_Click"/>
+                <MenuItem x:Name="MenuToggleBranchLines" Header="Guías de _Estructura (Branch Lines)" IsCheckable="True" IsChecked="True" Click="MenuToggleBranchLines_Click"/>
+                <Separator/>
+                <MenuItem Header="_Comentar Bloque" InputGestureText="Ctrl+K, Ctrl+C" Click="MenuCommentBlock_Click"/>
+                <MenuItem Header="_Descomentar Bloque" InputGestureText="Ctrl+K, Ctrl+U" Click="MenuUncommentBlock_Click"/>
+                <MenuItem Header="_Invertir Asignaciones (A = B ⇄ B = A)" InputGestureText="Ctrl+Shift+R" Click="MenuSwitchAssignment_Click"/>
+                <Separator/>
+                <MenuItem Header="Convertir a _MAYÚSCULAS" Click="MenuCaseUpper_Click"/>
+                <MenuItem Header="Convertir a m_inúsculas" Click="MenuCaseLower_Click"/>
+                <MenuItem Header="Convertir a Tipo _Título" Click="MenuCaseTitle_Click"/>
+            </MenuItem>
             <MenuItem Header="_Herramientas">
                 <MenuItem Header="_Opciones..." Click="MenuOptions_Click"/>
             </MenuItem>
@@ -109,6 +121,38 @@
                 <Button ToolTip="Buscar en Proyecto (Ctrl+Shift+F)" Click="MenuFindInProject_Click" Padding="4,2">
                     <TextBlock Text="🔎 Buscar en Proy." FontSize="12"/>
                 </Button>
+            </ToolBar>
+
+            <!-- Barra de Herramientas: Funciones Avanzadas VB7 -->
+            <ToolBar Band="1" BandIndex="0">
+                <Border Background="#E6EEF8" CornerRadius="3" Padding="5,2" Margin="0,0,4,0" VerticalAlignment="Center">
+                    <TextBlock Text="⚡ Funciones Avanzadas VB7:" FontWeight="SemiBold" FontSize="11" Foreground="#004488"/>
+                </Border>
+                <Button x:Name="BtnToolbarComment" ToolTip="Comentar Bloque Seleccionado (Ctrl+K, Ctrl+C)" Click="MenuCommentBlock_Click" Padding="4,2">
+                    <TextBlock Text="💬+ Comentar" FontSize="12"/>
+                </Button>
+                <Button x:Name="BtnToolbarUncomment" ToolTip="Descomentar Bloque Seleccionado (Ctrl+K, Ctrl+U)" Click="MenuUncommentBlock_Click" Padding="4,2">
+                    <TextBlock Text="💬- Descomentar" FontSize="12"/>
+                </Button>
+                <Separator/>
+                <Button x:Name="BtnToolbarSwitchAssignment" ToolTip="Invertir Asignaciones A = B ⇄ B = A (Ctrl+Shift+R)" Click="MenuSwitchAssignment_Click" Padding="4,2">
+                    <TextBlock Text="⇄ Invertir Asignación" FontSize="12"/>
+                </Button>
+                <Separator/>
+                <ToggleButton x:Name="BtnToolbarToggleLineHighlight" ToolTip="Alternar Resaltado de Línea Activa" IsChecked="True" Click="BtnToolbarToggleLineHighlight_Click" Padding="4,2">
+                    <TextBlock Text="💡 Línea Activa" FontSize="12"/>
+                </ToggleButton>
+                <ToggleButton x:Name="BtnToolbarToggleBranchLines" ToolTip="Alternar Guías de Estructura de Bloques (Branch Lines)" IsChecked="True" Click="BtnToolbarToggleBranchLines_Click" Padding="4,2">
+                    <TextBlock Text="🌿 Guías de Bloques" FontSize="12"/>
+                </ToggleButton>
+                <Separator/>
+                <Menu Background="Transparent" VerticalAlignment="Center">
+                    <MenuItem Header="🔤 Mayús/Minúsculas" Padding="4,2" FontSize="12">
+                        <MenuItem Header="Convertir a MAYÚSCULAS" Click="MenuCaseUpper_Click"/>
+                        <MenuItem Header="Convertir a minúsculas" Click="MenuCaseLower_Click"/>
+                        <MenuItem Header="Convertir a Tipo Título" Click="MenuCaseTitle_Click"/>
+                    </MenuItem>
+                </Menu>
             </ToolBar>
         </ToolBarTray>
 

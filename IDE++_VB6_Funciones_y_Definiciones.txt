@@ -1,0 +1,573 @@
+LISTADO DE FUNCIONES Y DEFINICIONES
+============================================================
+
+NOTA SOBRE EL ALCANCE
+--------------------
+Este documento agrupa las funcionalidades descritas públicamente por el
+fabricante de Codesmart para VB6 y resume para qué sirve cada una. La página del fabricante
+indica que su listado de funciones adicionales no es exhaustivo. Los
+nombres de algunas herramientas se conservan en inglés porque así aparecen
+en el producto y en su documentación.
+
+La razón de este documento es identificar una serie de opciones y funcionalidades a integrar en el IDE de VB6 en desarrollo (VB7-x64)
+
+============================================================
+1. INTEGRACIÓN CON EL IDE DE VB6
+============================================================
+
+1.1. Menú principal de Funciones avanzadas
+Agrega un menú propio dentro del IDE desde el que se accede a las funciones
+del complemento.
+
+1.2. Barras de herramientas adicionales
+Registra cuatro barras de herramientas para acceder rápidamente a las
+operaciones más utilizadas.
+
+1.3. Ventanas acoplables (Dockable Tool Windows)
+Las herramientas y sus resultados se muestran en ventanas que se pueden
+mover y acoplar a distintas zonas del IDE.
+
+1.6. Pestañas adicionales en la ventana Immediate
+Añade pestañas de resultados a la ventana Immediate para reunir información
+de herramientas del complemento sin eliminar su función original.
+
+1.7. Mejora de iconos de Object Browser e IntelliSense
+Sustituye determinados iconos antiguos por iconos de mayor profundidad de
+color y aspecto más moderno.
+
+============================================================
+2. MEJORAS VISUALES DEL EDITOR DE CÓDIGO
+============================================================
+
+2.1. Code View Assistant
+Conjunto de ayudas visuales que superpone información sobre las estructuras
+del código en el editor de VB6.
+
+2.2. Branch Lines
+Dibuja líneas que conectan la apertura y el cierre de estructuras de control.
+Ayuda a reconocer la anidación de If, Select Case, bucles y otras estructuras.
+
+2.3. End-of-Line Details
+Muestra detalles o comentarios descriptivos al final de determinadas líneas
+de cierre. Facilita identificar qué bloque se está cerrando cuando el código
+es largo o está profundamente anidado.
+
+2.4. Hotspots
+Incorpora marcadores interactivos para saltar entre las partes iniciales y
+finales de estructuras de control o procedimientos y resaltar visualmente
+sus ramas.
+
+2.5. Current Line Highlighting
+Resalta la línea activa del editor con un fondo diferente para localizar
+rápidamente la posición del cursor.
+
+============================================================
+3. EXPLORADORES Y NAVEGACIÓN
+============================================================
+
+3.1. Project Explorer mejorado
+Reemplaza el explorador de proyectos estándar de VB6 y muestra tanto los
+componentes habituales como la estructura interna de su código.
+
+3.2. Vista física del proyecto
+Agrupa los elementos del proyecto en carpetas convencionales, por ejemplo
+formularios, módulos y clases. Permite expandir los componentes para ver
+procedimientos, variables, eventos y estructuras de control.
+
+3.3. Vista lógica del proyecto
+Permite agrupar los elementos en carpetas definidas por el usuario para
+representar la organización funcional del sistema, no solo su tipo de archivo.
+
+3.4. Expansión del código en el explorador
+Muestra procedimientos, variables, eventos y elementos de flujo de código
+como Select Case dentro de la jerarquía del proyecto.
+
+3.5. Filtrado y búsqueda de nodos
+Busca elementos dentro del árbol del Project Explorer y reduce la vista a
+los componentes o miembros que interesan en ese momento.
+
+3.6. Historial de navegación
+Registra elementos visitados, como componentes abiertos, resultados
+seleccionados o elementos de código editados. El fabricante indica que el
+historial puede mantenerse entre sesiones por proyecto.
+
+3.7. Workbench / accesos directos
+Permite fijar enlaces a componentes o elementos importantes para regresar a
+ellos rápidamente. La configuración puede conservarse por proyecto.
+
+3.8. Resaltado de elementos del explorador
+Destaca visualmente elementos seleccionados o relevantes dentro del árbol.
+
+3.9. Code Flow Explorer
+Presenta en una ventana independiente una vista jerárquica del flujo y las
+estructuras del código. Permite configurar qué construcciones aparecen.
+
+3.10. Designer Explorer
+Muestra los controles de un formulario u otro diseñador, sus relaciones de
+contención y su jerarquía. Los controles pueden ordenarse alfabéticamente o
+según el orden de tabulación. También facilita operaciones sobre los
+componentes, incluidas algunas acciones de control de código fuente.
+
+3.11. Library Explorer
+Biblioteca para almacenar, clasificar, recuperar y compartir bloques de
+código y fragmentos de diseñadores. Organiza los recursos en carpetas
+lógicas y ofrece vista acoplable o integración con otros exploradores.
+
+3.12. Vista previa de plantillas de diseñador
+Muestra una vista previa ampliable de determinados fragmentos o plantillas
+visuales almacenados en la biblioteca.
+
+3.13. Organización de la Library Explorer
+Permite usar paneles divididos horizontal o verticalmente y mantener en la
+biblioteca elementos personalizados utilizados por otras herramientas.
+
+============================================================
+4. BÚSQUEDA Y REFERENCIAS
+============================================================
+
+4.1. Find and Replace ampliado
+Realiza búsquedas y reemplazos con más opciones y en diferentes ámbitos,
+incluidos grupos de proyectos, según la operación seleccionada.
+
+4.2. Resultados navegables
+Presenta los resultados en una lista desde la cual se puede saltar a la
+ubicación correspondiente en el código.
+
+4.3. Actualización y limpieza de resultados
+Permite refrescar o borrar la lista de resultados de una búsqueda.
+
+4.4. Agrupación y ordenación de resultados
+Organiza las coincidencias para facilitar la revisión de los resultados.
+
+4.5. Personalización de columnas
+Permite ajustar el orden de las columnas de las listas de resultados.
+
+4.6. Impresión y exportación de resultados
+Permite imprimir o exportar los resultados de determinadas operaciones de
+búsqueda para revisarlos fuera de la ventana del IDE.
+
+4.7. Historial de búsqueda y reemplazo
+Mantiene un historial de operaciones de búsqueda y reemplazo para poder
+repetirlas o consultar criterios usados anteriormente.
+
+4.8. Find References: referencias a componentes
+Busca dónde se hace referencia a componentes u objetos dentro del código
+y del proyecto.
+
+4.9. Find References: referencias a miembros
+Busca referencias a miembros del código, como procedimientos u otros
+símbolos reconocidos por la herramienta.
+
+4.10. Find References: referencias a controles
+Busca referencias relacionadas con controles de diseñadores, ayudando a
+localizar usos de controles en el proyecto.
+
+============================================================
+5. ANÁLISIS DE CÓDIGO Y CALIDAD
+============================================================
+
+5.1. Code Analyzer
+Analiza proyectos VB para identificar código muerto, símbolos no usados,
+patrones potencialmente lentos y construcciones que pueden causar errores.
+Su objetivo es ayudar a reducir código innecesario y detectar riesgos antes
+de entregar o mantener una aplicación.
+
+5.2. Detección de código muerto
+Localiza código que aparentemente ya no se utiliza. Eliminarlo puede reducir
+complejidad y mejorar la mantenibilidad, aunque los hallazgos deben revisarse
+antes de eliminar código dinámicamente referenciado.
+
+5.3. Detección de símbolos no utilizados
+Identifica variables, miembros u otros símbolos que no parecen tener uso.
+Ayuda a limpiar proyectos y comprender dependencias reales.
+
+5.4. Revisión de rendimiento
+Señala determinados patrones o instrucciones que suelen ser menos eficientes
+que otras alternativas. No sustituye la medición de rendimiento real.
+
+5.5. Detección de problemas potenciales
+Busca construcciones conocidas por poder provocar errores o comportamientos
+problemáticos.
+
+5.6. Designer Analyzer
+Analiza formularios, controles y otros componentes visuales para señalar
+problemas de diseño, configuración inconsistente o incumplimientos de
+estándares de interfaz.
+
+5.7. Revisión de problemas de formularios y diseñadores
+Comprueba determinados problemas habituales relacionados con formularios,
+UserControls, UserDocuments, PropertyPages y otros diseñadores compatibles.
+
+5.8. Revisión de problemas de controles
+Busca configuraciones de controles que puedan causar inconsistencias o
+problemas en la interfaz.
+
+5.9. Revisión general de interfaz
+Agrupa otros problemas relacionados con la calidad de la interfaz que no
+encajan en las categorías anteriores.
+
+5.10. Spelling Checker
+Revisa la ortografía en comentarios de código, constantes de texto y las
+propiedades Caption y Text de controles de diseñadores compatibles.
+
+5.11. Strings Reviewer
+Ayuda a revisar la redacción de los textos que ve el usuario. A diferencia
+del corrector ortográfico, se centra en frases y combinaciones de palabras,
+coherencia y corrección de los mensajes de la interfaz.
+
+5.12. Code Commenting Conformity Checker
+Verifica el cumplimiento de reglas de documentación del código, por ejemplo
+la existencia de comentarios descriptivos en módulos, procedimientos y
+secciones internas de las rutinas.
+
+============================================================
+6. INSERCIÓN RÁPIDA Y GENERACIÓN DE CÓDIGO
+============================================================
+
+6.1. AutoText
+Permite definir fragmentos de código reutilizables e insertarlos rápidamente
+mediante mecanismos de acceso rápido, reduciendo la escritura repetitiva.
+
+6.2. AutoText Manager
+Interfaz para crear, modificar, organizar y mantener las plantillas de
+AutoText.
+
+6.3. SmartComplete
+Ventana similar a IntelliSense que sugiere palabras reservadas, sentencias,
+funciones globales de Visual Basic que no aparecen en la lista estándar y
+elementos personalizados definidos por el usuario.
+
+6.4. SmartComplete Manager
+Permite administrar los elementos personalizados que se mostrarán en la
+lista de sugerencias de SmartComplete.
+
+6.5. Code Builders
+Conjunto de asistentes para generar estructuras repetitivas de código,
+reduciendo errores de escritura y el tiempo necesario para crear miembros.
+
+6.6. Generador Property Get
+Crea la estructura inicial de un procedimiento Property Get para consultar
+una propiedad de una clase o módulo compatible.
+
+6.7. Generador Property Let
+Crea la estructura inicial de un procedimiento Property Let para asignar un
+valor a una propiedad de tipo valor.
+
+6.8. Generador Property Set
+Crea la estructura inicial de un procedimiento Property Set para asignar
+una referencia de objeto a una propiedad.
+
+6.9. Generador Sub
+Inserta la estructura de un procedimiento Sub con la declaración inicial
+correspondiente.
+
+6.10. Generador Function
+Inserta la estructura de una Function para devolver un resultado.
+
+6.11. Generador de clases de colección
+Ayuda a generar una clase de colección con estructura repetitiva habitual,
+para simplificar la implementación de colecciones personalizadas.
+
+6.12. Switch Assignment Values
+Intercambia los lados de una asignación. Por ejemplo, convierte una
+asignación de inicialización en su operación inversa, útil al escribir o
+mantener código de carga y descarga de datos.
+
+6.13. Formateo rápido de strings
+Ayuda a organizar cadenas de texto en el código para mejorar su legibilidad.
+
+6.14. Formateo rápido de SQL
+Facilita ordenar o presentar cadenas SQL embebidas en el código de una
+forma más legible.
+
+6.15. Multiple Copy-and-Paste Buffers
+Amplía el portapapeles con múltiples buffers persistentes para guardar varios
+fragmentos de código y pegarlos después mediante atajos de teclado.
+
+============================================================
+7. HERRAMIENTAS PARA DISEÑADORES Y CONTROLES
+============================================================
+
+7.1. Tab Order Designer
+Permite modificar el orden en que el foco pasa de un control a otro cuando
+el usuario pulsa Tab. El fabricante describe edición manual y ordenación
+automática.
+
+7.2. Hotkey Designer
+Asiste en la creación y administración de teclas de acceso rápido asociadas
+a elementos de la interfaz, según las opciones soportadas por la herramienta.
+
+7.3. Change Name and Text Properties
+Ayuda a generar o modificar nombres y textos de propiedades de controles a
+partir de otros valores, por ejemplo derivar un nombre como lblSurname de un
+caption como Surname.
+
+7.4. New Control Properties
+Permite especificar valores predeterminados para determinadas propiedades
+cuando se crean controles o componentes nuevos.
+
+7.5. UI Standard Properties Manager
+Permite definir y mantener valores estándar de propiedades de interfaz para
+favorecer la consistencia visual y de comportamiento entre formularios.
+
+============================================================
+8. MANTENIMIENTO Y FORMATO DEL CÓDIGO
+============================================================
+
+8.1. Code Formatter
+Reformatea el código fuente de acuerdo con reglas configurables por el
+programador o el equipo.
+
+8.2. Indentación automática
+Ajusta la indentación de las líneas para que los bloques queden visualmente
+ordenados.
+
+8.3. Gestión de líneas en blanco
+Permite insertar una cantidad configurada de líneas antes o después de
+ciertas instrucciones, y limitar las secuencias largas de líneas vacías.
+
+8.4. División de líneas largas
+Divide líneas que superan una longitud definida para mejorar la lectura.
+
+8.5. Compactación de líneas divididas
+Revierte determinadas divisiones previas y compacta líneas cuando procede.
+
+8.6. División de declaraciones de procedimientos
+Distribuye declaraciones extensas de procedimientos en varias líneas para
+mejorar su legibilidad.
+
+8.7. División de declaraciones API
+Permite ajustar declaraciones Declare largas para que ocupen varias líneas.
+
+8.8. División de declaraciones As
+Ayuda a repartir declaraciones de variables que incluyen As en varias líneas
+según las reglas del formateador.
+
+8.9. Sort Procedures
+Reordena procedimientos de un módulo con criterios seleccionables, como
+ámbito, tipo de elemento y firma.
+
+8.10. Convert Case
+Convierte texto seleccionado o elementos compatibles a mayúsculas,
+minúsculas o capitalización tipo título, según la opción elegida.
+
+8.11. Code Statistics
+Genera estadísticas de código para un componente, proyecto o grupo de
+proyectos, según el alcance indicado.
+
+8.12. Custom Code Inserter
+Inserta fragmentos definidos por el usuario en varios procedimientos,
+funciones o propiedades de un módulo u otro ámbito soportado.
+
+8.13. Custom Code Remover
+Elimina fragmentos gestionados por la herramienta de los elementos en los
+que se insertaron, de acuerdo con las reglas configuradas.
+
+8.14. Show File Differences
+Muestra las diferencias entre el archivo guardado y los cambios actuales
+antes de guardar, para revisar qué se modificará.
+
+8.15. Close All Windows
+Cierra de una vez las ventanas de código o de diseñadores abiertas, según la
+operación seleccionada.
+
+============================================================
+9. DOCUMENTACIÓN AUTOMÁTICA DEL CÓDIGO
+============================================================
+
+9.1. Comment Templates Manager
+Permite configurar plantillas utilizadas para generar comentarios y
+cabeceras de documentación.
+
+9.2. Header Comments
+Añade cabeceras descriptivas a módulos, componentes y procedimientos.
+Puede aplicarse a un elemento o realizarse en lote cuando la herramienta
+lo admite.
+
+9.3. Embrace / Block Comments
+Inserta comentarios antes y después de un bloque de código para delimitarlo
+y explicar su propósito.
+
+9.4. Inline Comments
+Inserta comentarios asociados a instrucciones o secciones concretas, por lo
+general para explicar decisiones o comportamientos importantes.
+
+9.5. Eliminación de comentarios gestionados
+Permite quitar ciertos comentarios creados por el sistema de documentación,
+según las funciones y reglas de Funciones Avanzadas.
+
+9.6 Comments Code
+Permite convertir en comentario un bloque de código seleccionado o volver código nuevamente un bloque de comentario.
+
+============================================================
+10. GESTIÓN DE ERRORES Y TRAZAS
+============================================================
+
+10.1. Error Handling Engine
+Genera o elimina bloques de tratamiento de errores a partir de esquemas
+configurables. Los esquemas describen la estructura que se insertará y
+pueden asociarse a tipos de componentes o procedimientos que coincidan con
+patrones establecidos.
+
+10.2. Error Handling Schemes Manager
+Permite definir y administrar esquemas de manejo de errores: encabezados,
+secciones de salida, numeración de líneas y otras opciones utilizadas por
+la inserción/eliminación automática.
+
+10.3. Inserción masiva de manejo de errores
+Aplica las plantillas de tratamiento de errores a múltiples procedimientos
+o componentes compatibles en una operación por lotes.
+
+10.4. Eliminación masiva de manejo de errores
+Retira bloques de manejo de errores creados por la herramienta cuando la
+operación y el esquema lo permiten.
+
+10.5. Tracing Subsystem
+Inserta o elimina instrucciones de trazado para registrar el recorrido de
+la aplicación y ayudar a investigar problemas.
+
+10.6. AxVisualLogger / logger personalizado
+El fabricante describe una integración de ejemplo con AxVisualLogger y la
+posibilidad de utilizar un logger propio para recibir la información de
+trazado.
+
+10.7. MExceptionHandler
+Módulo de código fuente suministrado para ayudar a filtrar excepciones no
+controladas y propagar información hacia un contexto superior que pueda
+responder al problema.
+
+10.8. Limpieza durante la terminación
+El mecanismo de excepciones descrito permite incorporar código de limpieza
+para ejecutarlo durante la terminación incluso cuando aparece un error o
+una excepción no controlada, según la estructura configurada.
+
+NOTA:
+Estas herramientas automatizan inserción de código auxiliar. No sustituyen
+la revisión técnica de la estrategia de errores y no garantizan por sí solas
+que todas las clases de error sean recuperables.
+
+============================================================
+11. GESTIÓN DE TAREAS
+============================================================
+
+11.1. Task List
+Lista de tareas integrada en el entorno de desarrollo para registrar
+actividades, responsables, fechas y referencias relacionadas con el código.
+
+11.2. Assigned Tasks
+Tareas asignadas a miembros de un equipo. Pueden incluir fechas de inicio y
+vencimiento, responsable y enlaces a elementos de código.
+
+11.3. Personal Tasks
+Tareas privadas del usuario que las crea, sin asignación a otros miembros.
+
+11.4. Comment / TODO Tasks
+Tareas o recordatorios asociados a comentarios tipo TODO, que pueden usarse
+como marcadores para volver a una zona del código.
+
+============================================================
+12. AUTOMATIZACIÓN Y FUNCIONES ADICIONALES
+============================================================
+
+12.1. AutoSave
+Guarda automáticamente los documentos a intervalos de tiempo configurados,
+para reducir el riesgo de perder cambios.
+
+12.2. AutoBackup
+Crea copias de seguridad automáticas a intervalos de tiempo configurados.
+
+12.3. Mouse Wheel Support
+Añade desplazamiento vertical mediante la rueda del ratón al editor de VB6,
+que en su versión estándar no lo soportaba de la misma forma.
+
+12.4. Auto-checkout
+Intenta ejecutar la operación de checkout al comenzar a editar un archivo
+sometido a control de código fuente compatible.
+
+12.5. SCC Action Documentation
+Puede exigir o apoyar la documentación de determinadas operaciones sobre
+archivos gestionados mediante control de código fuente (SCC).
+
+12.6. Cierre masivo de ventanas
+Permite cerrar en una sola acción todas las ventanas de código o de diseño.
+
+12.7. Switch Assignment Values
+Función repetida en la documentación de herramientas adicionales: invierte
+la asignación para facilitar tareas de carga y descarga de valores.
+
+12.8. Convert Case
+Función de conversión de mayúsculas/minúsculas y capitalización.
+
+12.9. Custom Code Inserter / Remover
+Permite agregar o retirar bloques repetitivos definidos por el usuario en
+múltiples procedimientos, funciones o propiedades.
+
+12.10. Show File Differences
+Permite revisar los cambios que se han realizado en un archivo antes de
+confirmar el guardado.
+
+============================================================
+13. RESUMEN FUNCIONAL POR OBJETIVO
+============================================================
+
+A. Navegar en proyectos grandes:
+   Project Explorer, vistas física/lógica, Code Flow Explorer, Designer
+   Explorer, historial, Workbench, búsqueda de nodos y Find References.
+
+B. Leer código con mayor facilidad:
+   Branch Lines, End-of-Line Details, Hotspots, resaltado de línea activa,
+   pestañas de documentos y Code Flow Explorer.
+
+C. Escribir código más rápido:
+   AutoText, SmartComplete, Code Builders, buffers múltiples de copiar/
+   pegar, inserción de código personalizado y generadores de propiedades.
+
+D. Mantener consistencia:
+   Code Formatter, Sort Procedures, UI Standard Properties Manager,
+   New Control Properties, documentación por plantillas y comprobación de
+   estándares de comentarios.
+
+E. Detectar problemas:
+   Code Analyzer, Designer Analyzer, Spelling Checker, Strings Reviewer y
+   Code Commenting Conformity Checker.
+
+F. Reducir riesgo de pérdida de trabajo:
+   AutoSave, AutoBackup, historial de búsqueda, comparación de archivos y
+   detección de cambios de archivo.
+
+G. Mejorar formularios:
+   Designer Explorer, Tab Order Designer, Hotkey Designer, análisis de
+   diseñadores y gestión de propiedades estándar.
+
+H. Depurar y diagnosticar:
+   Error Handling Engine, esquemas de errores, tracing, logger y
+   MExceptionHandler.
+
+I. Organizar el trabajo:
+   Task List, tareas asignadas, personales y TODO.
+
+============================================================
+14. FUENTE Y OBSERVACIONES
+============================================================
+
+Fuente principal del fabricante:
+https://www.axtools.com/products-codesmart-vb6.php
+
+Página general de AxTools:
+https://www.axtools.com/
+
+La lista anterior describe las herramientas publicadas por el fabricante,
+pero no asegura que cada característica esté disponible en toda versión o
+configuración de CodeSMART. Algunas funciones dependen del tipo de proyecto,
+del componente activo, de configuración, del sistema de control de código
+fuente o de código auxiliar que se agregue al proyecto.
+
+Para desarrollar un IDE propio, estas funciones deben tomarse como una
+referencia funcional, no como una especificación de implementación exacta.
+Se recomienda diseñar cada herramienta con pruebas independientes y evitar
+modificar archivos VB6 sin conservar el contenido y formato que no se haya
+editado explícitamente.
+
+============================================================
+FIN DEL DOCUMENTO
+============================================================

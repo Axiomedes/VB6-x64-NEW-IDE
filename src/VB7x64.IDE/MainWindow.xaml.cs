@@ -70,6 +70,14 @@ public partial class MainWindow : Window
         MenuToggleOutput.IsChecked = _settings.ShowOutputPanel;
         SetOutputPanelVisibility(_settings.ShowOutputPanel);
 
+        // Restaurar estado de Funciones Avanzadas VB7
+        MenuToggleLineHighlight.IsChecked = _settings.EnableCurrentLineHighlight;
+        BtnToolbarToggleLineHighlight.IsChecked = _settings.EnableCurrentLineHighlight;
+        MenuToggleBranchLines.IsChecked = _settings.EnableBranchLines;
+        BtnToolbarToggleBranchLines.IsChecked = _settings.EnableBranchLines;
+
+        PreviewKeyDown += MainWindow_PreviewKeyDown;
+
         UpdateRecentMenus();
 
         AppLogger.Info("Ventana principal cargada correctamente.");
@@ -754,6 +762,167 @@ public partial class MainWindow : Window
     {
         var about = new AboutWindow { Owner = this };
         about.ShowDialog();
+    }
+    #endregion
+
+    #region Funciones Avanzadas VB7
+    private bool _isChordCtrlK;
+
+    private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        // 1. Invertir Asignaciones: Ctrl+Shift+R
+        if (e.Key == Key.R && (Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Shift)) == (ModifierKeys.Control | ModifierKeys.Shift))
+        {
+            if (ActiveEditor != null)
+            {
+                EditorOperationsHelper.SwitchAssignment(ActiveEditor);
+                SetStatusMessage("Asignaciones invertidas (A = B ⇄ B = A).");
+                e.Handled = true;
+                return;
+            }
+        }
+
+        // 2. Secuencia acorde Ctrl+K, Ctrl+C / Ctrl+K, Ctrl+U
+        if (_isChordCtrlK)
+        {
+            _isChordCtrlK = false;
+            if (e.Key == Key.C)
+            {
+                if (ActiveEditor != null)
+                {
+                    EditorOperationsHelper.CommentSelection(ActiveEditor);
+                    SetStatusMessage("Líneas comentadas.");
+                }
+                e.Handled = true;
+                return;
+            }
+            if (e.Key == Key.U)
+            {
+                if (ActiveEditor != null)
+                {
+                    EditorOperationsHelper.UncommentSelection(ActiveEditor);
+                    SetStatusMessage("Líneas descomentadas.");
+                }
+                e.Handled = true;
+                return;
+            }
+            SetStatusMessage("Combinación Ctrl+K cancelada.");
+        }
+        else if (e.Key == Key.K && Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            _isChordCtrlK = true;
+            SetStatusMessage("Ctrl+K presionado. Esperando segunda tecla (C para comentar, U para descomentar)...");
+            e.Handled = true;
+            return;
+        }
+    }
+
+    private void MenuToggleLineHighlight_Click(object sender, RoutedEventArgs e)
+    {
+        SetLineHighlightState(MenuToggleLineHighlight.IsChecked);
+    }
+
+    private void BtnToolbarToggleLineHighlight_Click(object sender, RoutedEventArgs e)
+    {
+        SetLineHighlightState(BtnToolbarToggleLineHighlight.IsChecked == true);
+    }
+
+    private void SetLineHighlightState(bool enabled)
+    {
+        _settings.EnableCurrentLineHighlight = enabled;
+        MenuToggleLineHighlight.IsChecked = enabled;
+        BtnToolbarToggleLineHighlight.IsChecked = enabled;
+
+        foreach (var item in DocumentsTabControl.Items)
+        {
+            if (item is EditorTabItem tab)
+            {
+                tab.SetCurrentLineHighlightEnabled(enabled);
+            }
+        }
+
+        SetStatusMessage(enabled ? "Resaltado de línea activa activado." : "Resaltado de línea activa desactivado.");
+    }
+
+    private void MenuToggleBranchLines_Click(object sender, RoutedEventArgs e)
+    {
+        SetBranchLinesState(MenuToggleBranchLines.IsChecked);
+    }
+
+    private void BtnToolbarToggleBranchLines_Click(object sender, RoutedEventArgs e)
+    {
+        SetBranchLinesState(BtnToolbarToggleBranchLines.IsChecked == true);
+    }
+
+    private void SetBranchLinesState(bool enabled)
+    {
+        _settings.EnableBranchLines = enabled;
+        MenuToggleBranchLines.IsChecked = enabled;
+        BtnToolbarToggleBranchLines.IsChecked = enabled;
+
+        foreach (var item in DocumentsTabControl.Items)
+        {
+            if (item is EditorTabItem tab)
+            {
+                tab.SetBranchLinesEnabled(enabled);
+            }
+        }
+
+        SetStatusMessage(enabled ? "Guías de bloques (Branch Lines) activadas." : "Guías de bloques desactivadas.");
+    }
+
+    private void MenuCommentBlock_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor != null)
+        {
+            EditorOperationsHelper.CommentSelection(ActiveEditor);
+            SetStatusMessage("Bloque comentado exitosamente.");
+        }
+    }
+
+    private void MenuUncommentBlock_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor != null)
+        {
+            EditorOperationsHelper.UncommentSelection(ActiveEditor);
+            SetStatusMessage("Bloque descomentado exitosamente.");
+        }
+    }
+
+    private void MenuSwitchAssignment_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor != null)
+        {
+            EditorOperationsHelper.SwitchAssignment(ActiveEditor);
+            SetStatusMessage("Asignaciones invertidas exitosamente (A = B ⇄ B = A).");
+        }
+    }
+
+    private void MenuCaseUpper_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor != null)
+        {
+            EditorOperationsHelper.ConvertCase(ActiveEditor, ProjectModel.Advanced.TextCaseMode.Upper);
+            SetStatusMessage("Texto convertido a MAYÚSCULAS.");
+        }
+    }
+
+    private void MenuCaseLower_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor != null)
+        {
+            EditorOperationsHelper.ConvertCase(ActiveEditor, ProjectModel.Advanced.TextCaseMode.Lower);
+            SetStatusMessage("Texto convertido a minúsculas.");
+        }
+    }
+
+    private void MenuCaseTitle_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor != null)
+        {
+            EditorOperationsHelper.ConvertCase(ActiveEditor, ProjectModel.Advanced.TextCaseMode.Title);
+            SetStatusMessage("Texto convertido a Tipo Título.");
+        }
     }
     #endregion
 

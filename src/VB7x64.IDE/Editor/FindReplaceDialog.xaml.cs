@@ -24,6 +24,15 @@ public partial class FindReplaceDialog : Window
             TxtFind.Focus();
             TxtFind.SelectAll();
         };
+
+        PreviewKeyDown += (s, e) =>
+        {
+            if (e.Key == System.Windows.Input.Key.Escape)
+            {
+                Close();
+                e.Handled = true;
+            }
+        };
     }
 
     private Regex? BuildRegex()
@@ -110,5 +119,10 @@ public partial class FindReplaceDialog : Window
         }
 
         MessageBox.Show($"Se reemplazaron {matches.Count} coincidencias.", "Reemplazar todo", MessageBoxButton.OK, MessageBoxImage.Information);
+    }
+
+    private void BtnClose_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
     }
 }

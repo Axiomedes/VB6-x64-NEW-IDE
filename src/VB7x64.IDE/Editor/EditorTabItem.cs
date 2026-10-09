@@ -21,7 +21,21 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
     public event Action<int, int>? CaretPositionChanged;
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public string HeaderText => Document.IsDirty ? $"{Document.DisplayName} *" : Document.DisplayName;
+    public string TitleWithoutExtension => System.IO.Path.GetFileNameWithoutExtension(Document.FilePath);
+    public string HeaderText => Document.IsDirty ? $"{TitleWithoutExtension} *" : TitleWithoutExtension;
+    public string ToolTipText => $"{Document.DisplayName}\n{Document.FilePath}";
+    public string FileExtension => System.IO.Path.GetExtension(Document.FilePath).ToLowerInvariant();
+    public string IconText => FileExtension switch
+    {
+        ".frm" => "🗔",
+        ".cls" => "🧩",
+        ".bas" => "📜",
+        ".ctl" => "🎛️",
+        ".pag" => "📑",
+        ".dob" => "📄",
+        ".dsr" => "📊",
+        _ => "📄"
+    };
 
     public EditorTabItem(EditorDocument document, AppSettings settings)
     {
@@ -29,21 +43,16 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
 
         Editor = new TextEditor
         {
-            FontFamily = new FontFamily(settings.FontFamily),
-            FontSize = settings.FontSize,
-            ShowLineNumbers = settings.ShowLineNumbers,
             WordWrap = false,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            Background = Brushes.White,
-            Foreground = Brushes.Black,
-            SyntaxHighlighting = VB6SyntaxHighlighting.Definition
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto
         };
 
-        Editor.Options.IndentationSize = settings.TabSize;
         Editor.Options.ConvertTabsToSpaces = false;
         Editor.Options.EnableRectangularSelection = true;
         Editor.Options.EnableVirtualSpace = false;
+
+        ApplyThemeSettings(settings);
 
         Editor.Text = document.Text;
 
@@ -145,6 +154,44 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             OnPropertyChanged(nameof(HeaderText));
         }
         return result;
+    }
+
+    public void ApplyThemeSettings(AppSettings settings)
+    {
+        Editor.FontFamily = new FontFamily(settings.FontFamily);
+        Editor.FontSize = settings.FontSize;
+        Editor.ShowLineNumbers = settings.ShowLineNumbers;
+        Editor.Options.IndentationSize = settings.TabSize;
+
+        try
+        {
+            if (ColorConverter.ConvertFromString(settings.EditorBackgroundColor) is Color bg)
+            {
+                Editor.Background = new SolidColorBrush(bg);
+            }
+        }
+        catch { Editor.Background = Brushes.White; }
+
+        try
+        {
+            if (ColorConverter.ConvertFromString(settings.EditorForegroundColor) is Color fg)
+            {
+                Editor.Foreground = new SolidColorBrush(fg);
+            }
+        }
+        catch { Editor.Foreground = Brushes.Black; }
+
+        try
+        {
+            if (ColorConverter.ConvertFromString(settings.LineNumbersColor) is Color ln)
+            {
+                Editor.LineNumbersForeground = new SolidColorBrush(ln);
+            }
+        }
+        catch { }
+
+        Editor.SyntaxHighlighting = VB6SyntaxHighlighting.CreateDefinition(settings);
+        Editor.TextArea?.TextView?.Redraw();
     }
 
     protected void OnPropertyChanged(string propertyName)

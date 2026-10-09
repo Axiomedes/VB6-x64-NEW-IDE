@@ -1,31 +1,64 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Xml;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using VB7x64.IDE.Logging;
+using VB7x64.ProjectModel.Settings;
 
 namespace VB7x64.IDE.SyntaxHighlighting;
 
 public static class VB6SyntaxHighlighting
 {
-    private static IHighlightingDefinition? _definition;
+    private static string? _cachedXshdRaw;
+    private static IHighlightingDefinition? _defaultDefinition;
 
-    public static IHighlightingDefinition Definition
+    public static IHighlightingDefinition Definition => _defaultDefinition ??= CreateDefinition(new AppSettings());
+
+    public static IHighlightingDefinition CreateDefinition(AppSettings settings)
     {
-        get
+        try
         {
-            if (_definition == null)
+            string rawXml = GetRawXshd();
+            if (string.IsNullOrWhiteSpace(rawXml))
             {
-                Register();
+                return Definition;
             }
-            return _definition!;
+
+            // Sustituir colores configurados por el usuario
+            rawXml = ReplaceColorHex(rawXml, "Comment", settings.CommentColor);
+            rawXml = ReplaceColorHex(rawXml, "String", settings.StringColor);
+            rawXml = ReplaceColorHex(rawXml, "Keyword", settings.KeywordColor);
+            rawXml = ReplaceColorHex(rawXml, "MethodName", settings.MethodNameColor);
+            rawXml = ReplaceColorHex(rawXml, "Type", settings.TypeColor);
+            rawXml = ReplaceColorHex(rawXml, "Constant", settings.ConstantColor);
+            rawXml = ReplaceColorHex(rawXml, "Number", settings.NumberColor);
+
+            using var reader = new XmlTextReader(new StringReader(rawXml));
+            var customDef = HighlightingLoader.Load(reader, HighlightingManager.Instance);
+            HighlightingManager.Instance.RegisterHighlighting("VB6", [".bas", ".cls", ".frm", ".ctl", ".pag", ".dob", ".dsr"], customDef);
+            return customDef;
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error("Error al generar la definición sintáctica personalizada de VB6", ex);
+            return _defaultDefinition ?? HighlightingLoader.Load(new XmlTextReader(new StringReader(GetRawXshd())), HighlightingManager.Instance);
         }
     }
 
-    public static void Register()
+    private static string ReplaceColorHex(string xml, string colorName, string newHex)
     {
+        if (string.IsNullOrWhiteSpace(newHex)) return xml;
+        string pattern = $@"(<Color\s+name=""{colorName}""[^>]*?foreground="")[^""]*("")";
+        return Regex.Replace(xml, pattern, $"${{1}}{newHex}${{2}}", RegexOptions.IgnoreCase);
+    }
+
+    private static string GetRawXshd()
+    {
+        if (_cachedXshdRaw != null) return _cachedXshdRaw;
+
         try
         {
             var assembly = Assembly.GetExecutingAssembly();
@@ -34,27 +67,28 @@ public static class VB6SyntaxHighlighting
             using Stream? stream = assembly.GetManifestResourceStream(resourceName);
             if (stream != null)
             {
-                using var reader = new XmlTextReader(stream);
-                _definition = HighlightingLoader.Load(reader, HighlightingManager.Instance);
-                HighlightingManager.Instance.RegisterHighlighting("VB6", [".bas", ".cls", ".frm"], _definition);
-                AppLogger.Info("Resaltado sintáctico de VB6 registrado con éxito desde recurso incrustado.");
-                return;
+                using var streamReader = new StreamReader(stream);
+                _cachedXshdRaw = streamReader.ReadToEnd();
+                return _cachedXshdRaw;
             }
 
-            // Fallback si corre en entorno sin recursos empaquetados
             string localFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SyntaxHighlighting", "VB6.xshd");
             if (File.Exists(localFilePath))
             {
-                using var fileStream = File.OpenRead(localFilePath);
-                using var reader = new XmlTextReader(fileStream);
-                _definition = HighlightingLoader.Load(reader, HighlightingManager.Instance);
-                HighlightingManager.Instance.RegisterHighlighting("VB6", [".bas", ".cls", ".frm"], _definition);
-                AppLogger.Info("Resaltado sintáctico de VB6 registrado desde archivo local.");
+                _cachedXshdRaw = File.ReadAllText(localFilePath);
+                return _cachedXshdRaw;
             }
         }
         catch (Exception ex)
         {
-            AppLogger.Error("Error al cargar la definición sintáctica de VB6", ex);
+            AppLogger.Error("Error al obtener la plantilla XSHD de VB6", ex);
         }
+
+        return string.Empty;
+    }
+
+    public static void Register()
+    {
+        _defaultDefinition = CreateDefinition(new AppSettings());
     }
 }

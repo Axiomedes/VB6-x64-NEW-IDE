@@ -742,10 +742,7 @@ public partial class MainWindow : Window
             {
                 if (item is EditorTabItem tab)
                 {
-                    tab.Editor.FontFamily = new FontFamily(_settings.FontFamily);
-                    tab.Editor.FontSize = _settings.FontSize;
-                    tab.Editor.ShowLineNumbers = _settings.ShowLineNumbers;
-                    tab.Editor.Options.IndentationSize = _settings.TabSize;
+                    tab.ApplyThemeSettings(_settings);
                 }
             }
         }

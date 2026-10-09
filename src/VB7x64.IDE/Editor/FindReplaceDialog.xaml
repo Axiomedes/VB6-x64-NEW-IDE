@@ -43,7 +43,7 @@
                 <Button Content="Buscar siguiente" Width="105" Height="26" Margin="4,2" Click="BtnFindNext_Click" IsDefault="True"/>
                 <Button Content="Reemplazar" Width="85" Height="26" Margin="4,2" Click="BtnReplace_Click"/>
                 <Button Content="Reemplazar todo" Width="105" Height="26" Margin="4,2" Click="BtnReplaceAll_Click"/>
-                <Button Content="Cerrar" Width="70" Height="26" Margin="4,2" IsCancel="True"/>
+                <Button Content="Cerrar" Width="70" Height="26" Margin="4,2" Click="BtnClose_Click"/>
             </WrapPanel>
         </Grid>
     </Grid>

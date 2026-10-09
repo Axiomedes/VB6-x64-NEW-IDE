@@ -155,14 +155,59 @@
                 <Border Grid.Column="2" Background="#ECECEC">
                     <Grid>
                         <TabControl x:Name="DocumentsTabControl" BorderThickness="0" Background="#FFFFFF">
+                            <TabControl.ItemContainerStyle>
+                                <Style TargetType="TabItem">
+                                    <Setter Property="MinHeight" Value="28"/>
+                                    <Setter Property="MinWidth" Value="110"/>
+                                    <Setter Property="Padding" Value="10,4,8,4"/>
+                                    <Setter Property="FontSize" Value="12"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                    <Setter Property="ToolTip" Value="{Binding ToolTipText}"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="TabItem">
+                                                <Border x:Name="TabBorder" BorderThickness="1,1,1,0" BorderBrush="#D0D0D0" 
+                                                        Background="#EDEDED" CornerRadius="4,4,0,0" Margin="2,2,2,0" Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                                      RecognizesAccessKey="True" ContentSource="Header"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="TabBorder" Property="Background" Value="#FFFFFF"/>
+                                                        <Setter TargetName="TabBorder" Property="BorderBrush" Value="#007ACC"/>
+                                                        <Setter TargetName="TabBorder" Property="BorderThickness" Value="1,2,1,0"/>
+                                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="TabBorder" Property="Background" Value="#F8F8F8"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </TabControl.ItemContainerStyle>
                             <TabControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding HeaderText}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                        <Button Content="✕" Width="16" Height="16" FontSize="9" Padding="0"
+                                        <TextBlock Text="{Binding IconText}" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="11"/>
+                                        <TextBlock Text="{Binding HeaderText}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12"/>
+                                        <Button Content="✕" Width="18" Height="18" FontSize="10" Padding="0"
                                                 VerticalAlignment="Center" HorizontalAlignment="Right"
                                                 Background="Transparent" BorderThickness="0" Cursor="Hand"
-                                                Tag="{Binding}" Click="BtnCloseTab_Click" ToolTip="Cerrar documento"/>
+                                                Tag="{Binding}" Click="BtnCloseTab_Click" ToolTip="Cerrar documento">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Foreground" Value="#777777"/>
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Foreground" Value="#D32F2F"/>
+                                                            <Setter Property="Background" Value="#FFEBEE"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
                                     </StackPanel>
                                 </DataTemplate>
                             </TabControl.ItemTemplate>

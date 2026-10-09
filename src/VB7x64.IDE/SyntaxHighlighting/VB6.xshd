@@ -4,12 +4,18 @@
   <Color name="String" foreground="#A31515" />
   <Color name="DateLiteral" foreground="#7F0055" />
   <Color name="Keyword" foreground="#0000FF" fontWeight="bold" />
+  <Color name="MethodName" foreground="#795E26" fontWeight="bold" />
   <Color name="Type" foreground="#2B91AF" />
   <Color name="Constant" foreground="#000080" />
   <Color name="Directive" foreground="#808080" fontWeight="bold" />
   <Color name="Number" foreground="#000000" />
 
   <RuleSet ignoreCase="true">
+    <!-- Nombres de procedimientos (Sub, Function, Property, Call) -->
+    <Rule color="MethodName">
+      \b(?&lt;=(?:Sub|Function|Property\s+Get|Property\s+Let|Property\s+Set|Call)\s+)[a-zA-Z_][a-zA-Z0-9_]*\b
+    </Rule>
+
     <!-- Comentarios: apóstrofe y Rem -->
     <Span color="Comment" begin="'" />
     <Span color="Comment" begin="\bRem\b" />

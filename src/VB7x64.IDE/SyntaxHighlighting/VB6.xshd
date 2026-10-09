@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<SyntaxDefinition name="VB6" extensions=".bas;.cls;.frm" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" foreground="#008000" fontStyle="italic" />
+  <Color name="String" foreground="#A31515" />
+  <Color name="DateLiteral" foreground="#7F0055" />
+  <Color name="Keyword" foreground="#0000FF" fontWeight="bold" />
+  <Color name="Type" foreground="#2B91AF" />
+  <Color name="Constant" foreground="#000080" />
+  <Color name="Directive" foreground="#808080" fontWeight="bold" />
+  <Color name="Number" foreground="#000000" />
+
+  <RuleSet ignoreCase="true">
+    <!-- Comentarios: apóstrofe y Rem -->
+    <Span color="Comment" begin="'" />
+    <Span color="Comment" begin="\bRem\b" />
+
+    <!-- Cadenas de texto con comillas escapadas "" -->
+    <Span color="String">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <Span begin="&quot;&quot;" end="" />
+      </RuleSet>
+    </Span>
+
+    <!-- Literales de fecha #...# -->
+    <Span color="DateLiteral">
+      <Begin>#</Begin>
+      <End>#</End>
+    </Span>
+
+    <!-- Directivas de preprocesador -->
+    <Keywords color="Directive">
+      <Word>#Const</Word>
+      <Word>#If</Word>
+      <Word>#Else</Word>
+      <Word>#ElseIf</Word>
+      <Word>#End If</Word>
+      <Word>#End</Word>
+    </Keywords>
+
+    <!-- Palabras reservadas / Instrucciones principales -->
+    <Keywords color="Keyword">
+      <Word>AddressOf</Word>
+      <Word>Alias</Word>
+      <Word>And</Word>
+      <Word>As</Word>
+      <Word>Attribute</Word>
+      <Word>Base</Word>
+      <Word>ByRef</Word>
+      <Word>ByVal</Word>
+      <Word>Call</Word>
+      <Word>Case</Word>
+      <Word>Close</Word>
+      <Word>Const</Word>
+      <Word>Declare</Word>
+      <Word>DefBool</Word>
+      <Word>DefByte</Word>
+      <Word>DefCur</Word>
+      <Word>DefDate</Word>
+      <Word>DefDbl</Word>
+      <Word>DefInt</Word>
+      <Word>DefLng</Word>
+      <Word>DefObj</Word>
+      <Word>DefSng</Word>
+      <Word>DefStr</Word>
+      <Word>DefVar</Word>
+      <Word>Dim</Word>
+      <Word>Do</Word>
+      <Word>Each</Word>
+      <Word>Else</Word>
+      <Word>ElseIf</Word>
+      <Word>End</Word>
+      <Word>Enum</Word>
+      <Word>Eqv</Word>
+      <Word>Erase</Word>
+      <Word>Error</Word>
+      <Word>Event</Word>
+      <Word>Exit</Word>
+      <Word>Explicit</Word>
+      <Word>For</Word>
+      <Word>Friend</Word>
+      <Word>Function</Word>
+      <Word>Get</Word>
+      <Word>Global</Word>
+      <Word>GoSub</Word>
+      <Word>GoTo</Word>
+      <Word>If</Word>
+      <Word>Imp</Word>
+      <Word>Implements</Word>
+      <Word>In</Word>
+      <Word>Input</Word>
+      <Word>Is</Word>
+      <Word>Let</Word>
+      <Word>Lib</Word>
+      <Word>Like</Word>
+      <Word>Line</Word>
+      <Word>Lock</Word>
+      <Word>Loop</Word>
+      <Word>LSet</Word>
+      <Word>Mod</Word>
+      <Word>New</Word>
+      <Word>Next</Word>
+      <Word>Not</Word>
+      <Word>On</Word>
+      <Word>Open</Word>
+      <Word>Option</Word>
+      <Word>Optional</Word>
+      <Word>Or</Word>
+      <Word>Output</Word>
+      <Word>ParamArray</Word>
+      <Word>Print</Word>
+      <Word>Private</Word>
+      <Word>Property</Word>
+      <Word>Public</Word>
+      <Word>Put</Word>
+      <Word>RaiseEvent</Word>
+      <Word>Random</Word>
+      <Word>ReDim</Word>
+      <Word>Resume</Word>
+      <Word>Return</Word>
+      <Word>RSet</Word>
+      <Word>Seek</Word>
+      <Word>Select</Word>
+      <Word>Set</Word>
+      <Word>Static</Word>
+      <Word>Step</Word>
+      <Word>Stop</Word>
+      <Word>Sub</Word>
+      <Word>Then</Word>
+      <Word>To</Word>
+      <Word>Type</Word>
+      <Word>TypeOf</Word>
+      <Word>Unlock</Word>
+      <Word>Until</Word>
+      <Word>Wend</Word>
+      <Word>While</Word>
+      <Word>With</Word>
+      <Word>Write</Word>
+      <Word>Xor</Word>
+    </Keywords>
+
+    <!-- Tipos de datos primitivos de VB6 -->
+    <Keywords color="Type">
+      <Word>Boolean</Word>
+      <Word>Byte</Word>
+      <Word>Currency</Word>
+      <Word>Date</Word>
+      <Word>Decimal</Word>
+      <Word>Double</Word>
+      <Word>Integer</Word>
+      <Word>Long</Word>
+      <Word>Object</Word>
+      <Word>Single</Word>
+      <Word>String</Word>
+      <Word>Variant</Word>
+    </Keywords>
+
+    <!-- Constantes y literales especiales -->
+    <Keywords color="Constant">
+      <Word>True</Word>
+      <Word>False</Word>
+      <Word>Nothing</Word>
+      <Word>Null</Word>
+      <Word>Empty</Word>
+      <Word>vbNullString</Word>
+      <Word>vbCrLf</Word>
+      <Word>vbCr</Word>
+      <Word>vbLf</Word>
+      <Word>vbTab</Word>
+      <Word>vbOK</Word>
+      <Word>vbCancel</Word>
+      <Word>vbAbort</Word>
+      <Word>vbRetry</Word>
+      <Word>vbIgnore</Word>
+      <Word>vbYes</Word>
+      <Word>vbNo</Word>
+      <Word>vbOKOnly</Word>
+      <Word>vbOKCancel</Word>
+      <Word>vbCritical</Word>
+      <Word>vbQuestion</Word>
+      <Word>vbExclamation</Word>
+      <Word>vbInformation</Word>
+    </Keywords>
+
+    <!-- Números hexadecimales e integrales -->
+    <Rule color="Number">
+      &amp;H[0-9a-fA-F]+&amp;?|&amp;O[0-7]+&amp;?|\b\d+(\.\d+)?([eE][+-]?\d+)?\b
+    </Rule>
+  </RuleSet>
+</SyntaxDefinition>

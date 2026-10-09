@@ -1,0 +1,546 @@
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using Microsoft.Win32;
+using ICSharpCode.AvalonEdit;
+using VB7x64.IDE.Editor;
+using VB7x64.IDE.Logging;
+using VB7x64.IDE.Settings;
+using VB7x64.ProjectModel.Documents;
+using VB7x64.ProjectModel.Vbp;
+
+namespace VB7x64.IDE;
+
+public partial class MainWindow : Window
+{
+    private readonly AppSettings _settings;
+    private VB6Project? _currentProject;
+
+    public EditorTabItem? ActiveTab => DocumentsTabControl.SelectedItem as EditorTabItem;
+    public TextEditor? ActiveEditor => ActiveTab?.Editor;
+
+    public MainWindow()
+    {
+        InitializeComponent();
+        _settings = AppSettings.Load();
+
+        Loaded += MainWindow_Loaded;
+        Closing += MainWindow_Closing;
+        DocumentsTabControl.SelectionChanged += DocumentsTabControl_SelectionChanged;
+
+        UpdateDocumentsVisibility();
+    }
+
+    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (_settings.WindowWidth > 200) Width = _settings.WindowWidth;
+        if (_settings.WindowHeight > 200) Height = _settings.WindowHeight;
+        if (_settings.WindowLeft >= 0) Left = _settings.WindowLeft;
+        if (_settings.WindowTop >= 0) Top = _settings.WindowTop;
+        if (_settings.IsMaximized) WindowState = WindowState.Maximized;
+
+        AppLogger.Info("Ventana principal cargada correctamente.");
+    }
+
+    private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+    {
+        // Verificar si hay documentos con cambios pendientes
+        foreach (var item in DocumentsTabControl.Items)
+        {
+            if (item is EditorTabItem tab && tab.Document.IsDirty)
+            {
+                var response = MessageBox.Show(
+                    $"¿Deseas guardar los cambios en '{tab.Document.DisplayName}' antes de salir?",
+                    "Cambios pendientes",
+                    MessageBoxButton.YesNoCancel,
+                    MessageBoxImage.Question);
+
+                if (response == MessageBoxResult.Cancel)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+
+                if (response == MessageBoxResult.Yes)
+                {
+                    var result = tab.Save(_settings.CreateBackupBeforeSave);
+                    if (result.Status != SaveStatus.Success && result.Status != SaveStatus.NotModified)
+                    {
+                        MessageBox.Show(result.Message, "Error al guardar", MessageBoxButton.OK, MessageBoxImage.Error);
+                        e.Cancel = true;
+                        return;
+                    }
+                }
+            }
+        }
+
+        // Guardar configuración de ventana
+        _settings.IsMaximized = WindowState == WindowState.Maximized;
+        if (WindowState == WindowState.Normal)
+        {
+            _settings.WindowWidth = Width;
+            _settings.WindowHeight = Height;
+            _settings.WindowLeft = Left;
+            _settings.WindowTop = Top;
+        }
+        _settings.Save();
+        AppLogger.Info("Configuración de ventana guardada.");
+    }
+
+    private void DocumentsTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        UpdateStatusFromActiveTab();
+    }
+
+    private void UpdateStatusFromActiveTab()
+    {
+        if (ActiveTab != null)
+        {
+            int line = ActiveTab.Editor.TextArea.Caret.Line;
+            int col = ActiveTab.Editor.TextArea.Caret.Column;
+            SetLineCol(line, col);
+
+            string encName = ActiveTab.Document.Encoding.EncodingName;
+            string bomInfo = ActiveTab.Document.HasByteOrderMark ? " (BOM)" : "";
+            string nl = ActiveTab.Document.NewLineConvention.ToString().ToUpperInvariant();
+            SetEncodingInfo($"{encName}{bomInfo}", nl);
+            SetStatusMessage($"Documento activo: {ActiveTab.Document.DisplayName}");
+        }
+        else
+        {
+            SetLineCol(1, 1);
+            SetEncodingInfo("Windows-1252 (ANSI)", "CRLF");
+            SetStatusMessage("Listo");
+        }
+    }
+
+    private void UpdateDocumentsVisibility()
+    {
+        if (DocumentsTabControl.Items.Count == 0)
+        {
+            EmptyDocsNotice.Visibility = Visibility.Visible;
+            DocumentsTabControl.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            EmptyDocsNotice.Visibility = Visibility.Collapsed;
+            DocumentsTabControl.Visibility = Visibility.Visible;
+        }
+    }
+
+    public void SetStatusMessage(string message) => TxtStatusMessage.Text = message;
+    public void SetLineCol(int line, int col) => TxtStatusLineCol.Text = $"Ln {line}, Col {col}";
+    public void SetEncodingInfo(string encoding, string lineEnding) => TxtStatusEncoding.Text = $"{encoding} | {lineEnding}";
+
+    public EditorTabItem? OpenFile(string filePath)
+    {
+        try
+        {
+            string fullPath = Path.GetFullPath(filePath);
+
+            // Evitar abrir duplicados para la misma ruta canónica
+            foreach (var item in DocumentsTabControl.Items)
+            {
+                if (item is EditorTabItem openTab &&
+                    string.Equals(Path.GetFullPath(openTab.Document.FilePath), fullPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    DocumentsTabControl.SelectedItem = openTab;
+                    UpdateStatusFromActiveTab();
+                    return openTab;
+                }
+            }
+
+            var doc = SafeFileStorage.LoadDocument(fullPath);
+            var tabItem = new EditorTabItem(doc, _settings);
+
+            tabItem.CaretPositionChanged += (line, col) =>
+            {
+                if (DocumentsTabControl.SelectedItem == tabItem)
+                {
+                    SetLineCol(line, col);
+                }
+            };
+
+            DocumentsTabControl.Items.Add(tabItem);
+            DocumentsTabControl.SelectedItem = tabItem;
+
+            UpdateDocumentsVisibility();
+            UpdateStatusFromActiveTab();
+            AppLogger.Info($"Archivo abierto: {fullPath}");
+            return tabItem;
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error($"Error al abrir el archivo {filePath}", ex);
+            MessageBox.Show($"No se pudo abrir el archivo:\n\n{ex.Message}", "Error al abrir archivo", MessageBoxButton.OK, MessageBoxImage.Error);
+            return null;
+        }
+    }
+
+    public bool CloseTab(EditorTabItem tab)
+    {
+        if (tab.Document.IsDirty)
+        {
+            var response = MessageBox.Show(
+                $"¿Deseas guardar los cambios en '{tab.Document.DisplayName}' antes de cerrar?",
+                "Cambios pendientes",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Question);
+
+            if (response == MessageBoxResult.Cancel) return false;
+
+            if (response == MessageBoxResult.Yes)
+            {
+                var result = tab.Save(_settings.CreateBackupBeforeSave);
+                if (result.Status != SaveStatus.Success && result.Status != SaveStatus.NotModified)
+                {
+                    MessageBox.Show(result.Message, "Error al guardar", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+            }
+        }
+
+        DocumentsTabControl.Items.Remove(tab);
+        UpdateDocumentsVisibility();
+        UpdateStatusFromActiveTab();
+        return true;
+    }
+
+    #region Project Handling (Milestone 5)
+    public void LoadProject(string vbpFilePath)
+    {
+        try
+        {
+            var project = VbpParser.Parse(vbpFilePath);
+            _currentProject = project;
+
+            ProjectTreeView.Items.Clear();
+
+            var rootItem = new TreeViewItem
+            {
+                Header = $"📁 {project.Name} ({Path.GetFileName(project.ProjectFilePath)})",
+                IsExpanded = true,
+                FontWeight = FontWeights.Bold
+            };
+
+            // Formularios
+            if (project.Forms.Any())
+            {
+                var formsFolder = new TreeViewItem { Header = $"🗔 Formularios ({project.Forms.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
+                foreach (var form in project.Forms)
+                {
+                    formsFolder.Items.Add(CreateProjectItemNode(form));
+                }
+                rootItem.Items.Add(formsFolder);
+            }
+
+            // Módulos
+            if (project.Modules.Any())
+            {
+                var modulesFolder = new TreeViewItem { Header = $"📜 Módulos ({project.Modules.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
+                foreach (var mod in project.Modules)
+                {
+                    modulesFolder.Items.Add(CreateProjectItemNode(mod));
+                }
+                rootItem.Items.Add(modulesFolder);
+            }
+
+            // Clases
+            if (project.Classes.Any())
+            {
+                var classesFolder = new TreeViewItem { Header = $"🧩 Módulos de Clase ({project.Classes.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
+                foreach (var cls in project.Classes)
+                {
+                    classesFolder.Items.Add(CreateProjectItemNode(cls));
+                }
+                rootItem.Items.Add(classesFolder);
+            }
+
+            // Controles de Usuario
+            if (project.UserControls.Any())
+            {
+                var ucFolder = new TreeViewItem { Header = $"🎛️ Controles de Usuario ({project.UserControls.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
+                foreach (var uc in project.UserControls)
+                {
+                    ucFolder.Items.Add(CreateProjectItemNode(uc));
+                }
+                rootItem.Items.Add(ucFolder);
+            }
+
+            // Referencias
+            if (project.References.Any())
+            {
+                var refFolder = new TreeViewItem { Header = $"🔗 Referencias ({project.References.Count})", IsExpanded = false, FontWeight = FontWeights.Normal };
+                foreach (var r in project.References)
+                {
+                    var refNode = new TreeViewItem
+                    {
+                        Header = $"• {r.DisplayTitle}",
+                        Foreground = Brushes.Gray,
+                        FontWeight = FontWeights.Normal
+                    };
+                    refFolder.Items.Add(refNode);
+                }
+                rootItem.Items.Add(refFolder);
+            }
+
+            ProjectTreeView.Items.Add(rootItem);
+            SetStatusMessage($"Proyecto '{project.Name}' cargado exitosamente.");
+            Title = $"VB7-x64 IDE - {project.Name} ({Path.GetFileName(project.ProjectFilePath)})";
+            AppLogger.Info($"Proyecto cargado: {project.ProjectFilePath}");
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error($"Error al abrir el proyecto {vbpFilePath}", ex);
+            MessageBox.Show($"Error al abrir el proyecto:\n\n{ex.Message}", "Error al abrir proyecto", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private static TreeViewItem CreateProjectItemNode(ProjectItem item)
+    {
+        var node = new TreeViewItem
+        {
+            Header = $"{item.DisplayIcon} {item.DisplayTitle}" + (!item.FileExists ? " (No encontrado)" : ""),
+            Tag = item,
+            FontWeight = FontWeights.Normal
+        };
+
+        if (!item.FileExists)
+        {
+            node.Foreground = Brushes.Crimson;
+            node.ToolTip = $"El archivo no fue encontrado en: {item.AbsolutePath}";
+        }
+        else
+        {
+            node.ToolTip = item.AbsolutePath;
+        }
+
+        return node;
+    }
+
+    private void ProjectTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (ProjectTreeView.SelectedItem is TreeViewItem { Tag: ProjectItem item })
+        {
+            if (!item.FileExists)
+            {
+                MessageBox.Show($"El archivo '{item.DisplayTitle}' no existe en la ruta esperada:\n\n{item.AbsolutePath}",
+                    "Archivo no encontrado", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (item.IsEditable)
+            {
+                OpenFile(item.AbsolutePath);
+            }
+        }
+    }
+    #endregion
+
+    #region Menu File Actions
+    private void MenuOpenProject_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog
+        {
+            Title = "Abrir Proyecto VB6",
+            Filter = "Proyectos Visual Basic (*.vbp)|*.vbp|Todos los archivos (*.*)|*.*"
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            LoadProject(dialog.FileName);
+        }
+    }
+
+    private void MenuOpenFile_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog
+        {
+            Title = "Abrir Archivo de Código VB6",
+            Filter = "Archivos VB6 (*.bas;*.cls;*.frm)|*.bas;*.cls;*.frm|Módulos (*.bas)|*.bas|Módulos de Clase (*.cls)|*.cls|Formularios (*.frm)|*.frm|Todos los archivos (*.*)|*.*"
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            OpenFile(dialog.FileName);
+        }
+    }
+
+    private void MenuSave_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveTab == null) return;
+
+        var result = ActiveTab.Save(_settings.CreateBackupBeforeSave);
+        switch (result.Status)
+        {
+            case SaveStatus.Success:
+                SetStatusMessage($"'{ActiveTab.Document.DisplayName}' guardado exitosamente.");
+                break;
+            case SaveStatus.NotModified:
+                SetStatusMessage($"'{ActiveTab.Document.DisplayName}' no tiene cambios.");
+                break;
+            case SaveStatus.ReadOnlyFile:
+            case SaveStatus.ExternalConflict:
+            case SaveStatus.Error:
+                MessageBox.Show(result.Message, "Error al guardar", MessageBoxButton.OK, MessageBoxImage.Warning);
+                SetStatusMessage(result.Message);
+                break;
+        }
+    }
+
+    private void MenuSaveAs_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveTab == null) return;
+
+        var dialog = new SaveFileDialog
+        {
+            Title = "Guardar como",
+            FileName = ActiveTab.Document.DisplayName,
+            Filter = "Archivos de Código VB6 (*.bas;*.cls;*.frm)|*.bas;*.cls;*.frm|Todos los archivos (*.*)|*.*"
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            ActiveTab.Document.FilePath = dialog.FileName;
+            ActiveTab.Document.DisplayName = Path.GetFileName(dialog.FileName);
+            ActiveTab.Document.IsDirty = true;
+            MenuSave_Click(sender, e);
+        }
+    }
+
+    private void MenuSaveAll_Click(object sender, RoutedEventArgs e)
+    {
+        int count = 0;
+        foreach (var item in DocumentsTabControl.Items)
+        {
+            if (item is EditorTabItem tab && tab.Document.IsDirty)
+            {
+                var result = tab.Save(_settings.CreateBackupBeforeSave);
+                if (result.Status == SaveStatus.Success) count++;
+            }
+        }
+        SetStatusMessage(count > 0 ? $"Se guardaron {count} documentos modificados." : "Todos los documentos están actualizados.");
+    }
+
+    private void MenuCloseDoc_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveTab != null)
+        {
+            CloseTab(ActiveTab);
+        }
+    }
+
+    private void MenuExit_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+    #endregion
+
+    #region Menu Edit Actions
+    private void MenuUndo_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor != null && ActiveEditor.CanUndo) ActiveEditor.Undo();
+    }
+
+    private void MenuRedo_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor != null && ActiveEditor.CanRedo) ActiveEditor.Redo();
+    }
+
+    private void MenuCut_Click(object sender, RoutedEventArgs e)
+    {
+        ActiveEditor?.Cut();
+    }
+
+    private void MenuCopy_Click(object sender, RoutedEventArgs e)
+    {
+        ActiveEditor?.Copy();
+    }
+
+    private void MenuPaste_Click(object sender, RoutedEventArgs e)
+    {
+        ActiveEditor?.Paste();
+    }
+
+    private void MenuFind_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor == null) return;
+        var dlg = new FindReplaceDialog(ActiveEditor) { Owner = this };
+        dlg.Show();
+    }
+
+    private void MenuReplace_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor == null) return;
+        var dlg = new FindReplaceDialog(ActiveEditor) { Owner = this };
+        dlg.Show();
+    }
+
+    private void MenuGoToLine_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor == null) return;
+
+        int currentLine = ActiveEditor.TextArea.Caret.Line;
+        int lineCount = ActiveEditor.Document.LineCount;
+
+        var dlg = new GoToLineDialog(currentLine, lineCount) { Owner = this };
+        if (dlg.ShowDialog() == true)
+        {
+            int targetLine = dlg.SelectedLine;
+            var line = ActiveEditor.Document.GetLineByNumber(targetLine);
+            ActiveEditor.CaretOffset = line.Offset;
+            ActiveEditor.ScrollToLine(targetLine);
+        }
+    }
+    #endregion
+
+    #region Menu View Actions
+    private void MenuToggleProjectExplorer_Click(object sender, RoutedEventArgs e)
+    {
+        ColProjectExplorer.Width = MenuToggleProjectExplorer.IsChecked ? new GridLength(260) : new GridLength(0);
+    }
+
+    private void MenuToggleStatusBar_Click(object sender, RoutedEventArgs e)
+    {
+        MainStatusBar.Visibility = MenuToggleStatusBar.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void MenuOpenLogsFolder_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            string dir = Path.GetDirectoryName(AppLogger.LogFilePath)!;
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = dir,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error("No se pudo abrir la carpeta de logs", ex);
+        }
+    }
+    #endregion
+
+    #region Menu Help Actions
+    private void MenuAbout_Click(object sender, RoutedEventArgs e)
+    {
+        var about = new AboutWindow { Owner = this };
+        about.ShowDialog();
+    }
+    #endregion
+
+    private void BtnCloseTab_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is EditorTabItem tabItem)
+        {
+            CloseTab(tabItem);
+        }
+    }
+}

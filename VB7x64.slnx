@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/VB7x64.IDE/VB7x64.IDE.csproj" />
+    <Project Path="src/VB7x64.ProjectModel/VB7x64.ProjectModel.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/VB7x64.Tests/VB7x64.Tests.csproj" />
+  </Folder>
+</Solution>

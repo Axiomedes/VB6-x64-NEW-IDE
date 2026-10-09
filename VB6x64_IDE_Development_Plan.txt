@@ -1,0 +1,536 @@
+VB6-x64 IDE
+PLAN DE DESARROLLO TÉCNICO POR MILESTONES
+Versión 1.0 — MVP: abrir, leer y editar proyectos VB6 clásicos en Windows x64
+============================================================================
+
+1. OBJETIVO
+-----------
+Construir un IDE para Windows x64 inspirado en Microsoft Visual Basic 6.0. La
+primera versión debe abrir proyectos VB6 existentes, navegar sus archivos y
+editar código sin convertirlos a otro formato ni corromper el diseño visual.
+
+El IDE se desarrollará en paralelo al compilador VB6 Open Compiler x64, pero
+ambos deben permanecer desacoplados. El IDE podrá abrir y guardar código aunque
+el compilador y el runtime todavía no existan.
+
+MVP: FUNCIONES INCLUIDAS
+- Abrir un proyecto .vbp.
+- Mostrar los elementos del proyecto en un Project Explorer.
+- Abrir y editar .bas, .cls y código de formularios .frm.
+- Resaltado sintáctico VB6.
+- Pestañas, guardar, guardar como, deshacer/rehacer, buscar/reemplazar.
+- Avisos de cambios no guardados y copias de seguridad configurables.
+- Conservación de codificación, saltos de línea y recursos no editados.
+
+FUERA DEL MVP
+- Compilación, ejecución y hot reload.
+- Depurador.
+- Diseñador visual editable.
+- Reimplementación de controles VB6.
+- Conversión automática o reformateo del proyecto.
+
+Los controles x64 serán una fase posterior. No son necesarios para leer y editar
+código. La primera prioridad es abrir, editar y guardar sin alterar archivos que
+el usuario no ha modificado.
+
+2. ARQUITECTURA TÉCNICA RECOMENDADA
+-----------------------------------
+IDE:
+    C# + WPF, dirigido a Windows x64, sobre .NET 10 LTS.
+Editor de código:
+    AvalonEdit, componente WPF con licencia MIT; crear reglas propias para VB6.
+Integración futura:
+    API, CLI o servicio independiente (por ejemplo JSON-RPC/LSP) para recibir
+    diagnósticos y símbolos del parser/compiler cuando estén disponibles.
+
+Referencias oficiales:
+    WPF / Windows Desktop:
+    https://learn.microsoft.com/en-us/dotnet/desktop/
+    .NET 10:
+    https://learn.microsoft.com/en-us/dotnet/core/whats-new/dotnet-10/overview
+    AvalonEdit:
+    https://github.com/icsharpcode/AvalonEdit
+    Scintilla, alternativa de editor:
+    https://www.scintilla.org/ScintillaDoc.html
+
+Que el IDE esté escrito en C#/.NET NO significa que las aplicaciones VB6-x64
+compiladas deban depender de .NET. El IDE, el compilador y el runtime son
+componentes distintos.
+
+3. REGLAS FUNDAMENTALES DE SEGURIDAD
+-----------------------------------
+1. No reescribir archivos que el usuario no modificó.
+2. No convertir ANSI a UTF-8 de forma silenciosa.
+3. No cambiar CRLF/LF sin autorización.
+4. No reconstruir completamente un .frm para guardar solo un cambio de código.
+5. No abrir ni guardar archivos .frx como texto: contienen datos binarios.
+6. Preservar líneas desconocidas del .vbp y referencias que aún no se soporten.
+7. No borrar elementos desconocidos del proyecto.
+8. Abrir o editar no debe ejecutar código.
+9. Cada Milestone tendrá pruebas automatizadas y fixtures reales.
+10. No declarar compatibilidad total con VB6 sin pruebas demostrables.
+11. No activar compilación/ejecución en el MVP.
+12. Si la codificación es ambigua, permitir configurarla y advertir; no fingir
+    que siempre puede detectarse automáticamente sin error.
+
+4. ESTRUCTURA INICIAL DEL REPOSITORIO
+------------------------------------
+VB6x64.sln
+  src/IDE
+    Shell
+    ProjectExplorer
+    Editor
+    Documents
+    FileIO
+    SyntaxHighlighting
+    Navigation
+    Settings
+  src/ProjectModel
+    VB6Project
+    ProjectItem
+    VbpParser
+    ProjectReference
+    ProjectComponent
+  src/LanguageService      (futuro)
+  tests
+    ProjectLoaderTests
+    EditorDocumentTests
+    FileRoundTripTests
+    VbpSafetyTests
+    FrmSafetyTests
+  docs
+
+El compilador tendrá su propio directorio/proyecto. El contrato entre IDE y
+compilador se documentará y versionará; la UI WPF no debe depender directamente
+de las clases internas del compilador.
+
+============================================================================
+MILESTONE 0 — DECISIONES Y ESPECIFICACIÓN
+============================================================================
+Objetivo: cerrar las decisiones técnicas y definir exactamente el MVP.
+
+Tareas:
+0.1 Crear repositorio y directorios iniciales.
+0.2 Confirmar C# + WPF + .NET 10 LTS para la interfaz.
+0.3 Confirmar AvalonEdit y revisar su licencia/dependencias.
+0.4 Crear README.md, ARCHITECTURE.md y LICENSES.md.
+0.5 Definir claramente funciones incluidas y excluidas.
+0.6 Crear colección inicial de proyectos VB6 de prueba.
+0.7 Registrar decisiones relevantes en documentos ADR.
+0.8 Definir convenciones de nombres, logging y pruebas.
+
+Terminado cuando: no existen decisiones contradictorias sobre la tecnología,
+el alcance del MVP y la separación entre IDE, compilador y runtime.
+
+============================================================================
+MILESTONE 1 — APLICACIÓN WPF WINDOWS x64
+============================================================================
+Objetivo: obtener una aplicación Windows x64 que abra una ventana estable.
+
+Tareas:
+1.1 Crear solución y proyecto WPF.
+1.2 Configurar la plataforma x64 explícitamente.
+1.3 Crear MainWindow.
+1.4 Crear menú superior y barra de herramientas inicial.
+1.5 Reservar el panel lateral para Project Explorer.
+1.6 Crear zona central con pestañas.
+1.7 Crear barra de estado inferior.
+1.8 Añadir configuración básica y logging.
+1.9 Añadir información de versión y gestión global de excepciones.
+1.10 Configurar nombre e icono provisional de VB6-x64 IDE.
+
+Prueba: el proceso se ejecuta como x64 y presenta una ventana usable.
+
+============================================================================
+MILESTONE 2 — MODELO DE DOCUMENTO Y LECTURA/GUARDADO SEGURO
+============================================================================
+Objetivo: poder leer y guardar texto VB6 sin cambios involuntarios.
+
+Crear EditorDocument con campos conceptuales:
+    FilePath, DisplayName, Text, Encoding, HasByteOrderMark,
+    NewLineConvention, IsDirty, IsReadOnly, OriginalHash, LastSavedHash.
+
+Tareas:
+2.1 Detectar BOM de UTF-8 y UTF-16.
+2.2 Para archivos sin BOM, admitir la página de códigos ANSI de Windows y una
+    opción de codificación por documento/proyecto.
+2.3 No asumir que Encoding.Default equivale a la página ANSI del sistema en
+    todas las versiones de .NET; consultar explícitamente la ACP si se necesita.
+2.4 Registrar el tipo de salto de línea CRLF, LF o CR.
+2.5 No reescribir un archivo que no haya sido modificado.
+2.6 Implementar guardado temporal + reemplazo controlado.
+2.7 Crear copia .bak antes de sobrescribir, según configuración.
+2.8 Detectar cambios externos ocurridos mientras el documento estaba abierto.
+2.9 Avisar de conflictos de escritura y respetar el atributo de solo lectura.
+2.10 Mantener el hash/tamaño/fecha que se usará para pruebas de integridad.
+
+Pruebas obligatorias:
+- ANSI, UTF-8 con/sin BOM y UTF-16.
+- CRLF y LF.
+- Caracteres acentuados.
+- Archivo de solo lectura.
+- Modificación externa en disco.
+- Abrir/cerrar sin editar y comprobar que el archivo no cambió byte a byte.
+
+Terminado cuando las pruebas verifican que los archivos no modificados no se
+reescriben y que los modificados siguen las reglas definidas.
+
+============================================================================
+MILESTONE 3 — EDITOR DE CÓDIGO FUNCIONAL
+============================================================================
+Objetivo: editar código desde la interfaz.
+
+Tareas:
+3.1 Integrar AvalonEdit.
+3.2 Añadir números de línea.
+3.3 Habilitar selección, copiar, cortar, pegar, deshacer y rehacer.
+3.4 Implementar Buscar y Reemplazar.
+3.5 Implementar Ir a línea.
+3.6 Mostrar línea/columna actual en la barra de estado.
+3.7 Mostrar documento modificado con asterisco/indicador.
+3.8 Crear pestañas de documentos.
+3.9 Implementar Guardar y Guardar como.
+3.10 Preguntar antes de cerrar documentos con cambios no guardados.
+3.11 Configurar fuente, tamaño y tabulaciones.
+3.12 Añadir atajos de teclado esenciales.
+3.13 No aplicar reformateo automático ni generar código automáticamente.
+
+Prueba: abrir, editar, guardar, cerrar y reabrir un .bas sin perder contenido.
+
+============================================================================
+MILESTONE 4 — RESALTADO SINTÁCTICO VB6
+============================================================================
+Objetivo: destacar sintaxis VB6 sin alterar el texto.
+
+Categorías iniciales:
+- Palabras reservadas.
+- Tipos de datos.
+- Comentarios con apóstrofo y Rem.
+- Strings con comillas dobles y comillas dobles escapadas.
+- Literales numéricos.
+- Literales de fecha delimitados por #.
+- Operadores y puntuación.
+- Atributos/directivas reconocibles.
+
+Tareas:
+4.1 Definir reglas y colores de sintaxis VB6.
+4.2 Crear pruebas de strings, comentarios, continuaciones y operadores.
+4.3 Asegurar que las palabras dentro de strings no se resaltan como keywords.
+4.4 Implementar tema claro/oscuro como configuración.
+4.5 Diferenciar claramente resaltado de sintaxis de análisis semántico.
+
+Terminado cuando los ejemplos se muestran correctamente y el resaltado no
+altera el documento.
+
+============================================================================
+MILESTONE 5 — CARGA Y MODELO DEL PROYECTO .VBP
+============================================================================
+Objetivo: abrir .vbp y mostrar la estructura conocida del proyecto.
+
+Implementar:
+    VbpParser, VB6Project, ProjectItem, ProjectReference,
+    ProjectComponent, ProjectSettings.
+
+Tareas:
+5.1 Leer .vbp línea a línea conservando el texto original.
+5.2 Reconocer nombre y tipo del proyecto.
+5.3 Reconocer entradas Form=, Module=, Class=, UserControl=, PropertyPage=,
+    Type= y otras líneas conocidas.
+5.4 Resolver rutas relativas con respecto al directorio del .vbp.
+5.5 Admitir rutas absolutas cuando existan.
+5.6 Preservar líneas desconocidas y su orden.
+5.7 Advertir sobre archivos faltantes; no borrarlos automáticamente.
+5.8 Mostrar estructura en Project Explorer.
+5.9 Cargar proyecto sin reescribir el archivo .vbp.
+5.10 Doble clic en elemento abre su documento si es un archivo editable.
+
+Pruebas:
+- Proyecto simple.
+- Proyecto con múltiples módulos, clases y formularios.
+- Rutas relativas y nombres con espacios.
+- Referencias/componentes no soportados.
+- Archivos faltantes.
+
+Terminado cuando un proyecto VB6 real se representa correctamente y su .vbp
+permanece intacto hasta que el usuario cambie algo que requiera editarlo.
+
+============================================================================
+MILESTONE 6 — GESTIÓN DE VARIOS DOCUMENTOS
+============================================================================
+Objetivo: conectar Project Explorer con el editor.
+
+Tareas:
+6.1 Abrir .bas y .cls desde el árbol.
+6.2 Evitar abrir dos pestañas para la misma ruta canónica por accidente.
+6.3 Activar pestaña existente al volver a seleccionar el mismo archivo.
+6.4 Guardar todos los documentos modificados.
+6.5 Preguntar antes de cerrar proyecto con cambios pendientes.
+6.6 Implementar Abrir archivo y Abrir proyecto.
+6.7 Manejar renombrados/eliminaciones externas sin bloquear el IDE.
+6.8 Mostrar archivos recientes.
+
+Terminado cuando abrir -> editar varios archivos -> guardar -> cerrar -> volver
+a abrir funciona sin pérdida de cambios.
+
+============================================================================
+MILESTONE 7 — EDICIÓN SEGURA DE FORMULARIOS .FRM Y RECURSOS .FRX
+============================================================================
+Objetivo: editar el código de formularios sin corromper su diseño.
+
+Advertencia técnica:
+Un .frm contiene información serializada del formulario/controles, propiedades,
+atributos y código. Puede apuntar a recursos binarios guardados en un .frx.
+No se debe tratar el .frm como si fuera solamente un .bas ni reconstruirlo
+completo a partir de un modelo parcial.
+
+Tareas:
+7.1 Recopilar formularios de prueba guardados por VB6 SP6.
+7.2 Estudiar y delimitar la sección de código frente a la sección serializada.
+7.3 Mantener intacta la parte de diseño original.
+7.4 Guardar sustituyendo únicamente el tramo de código editado.
+7.5 Preservar atributos de módulo y líneas desconocidas.
+7.6 No actualizar offsets ni referencias .frx desde el editor de código.
+7.7 Nunca abrir un .frx en el editor de texto.
+7.8 Si no se puede identificar la región modificable con seguridad, abrir .frm
+    en solo lectura y mostrar un aviso explícito.
+7.9 Comparar el .frm antes/después y confirmar que no cambió el diseño.
+7.10 Confirmar que los .frx no cambiaron byte a byte.
+
+Terminado cuando formularios de prueba pueden editar su código sin alterar
+involuntariamente los controles, propiedades o recursos.
+
+============================================================================
+MILESTONE 8 — NAVEGACIÓN DEL CÓDIGO
+============================================================================
+Objetivo: facilitar el trabajo con módulos grandes.
+
+Tareas:
+8.1 Listar procedimientos del archivo actual.
+8.2 Reconocer inicialmente Sub, Function y Property.
+8.3 Saltar a un procedimiento seleccionado.
+8.4 Buscar texto en todo el proyecto.
+8.5 Añadir marcadores/bookmarks y volver a la posición anterior.
+8.6 Implementar búsqueda rápida por nombre de archivo.
+8.7 Mantener una API interna de símbolos que pueda reemplazarse por el parser
+    formal del compilador más adelante.
+
+Terminado cuando es posible localizar procedimientos y texto en proyectos
+con muchos archivos sin compilar ni ejecutar el proyecto.
+
+============================================================================
+MILESTONE 9 — CONFIGURACIÓN Y EXPERIENCIA DE USUARIO
+============================================================================
+Objetivo: aproximarse gradualmente al flujo de trabajo del IDE clásico.
+
+Tareas:
+9.1 Ajustar la distribución de menús, toolbar, Project Explorer y editor.
+9.2 Persistir tamaño/posición de ventana.
+9.3 Persistir fuente, tamaño, tabulaciones y tema.
+9.4 Recordar archivos y proyectos recientes.
+9.5 Permitir mostrar/ocultar paneles.
+9.6 Añadir mensajes de error claros y log técnico consultable.
+9.7 Probar diferentes resoluciones y escalado DPI.
+9.8 Mantener los comandos Compile/Run deshabilitados o ausentes en el MVP.
+9.9 No copiar código ni recursos propietarios del IDE original.
+
+Terminado cuando el IDE es cómodo para tareas reales de edición, aunque aún no
+tenga diseñador visual.
+
+============================================================================
+MILESTONE 10 — INTEGRACIÓN FUTURA CON PARSER / SERVICIO DE LENGUAJE
+============================================================================
+Objetivo: añadir diagnósticos y navegación sin acoplar la interfaz.
+
+Opciones de comunicación: proceso independiente, JSON-RPC, LSP o API local.
+
+Tareas:
+10.1 Definir protocolo, versión y manejo de errores.
+10.2 Enviar documentos abiertos al servicio.
+10.3 Recibir diagnósticos por archivo/línea/columna.
+10.4 Mostrar errores y advertencias sin bloquear la edición.
+10.5 Recibir símbolos/procedimientos para navegación.
+10.6 No compilar ni ejecutar como efecto secundario del análisis.
+10.7 No guardar ni reformatear documentos automáticamente.
+10.8 Permitir usar el IDE aunque el servicio no exista o falle.
+
+Terminado cuando la integración es opcional y el editor sigue siendo autónomo.
+
+============================================================================
+MILESTONE 11 — VISTA PREVIA DE FORMULARIOS (SOLO LECTURA)
+============================================================================
+Fase posterior al MVP.
+
+Objetivo: interpretar un subconjunto de .frm y mostrar una vista previa sin
+permitir cambios de diseño.
+
+Tareas:
+11.1 Crear un modelo de diseño separado del texto original.
+11.2 Reconocer controles y propiedades soportados.
+11.3 Mostrar controles desconocidos como elementos no interpretados.
+11.4 No cambiar .frm/.frx desde la vista previa.
+11.5 Comparar vistas previas contra formularios de prueba.
+
+Terminado cuando la vista previa no modifica archivos y es correcta para el
+subconjunto documentado.
+
+============================================================================
+MILESTONE 12 — DISEÑADOR EDITABLE Y CONTROLES X64
+============================================================================
+Fase posterior: no comenzar antes de estabilizar apertura y guardado.
+
+Objetivo: editar formularios y crear controles compatibles con el runtime x64.
+
+Tareas:
+12.1 Definir contrato de cada control: propiedades, eventos, valores por
+     defecto, persistencia y ciclo de vida.
+12.2 Separar modelo de diseño de la interfaz del IDE.
+12.3 Definir una biblioteca de controles x64 para el runtime.
+12.4 Priorizar controles intrínsecos:
+     Form, Label, TextBox, CommandButton, CheckBox, OptionButton, Frame,
+     ListBox, ComboBox, PictureBox, Image y Timer.
+12.5 Implementar propiedades y eventos de forma incremental.
+12.6 Mantener correspondencia de nombres, por ejemplo Command1_Click.
+12.7 Implementar serialización .frm solo para los casos conocidos.
+12.8 Preservar propiedades/líneas desconocidas del archivo.
+12.9 Crear pruebas de apertura y guardado que incluyan VB6 SP6.
+12.10 Probar por separado diseñador, controles y runtime.
+
+Advertencia:
+Un proceso x64 no puede cargar directamente DLL/OCX de 32 bits. Los ActiveX
+clásicos de 32 bits requerirán sustitución por componentes x64 o un puente entre
+procesos. No intentar cargarlos directamente dentro del proceso x64.
+
+Terminado cuando un subconjunto documentado de formularios puede editarse,
+guardarse y, en el futuro, ejecutarse con el runtime x64.
+
+============================================================================
+MILESTONE 13 — INTEGRACIÓN DE BUILD TRADICIONAL (FUTURO)
+============================================================================
+No forma parte del MVP.
+
+Objetivo: integrar compilación y ejecución normal cuando el compilador esté
+listo, generando primero un ejecutable en disco.
+
+Reglas:
+- No ejecutar código sin compilarlo.
+- No implementar hot reload/hot execution.
+- Build debe producir salida verificable.
+- Run debe ejecutar el EXE construido, no interpretar directamente el fuente.
+- Los errores deben enlazar con archivo/línea/columna cuando sea posible.
+- Build/Run deben ser opcionales y desacoplados del editor.
+
+Terminado cuando las acciones utilizan un compilador real, documentado y
+probado. No simular compilación si no existe.
+
+============================================================================
+ORDEN DE EJECUCIÓN RECOMENDADO
+============================================================================
+M0  Decisiones y especificación.
+M1  Shell WPF x64.
+M2  Modelo de documento y archivos seguros.
+M3  Editor funcional.
+M4  Resaltado de sintaxis VB6.
+M5  Carga .vbp y Project Explorer.
+M6  Gestión de múltiples documentos.
+M7  Edición segura de .frm y preservación de .frx.
+M8  Navegación del código.
+M9  Preferencias y experiencia de usuario.
+M10 Integración opcional de parser/servicio de lenguaje.
+M11 Vista previa de formularios solo lectura.
+M12 Diseñador editable y controles x64.
+M13 Build explícito/ejecución tradicional futura.
+
+No comenzar el diseñador editable antes de que las pruebas demuestren que los
+archivos fuente se guardan con seguridad. No integrar Build/Run hasta que exista
+un compilador funcional. El MVP no compila ni ejecuta.
+
+============================================================================
+PRIMERA ENTREGA VERTICAL
+============================================================================
+1. Ejecutar VB6-x64 IDE.
+2. Abrir un .bas.
+3. Mostrar números de línea.
+4. Editar algunas líneas.
+5. Guardar.
+6. Cerrar y volver a abrir.
+7. Confirmar que el contenido, codificación y saltos de línea son correctos.
+
+SEGUNDA ENTREGA
+1. Abrir un .vbp.
+2. Mostrar módulos en Project Explorer.
+3. Abrir archivos desde el árbol.
+4. Editar dos módulos y guardar.
+5. Cerrar y volver a abrir.
+6. Confirmar que los cambios persistieron y otros archivos siguen intactos.
+
+TERCERA ENTREGA
+Abrir .frm, editar solamente el código, guardar y demostrar que la sección de
+diseño y los archivos/referencias .frx no sufrieron cambios involuntarios.
+
+============================================================================
+PRUEBAS OBLIGATORIAS
+============================================================================
+Crear fixtures con:
+- Proyecto simple y proyecto con múltiples módulos/clases/formularios.
+- Rutas relativas, nombres con espacios y acentos.
+- Referencias/componentes desconocidos.
+- Archivos faltantes.
+- Archivos ANSI, UTF-8 y UTF-16.
+- CRLF y LF.
+- Archivos .frm vinculados a .frx.
+- Atributos de solo lectura.
+- Cambios externos mientras un documento está abierto.
+
+Comprobar:
+- Los archivos no editados permanecen byte a byte idénticos.
+- Los .frx nunca cambian al editar código.
+- No se pierden caracteres acentuados.
+- No se eliminan líneas desconocidas de .vbp.
+- Se detectan conflictos y documentos modificados.
+- Abrir/editar nunca ejecuta el programa.
+- No hay comandos de Build/Run funcionales en el MVP.
+
+============================================================================
+DEFINICIÓN DE MILESTONE TERMINADO
+============================================================================
+[ ] Código implementado.
+[ ] Pruebas automatizadas agregadas.
+[ ] Pruebas ejecutadas y aprobadas.
+[ ] Casos límite documentados.
+[ ] Errores conocidos registrados.
+[ ] Sin regresiones de Milestones anteriores.
+[ ] Instrucciones de build actualizadas.
+[ ] Cambios revisados.
+
+Estados de tarea:
+TODO -> IN_PROGRESS -> IMPLEMENTED -> TESTED -> VERIFIED
+
+No marcar una tarea como terminada solo porque compila.
+
+============================================================================
+PRIMEROS PASOS CONCRETOS
+============================================================================
+PASO 1  Crear el repositorio y confirmar que .NET 10 SDK está instalado.
+PASO 2  Crear la solución WPF Windows x64.
+PASO 3  Ejecutar la aplicación vacía en Windows x64.
+PASO 4  Integrar AvalonEdit con un documento de texto simple.
+PASO 5  Crear EditorDocument y pruebas de codificación/saltos de línea.
+PASO 6  Implementar abrir, guardar, guardar como y estado IsDirty.
+PASO 7  Implementar números de línea, buscar/reemplazar y atajos.
+PASO 8  Añadir resaltado VB6.
+PASO 9  Implementar VbpParser y Project Explorer.
+PASO 10 Añadir edición segura de código .frm, sin reescribir el diseñador.
+PASO 11 Probar con copias de proyectos reales VB6 SP6.
+PASO 12 Documentar limitaciones y declarar el MVP utilizable solo tras tests.
+
+REGLA FINAL
+===========
+Primero: abrir + editar + guardar de forma segura.
+Después: navegación + compatibilidad de archivos + experiencia visual.
+Más adelante: diseñador + controles x64 + integración con compilador/runtime.
+
+El IDE debe aportar valor desde sus primeras versiones y evolucionar sin
+obligar a rehacer la arquitectura cuando avance el compilador VB6-x64.
+
+FIN DEL DOCUMENTO
+============================================================================

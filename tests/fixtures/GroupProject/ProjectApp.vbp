@@ -1,0 +1,7 @@
+Type=Exe
+Name="ProjectApp"
+Startup="Form1"
+Form=Form1.frm
+Module=MainMod; MainMod.bas
+Title="ProjectApp"
+ExeName32="ProjectApp.exe"

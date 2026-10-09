@@ -21,6 +21,9 @@ public class EditorDocument
     public DateTime LastModifiedTimeUtc { get; private set; }
     public long FileSize { get; private set; }
 
+    public string? DesignHeader { get; set; }
+    public bool IsFormFile => !string.IsNullOrEmpty(DesignHeader);
+
     public string Text
     {
         get => _text;
@@ -49,7 +52,8 @@ public class EditorDocument
         bool isReadOnly,
         string sha256Hash,
         DateTime lastModifiedTimeUtc,
-        long fileSize)
+        long fileSize,
+        string? designHeader = null)
     {
         FilePath = filePath;
         DisplayName = Path.GetFileName(filePath);
@@ -62,6 +66,7 @@ public class EditorDocument
         LastSavedHash = sha256Hash;
         LastModifiedTimeUtc = lastModifiedTimeUtc;
         FileSize = fileSize;
+        DesignHeader = designHeader;
         _isDirty = false;
     }
 
@@ -75,7 +80,11 @@ public class EditorDocument
 
     public string CalculateCurrentContentHash()
     {
-        string normalized = NormalizeNewLines(_text, NewLineConvention);
+        string textToHash = IsFormFile
+            ? FrmDocumentHandler.CombineFrmContent(DesignHeader!, _text, NewLineConvention)
+            : _text;
+
+        string normalized = NormalizeNewLines(textToHash, NewLineConvention);
         byte[] bytes;
 
         if (HasByteOrderMark && Encoding is UTF8Encoding)
@@ -105,7 +114,6 @@ public class EditorDocument
             _ => "\r\n"
         };
 
-        // Normalizar primero a \n y luego al destino
         string unified = text.Replace("\r\n", "\n").Replace("\r", "\n");
         if (targetEnding == "\n") return unified;
         return unified.Replace("\n", targetEnding);

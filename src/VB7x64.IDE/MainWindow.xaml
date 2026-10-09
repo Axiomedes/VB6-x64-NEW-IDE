@@ -28,7 +28,7 @@
         <Menu Grid.Row="0" Background="#F5F5F5" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Padding="2">
             <MenuItem Header="_Archivo">
                 <MenuItem Header="_Nuevo Proyecto..." IsEnabled="False"/>
-                <MenuItem Header="_Abrir Proyecto..." InputGestureText="Ctrl+O" Click="MenuOpenProject_Click"/>
+                <MenuItem Header="_Abrir Proyecto o Grupo..." InputGestureText="Ctrl+O" Click="MenuOpenProject_Click"/>
                 <MenuItem Header="Abrir _Archivo..." Click="MenuOpenFile_Click"/>
                 <Separator/>
                 <MenuItem x:Name="MenuRecentProjects" Header="Proyectos _recientes"/>
@@ -72,8 +72,8 @@
         <!-- 2. Barra de Herramientas Inicial -->
         <ToolBarTray Grid.Row="1" Background="#F0F0F0">
             <ToolBar Band="0" BandIndex="0">
-                <Button ToolTip="Abrir Proyecto (Ctrl+O)" Click="MenuOpenProject_Click" Padding="4,2">
-                    <TextBlock Text="📂 Abrir Proy." FontSize="12"/>
+                <Button ToolTip="Abrir Proyecto o Grupo (Ctrl+O)" Click="MenuOpenProject_Click" Padding="4,2">
+                    <TextBlock Text="📂 Abrir Proy./Grupo" FontSize="12"/>
                 </Button>
                 <Button ToolTip="Abrir Archivo" Click="MenuOpenFile_Click" Padding="4,2">
                     <TextBlock Text="📄 Abrir Archivo" FontSize="12"/>
@@ -172,9 +172,9 @@
                         <Border x:Name="EmptyDocsNotice" Background="#FDFDFD" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Visible">
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <TextBlock Text="VB7-x64 IDE" FontSize="26" FontWeight="Bold" Foreground="#888888" HorizontalAlignment="Center"/>
-                                <TextBlock Text="Abre un proyecto .vbp o archivo .bas/.frm/.cls para comenzar" FontSize="13" Foreground="#999999" Margin="0,8,0,0" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Abre un proyecto .vbp / grupo .vbg o archivo .bas/.frm/.cls para comenzar" FontSize="13" Foreground="#999999" Margin="0,8,0,0" HorizontalAlignment="Center"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
-                                    <Button Content="Abrir Proyecto (.vbp)" Padding="10,5" Margin="5" Click="MenuOpenProject_Click"/>
+                                    <Button Content="Abrir Proyecto / Grupo (.vbp, .vbg)" Padding="10,5" Margin="5" Click="MenuOpenProject_Click"/>
                                     <Button Content="Abrir Archivo (.bas / .frm / .cls)" Padding="10,5" Margin="5" Click="MenuOpenFile_Click"/>
                                 </StackPanel>
                             </StackPanel>

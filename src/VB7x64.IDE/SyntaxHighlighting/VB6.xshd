@@ -19,15 +19,14 @@
       <Begin>"</Begin>
       <End>"</End>
       <RuleSet>
-        <Span begin="&quot;&quot;" end="" />
+        <Rule color="String">""</Rule>
       </RuleSet>
     </Span>
 
-    <!-- Literales de fecha #...# -->
-    <Span color="DateLiteral">
-      <Begin>#</Begin>
-      <End>#</End>
-    </Span>
+    <!-- Literales de fecha #...# (ej: #12/31/1999#) -->
+    <Rule color="DateLiteral">
+      \#[^#\r\n\t]+?\#
+    </Rule>
 
     <!-- Directivas de preprocesador -->
     <Keywords color="Directive">

@@ -41,6 +41,23 @@ public static class SafeFileStorage
         string text = detection.Encoding.GetString(bytes.AsSpan(detection.PreambleLength));
 
         bool isReadOnly = (fileInfo.Attributes & FileAttributes.ReadOnly) != 0;
+        string? designHeader = null;
+
+        // Si es un formulario .frm, separar quirúrgicamente la cabecera de diseño del código fuente
+        if (string.Equals(Path.GetExtension(filePath), ".frm", StringComparison.OrdinalIgnoreCase))
+        {
+            var split = FrmDocumentHandler.SplitFrmContent(text);
+            if (split.IsSafelyDelimited)
+            {
+                designHeader = split.HeaderAndDesign;
+                text = split.Code;
+            }
+            else
+            {
+                // Si la delimitación no es segura, abrir en modo de solo lectura para evitar corrupción
+                isReadOnly = true;
+            }
+        }
 
         return new EditorDocument(
             filePath: filePath,
@@ -51,7 +68,8 @@ public static class SafeFileStorage
             isReadOnly: isReadOnly,
             sha256Hash: hash,
             lastModifiedTimeUtc: fileInfo.LastWriteTimeUtc,
-            fileSize: fileInfo.Length
+            fileSize: fileInfo.Length,
+            designHeader: designHeader
         );
     }
 
@@ -103,8 +121,12 @@ public static class SafeFileStorage
                 File.Copy(filePath, backupPath, overwrite: true);
             }
 
-            // Preparar contenido normalizando saltos de línea (CRLF/LF)
-            string normalizedText = EditorDocument.NormalizeNewLines(document.Text, document.NewLineConvention);
+            // Preparar contenido reconstruyendo el archivo si es un .frm con diseño serializado
+            string textToSave = document.IsFormFile
+                ? FrmDocumentHandler.CombineFrmContent(document.DesignHeader!, document.Text, document.NewLineConvention)
+                : document.Text;
+
+            string normalizedText = EditorDocument.NormalizeNewLines(textToSave, document.NewLineConvention);
             byte[] contentBytes = document.Encoding.GetBytes(normalizedText);
 
             // Escribir a archivo temporal

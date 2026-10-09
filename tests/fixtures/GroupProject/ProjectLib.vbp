@@ -1,0 +1,6 @@
+Type=OleDll
+Name="ProjectLib"
+Class=Customer; Customer.cls
+Module=HelperMod; HelperMod.bas
+Title="ProjectLib"
+ExeName32="ProjectLib.dll"

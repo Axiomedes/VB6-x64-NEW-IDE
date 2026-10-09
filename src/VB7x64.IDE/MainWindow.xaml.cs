@@ -21,6 +21,7 @@ public partial class MainWindow : Window
 {
     private readonly AppSettings _settings;
     private VB6Project? _currentProject;
+    private VB6ProjectGroup? _currentProjectGroup;
 
     public EditorTabItem? ActiveTab => DocumentsTabControl.SelectedItem as EditorTabItem;
     public TextEditor? ActiveEditor => ActiveTab?.Editor;
@@ -289,85 +290,72 @@ public partial class MainWindow : Window
         return true;
     }
 
-    #region Project Handling (Milestone 5)
-    public void LoadProject(string vbpFilePath)
+    #region Project Handling (Milestone 5 & VBG Groups)
+    public void LoadProject(string filePath)
+    {
+        string ext = Path.GetExtension(filePath);
+        if (string.Equals(ext, ".vbg", StringComparison.OrdinalIgnoreCase))
+        {
+            LoadProjectGroup(filePath);
+        }
+        else
+        {
+            LoadSingleProject(filePath);
+        }
+    }
+
+    public void LoadProjectGroup(string vbgFilePath)
+    {
+        try
+        {
+            var group = VbgParser.Parse(vbgFilePath);
+            _currentProjectGroup = group;
+            _currentProject = group.StartupProject ?? group.Projects.FirstOrDefault();
+
+            ProjectTreeView.Items.Clear();
+
+            var groupRoot = new TreeViewItem
+            {
+                Header = $"💼 Grupo de Proyectos: {group.Name} ({Path.GetFileName(group.GroupFilePath)})",
+                IsExpanded = true,
+                FontWeight = FontWeights.Bold
+            };
+
+            foreach (var project in group.Projects)
+            {
+                bool isStartup = project == group.StartupProject;
+                var prjNode = CreateProjectNode(project, isStartup);
+                groupRoot.Items.Add(prjNode);
+            }
+
+            ProjectTreeView.Items.Add(groupRoot);
+            SetStatusMessage($"Grupo de proyectos '{group.Name}' cargado con {group.Projects.Count} proyectos.");
+            Title = $"VB7-x64 IDE - [Grupo] {group.Name} ({Path.GetFileName(group.GroupFilePath)})";
+
+            _settings.AddRecentProject(group.GroupFilePath);
+            UpdateRecentMenus();
+
+            AppLogger.Info($"Grupo de proyectos cargado: {group.GroupFilePath}");
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error($"Error al abrir el grupo de proyectos {vbgFilePath}", ex);
+            MessageBox.Show($"Error al abrir el grupo de proyectos:\n\n{ex.Message}", "Error al abrir grupo de proyectos", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    public void LoadSingleProject(string vbpFilePath)
     {
         try
         {
             var project = VbpParser.Parse(vbpFilePath);
             _currentProject = project;
+            _currentProjectGroup = null;
 
             ProjectTreeView.Items.Clear();
+            var prjNode = CreateProjectNode(project, false);
+            ProjectTreeView.Items.Add(prjNode);
 
-            var rootItem = new TreeViewItem
-            {
-                Header = $"📁 {project.Name} ({Path.GetFileName(project.ProjectFilePath)})",
-                IsExpanded = true,
-                FontWeight = FontWeights.Bold
-            };
-
-            // Formularios
-            if (project.Forms.Any())
-            {
-                var formsFolder = new TreeViewItem { Header = $"🗔 Formularios ({project.Forms.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
-                foreach (var form in project.Forms)
-                {
-                    formsFolder.Items.Add(CreateProjectItemNode(form));
-                }
-                rootItem.Items.Add(formsFolder);
-            }
-
-            // Módulos
-            if (project.Modules.Any())
-            {
-                var modulesFolder = new TreeViewItem { Header = $"📜 Módulos ({project.Modules.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
-                foreach (var mod in project.Modules)
-                {
-                    modulesFolder.Items.Add(CreateProjectItemNode(mod));
-                }
-                rootItem.Items.Add(modulesFolder);
-            }
-
-            // Clases
-            if (project.Classes.Any())
-            {
-                var classesFolder = new TreeViewItem { Header = $"🧩 Módulos de Clase ({project.Classes.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
-                foreach (var cls in project.Classes)
-                {
-                    classesFolder.Items.Add(CreateProjectItemNode(cls));
-                }
-                rootItem.Items.Add(classesFolder);
-            }
-
-            // Controles de Usuario
-            if (project.UserControls.Any())
-            {
-                var ucFolder = new TreeViewItem { Header = $"🎛️ Controles de Usuario ({project.UserControls.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
-                foreach (var uc in project.UserControls)
-                {
-                    ucFolder.Items.Add(CreateProjectItemNode(uc));
-                }
-                rootItem.Items.Add(ucFolder);
-            }
-
-            // Referencias
-            if (project.References.Any())
-            {
-                var refFolder = new TreeViewItem { Header = $"🔗 Referencias ({project.References.Count})", IsExpanded = false, FontWeight = FontWeights.Normal };
-                foreach (var r in project.References)
-                {
-                    var refNode = new TreeViewItem
-                    {
-                        Header = $"• {r.DisplayTitle}",
-                        Foreground = Brushes.Gray,
-                        FontWeight = FontWeights.Normal
-                    };
-                    refFolder.Items.Add(refNode);
-                }
-                rootItem.Items.Add(refFolder);
-            }
-
-            ProjectTreeView.Items.Add(rootItem);
             SetStatusMessage($"Proyecto '{project.Name}' cargado exitosamente.");
             Title = $"VB7-x64 IDE - {project.Name} ({Path.GetFileName(project.ProjectFilePath)})";
 
@@ -381,6 +369,83 @@ public partial class MainWindow : Window
             AppLogger.Error($"Error al abrir el proyecto {vbpFilePath}", ex);
             MessageBox.Show($"Error al abrir el proyecto:\n\n{ex.Message}", "Error al abrir proyecto", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+    }
+
+    private static TreeViewItem CreateProjectNode(VB6Project project, bool isStartup)
+    {
+        string title = isStartup
+            ? $"📁 {project.Name} ({Path.GetFileName(project.ProjectFilePath)}) [Inicio]"
+            : $"📁 {project.Name} ({Path.GetFileName(project.ProjectFilePath)})";
+
+        var rootItem = new TreeViewItem
+        {
+            Header = title,
+            IsExpanded = true,
+            FontWeight = isStartup ? FontWeights.Bold : FontWeights.SemiBold
+        };
+
+        // Formularios
+        if (project.Forms.Any())
+        {
+            var formsFolder = new TreeViewItem { Header = $"🗔 Formularios ({project.Forms.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
+            foreach (var form in project.Forms)
+            {
+                formsFolder.Items.Add(CreateProjectItemNode(form));
+            }
+            rootItem.Items.Add(formsFolder);
+        }
+
+        // Módulos
+        if (project.Modules.Any())
+        {
+            var modulesFolder = new TreeViewItem { Header = $"📜 Módulos ({project.Modules.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
+            foreach (var mod in project.Modules)
+            {
+                modulesFolder.Items.Add(CreateProjectItemNode(mod));
+            }
+            rootItem.Items.Add(modulesFolder);
+        }
+
+        // Clases
+        if (project.Classes.Any())
+        {
+            var classesFolder = new TreeViewItem { Header = $"🧩 Módulos de Clase ({project.Classes.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
+            foreach (var cls in project.Classes)
+            {
+                classesFolder.Items.Add(CreateProjectItemNode(cls));
+            }
+            rootItem.Items.Add(classesFolder);
+        }
+
+        // Controles de Usuario
+        if (project.UserControls.Any())
+        {
+            var ucFolder = new TreeViewItem { Header = $"🎛️ Controles de Usuario ({project.UserControls.Count()})", IsExpanded = true, FontWeight = FontWeights.SemiBold };
+            foreach (var uc in project.UserControls)
+            {
+                ucFolder.Items.Add(CreateProjectItemNode(uc));
+            }
+            rootItem.Items.Add(ucFolder);
+        }
+
+        // Referencias
+        if (project.References.Any())
+        {
+            var refFolder = new TreeViewItem { Header = $"🔗 Referencias ({project.References.Count})", IsExpanded = false, FontWeight = FontWeights.Normal };
+            foreach (var r in project.References)
+            {
+                var refNode = new TreeViewItem
+                {
+                    Header = $"• {r.DisplayTitle}",
+                    Foreground = Brushes.Gray,
+                    FontWeight = FontWeights.Normal
+                };
+                refFolder.Items.Add(refNode);
+            }
+            rootItem.Items.Add(refFolder);
+        }
+
+        return rootItem;
     }
 
     private static TreeViewItem CreateProjectItemNode(ProjectItem item)
@@ -429,8 +494,8 @@ public partial class MainWindow : Window
     {
         var dialog = new OpenFileDialog
         {
-            Title = "Abrir Proyecto VB6",
-            Filter = "Proyectos Visual Basic (*.vbp)|*.vbp|Todos los archivos (*.*)|*.*"
+            Title = "Abrir Proyecto o Grupo de Proyectos VB6",
+            Filter = "Proyectos y Grupos VB (*.vbp;*.vbg)|*.vbp;*.vbg|Grupos de Proyectos (*.vbg)|*.vbg|Proyectos VB (*.vbp)|*.vbp|Todos los archivos (*.*)|*.*"
         };
 
         if (dialog.ShowDialog() == true)
@@ -565,13 +630,22 @@ public partial class MainWindow : Window
 
     private void MenuFindInProject_Click(object sender, RoutedEventArgs e)
     {
-        if (_currentProject == null)
+        IReadOnlyList<VB6Project> projectsToSearch;
+        if (_currentProjectGroup != null && _currentProjectGroup.Projects.Count > 0)
         {
-            MessageBox.Show("Debes abrir un proyecto .vbp para buscar en todo el proyecto.", "Buscar en Proyecto", MessageBoxButton.OK, MessageBoxImage.Information);
+            projectsToSearch = _currentProjectGroup.Projects;
+        }
+        else if (_currentProject != null)
+        {
+            projectsToSearch = [_currentProject];
+        }
+        else
+        {
+            MessageBox.Show("Debes abrir un proyecto .vbp o grupo .vbg para buscar.", "Buscar en Proyecto", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
-        var dlg = new FindInProjectDialog(_currentProject, (filePath, line) =>
+        var dlg = new FindInProjectDialog(projectsToSearch, (filePath, line) =>
         {
             var tab = OpenFile(filePath);
             if (tab != null)

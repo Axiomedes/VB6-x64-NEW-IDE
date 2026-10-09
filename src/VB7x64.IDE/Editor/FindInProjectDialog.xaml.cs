@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
@@ -18,13 +19,18 @@ public record SearchResultItem(
 
 public partial class FindInProjectDialog : Window
 {
-    private readonly VB6Project _project;
+    private readonly IReadOnlyList<VB6Project> _projects;
     private readonly Action<string, int> _navigateTo;
 
     public FindInProjectDialog(VB6Project project, Action<string, int> navigateTo)
+        : this([project], navigateTo)
+    {
+    }
+
+    public FindInProjectDialog(IReadOnlyList<VB6Project> projects, Action<string, int> navigateTo)
     {
         InitializeComponent();
-        _project = project;
+        _projects = projects;
         _navigateTo = navigateTo;
 
         Loaded += (_, _) =>
@@ -50,34 +56,40 @@ public partial class FindInProjectDialog : Window
         if (ChkMatchCase.IsChecked != true) options |= RegexOptions.IgnoreCase;
         var regex = new Regex(pattern, options);
 
-        foreach (var item in _project.Items)
+        int totalFilesSearched = 0;
+
+        foreach (var project in _projects)
         {
-            if (!item.IsEditable || !item.FileExists || string.IsNullOrWhiteSpace(item.AbsolutePath)) continue;
-
-            try
+            foreach (var item in project.Items)
             {
-                var doc = SafeFileStorage.LoadDocument(item.AbsolutePath);
-                using var reader = new StringReader(doc.Text);
-                string? line;
-                int lineNum = 0;
+                if (!item.IsEditable || !item.FileExists || string.IsNullOrWhiteSpace(item.AbsolutePath)) continue;
 
-                while ((line = reader.ReadLine()) != null)
+                totalFilesSearched++;
+                try
                 {
-                    lineNum++;
-                    if (regex.IsMatch(line))
+                    var doc = SafeFileStorage.LoadDocument(item.AbsolutePath);
+                    using var reader = new StringReader(doc.Text);
+                    string? line;
+                    int lineNum = 0;
+
+                    while ((line = reader.ReadLine()) != null)
                     {
-                        results.Add(new SearchResultItem(
-                            FilePath: item.AbsolutePath,
-                            FileName: Path.GetFileName(item.AbsolutePath),
-                            LineNumber: lineNum,
-                            LineText: line.Trim()
-                        ));
+                        lineNum++;
+                        if (regex.IsMatch(line))
+                        {
+                            results.Add(new SearchResultItem(
+                                FilePath: item.AbsolutePath,
+                                FileName: Path.GetFileName(item.AbsolutePath),
+                                LineNumber: lineNum,
+                                LineText: line.Trim()
+                            ));
+                        }
                     }
                 }
-            }
-            catch
-            {
-                // Ignorar archivos que no se puedan leer
+                catch
+                {
+                    // Ignorar archivos que no se puedan leer
+                }
             }
         }
 
@@ -86,7 +98,7 @@ public partial class FindInProjectDialog : Window
             LstResults.Items.Add(r);
         }
 
-        TxtStatus.Text = $"Se encontraron {results.Count} coincidencias en {_project.Items.Count(i => i.IsEditable)} archivos.";
+        TxtStatus.Text = $"Se encontraron {results.Count} coincidencias en {totalFilesSearched} archivos.";
     }
 
     private void LstResults_MouseDoubleClick(object sender, MouseButtonEventArgs e)

@@ -1,0 +1,54 @@
+<Window x:Class="VB7x64.IDE.Editor.FindInProjectDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Buscar en todo el proyecto"
+        Height="450" Width="680"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="#F5F5F5">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Barra de búsqueda -->
+        <Grid Grid.Row="0" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Buscar:" VerticalAlignment="Center" FontSize="12"/>
+            <TextBox x:Name="TxtSearchQuery" Grid.Column="1" Height="26" VerticalContentAlignment="Center" Margin="0,0,8,0"/>
+            <Button Grid.Column="2" Content="Buscar" Width="85" Height="26" Click="BtnSearch_Click" IsDefault="True"/>
+        </Grid>
+
+        <!-- Opciones -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="60,0,0,8">
+            <CheckBox x:Name="ChkMatchCase" Content="Coincidir mayús./minús." Margin="0,0,15,0"/>
+            <CheckBox x:Name="ChkWholeWord" Content="Palabras completas"/>
+        </StackPanel>
+
+        <!-- Resultados -->
+        <GroupBox Grid.Row="2" Header="Resultados de la búsqueda">
+            <ListView x:Name="LstResults" MouseDoubleClick="LstResults_MouseDoubleClick">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Archivo" Width="140" DisplayMemberBinding="{Binding FileName}"/>
+                        <GridViewColumn Header="Línea" Width="50" DisplayMemberBinding="{Binding LineNumber}"/>
+                        <GridViewColumn Header="Texto coincidente" Width="420" DisplayMemberBinding="{Binding LineText}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </GroupBox>
+
+        <!-- Barra de estado de resultados -->
+        <Grid Grid.Row="3" Margin="0,8,0,0">
+            <TextBlock x:Name="TxtStatus" Text="Ingresa un término y pulsa Buscar." VerticalAlignment="Center" Foreground="#555555" FontSize="11.5"/>
+            <Button Content="Cerrar" HorizontalAlignment="Right" Width="75" Height="24" IsCancel="True"/>
+        </Grid>
+    </Grid>
+</Window>

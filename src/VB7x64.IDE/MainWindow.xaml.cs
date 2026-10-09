@@ -12,6 +12,7 @@ using VB7x64.IDE.Editor;
 using VB7x64.IDE.Logging;
 using VB7x64.IDE.Settings;
 using VB7x64.ProjectModel.Documents;
+using VB7x64.ProjectModel.Settings;
 using VB7x64.ProjectModel.Vbp;
 
 namespace VB7x64.IDE;
@@ -33,16 +34,42 @@ public partial class MainWindow : Window
         Closing += MainWindow_Closing;
         DocumentsTabControl.SelectionChanged += DocumentsTabControl_SelectionChanged;
 
+        // Suscribirse al stream de log en tiempo real
+        AppLogger.LogMessageReceived += OnLogMessageReceived;
+
         UpdateDocumentsVisibility();
+    }
+
+    private void OnLogMessageReceived(string logEntry)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            if (TxtOutputLog.Text.Length > 100000)
+            {
+                TxtOutputLog.Text = TxtOutputLog.Text[^50000..];
+            }
+            TxtOutputLog.AppendText(logEntry + Environment.NewLine);
+            TxtOutputLog.ScrollToEnd();
+        });
     }
 
     private void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
+        // Restaurar posición y tamaño de ventana
         if (_settings.WindowWidth > 200) Width = _settings.WindowWidth;
         if (_settings.WindowHeight > 200) Height = _settings.WindowHeight;
         if (_settings.WindowLeft >= 0) Left = _settings.WindowLeft;
         if (_settings.WindowTop >= 0) Top = _settings.WindowTop;
         if (_settings.IsMaximized) WindowState = WindowState.Maximized;
+
+        // Restaurar estado de paneles
+        MenuToggleProjectExplorer.IsChecked = _settings.ShowProjectExplorer;
+        ColProjectExplorer.Width = _settings.ShowProjectExplorer ? new GridLength(_settings.ProjectExplorerWidth) : new GridLength(0);
+
+        MenuToggleOutput.IsChecked = _settings.ShowOutputPanel;
+        SetOutputPanelVisibility(_settings.ShowOutputPanel);
+
+        UpdateRecentMenus();
 
         AppLogger.Info("Ventana principal cargada correctamente.");
     }
@@ -79,7 +106,7 @@ public partial class MainWindow : Window
             }
         }
 
-        // Guardar configuración de ventana
+        // Guardar configuración de ventana y paneles
         _settings.IsMaximized = WindowState == WindowState.Maximized;
         if (WindowState == WindowState.Normal)
         {
@@ -88,8 +115,56 @@ public partial class MainWindow : Window
             _settings.WindowLeft = Left;
             _settings.WindowTop = Top;
         }
+
+        _settings.ShowProjectExplorer = MenuToggleProjectExplorer.IsChecked;
+        if (ColProjectExplorer.Width.Value > 50)
+        {
+            _settings.ProjectExplorerWidth = ColProjectExplorer.Width.Value;
+        }
+
+        _settings.ShowOutputPanel = MenuToggleOutput.IsChecked;
+        if (RowOutput.Height.Value > 30)
+        {
+            _settings.OutputPanelHeight = RowOutput.Height.Value;
+        }
+
         _settings.Save();
-        AppLogger.Info("Configuración de ventana guardada.");
+        AppLogger.Info("Configuración guardada.");
+    }
+
+    private void UpdateRecentMenus()
+    {
+        // Actualizar menú de proyectos recientes
+        MenuRecentProjects.Items.Clear();
+        if (_settings.RecentProjects.Count == 0)
+        {
+            MenuRecentProjects.Items.Add(new MenuItem { Header = "(Vacío)", IsEnabled = false });
+        }
+        else
+        {
+            foreach (var prj in _settings.RecentProjects)
+            {
+                var mi = new MenuItem { Header = Path.GetFileName(prj), ToolTip = prj };
+                mi.Click += (_, _) => LoadProject(prj);
+                MenuRecentProjects.Items.Add(mi);
+            }
+        }
+
+        // Actualizar menú de archivos recientes
+        MenuRecentFiles.Items.Clear();
+        if (_settings.RecentFiles.Count == 0)
+        {
+            MenuRecentFiles.Items.Add(new MenuItem { Header = "(Vacío)", IsEnabled = false });
+        }
+        else
+        {
+            foreach (var file in _settings.RecentFiles)
+            {
+                var mi = new MenuItem { Header = Path.GetFileName(file), ToolTip = file };
+                mi.Click += (_, _) => OpenFile(file);
+                MenuRecentFiles.Items.Add(mi);
+            }
+        }
     }
 
     private void DocumentsTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -168,6 +243,9 @@ public partial class MainWindow : Window
 
             DocumentsTabControl.Items.Add(tabItem);
             DocumentsTabControl.SelectedItem = tabItem;
+
+            _settings.AddRecentFile(fullPath);
+            UpdateRecentMenus();
 
             UpdateDocumentsVisibility();
             UpdateStatusFromActiveTab();
@@ -292,6 +370,10 @@ public partial class MainWindow : Window
             ProjectTreeView.Items.Add(rootItem);
             SetStatusMessage($"Proyecto '{project.Name}' cargado exitosamente.");
             Title = $"VB7-x64 IDE - {project.Name} ({Path.GetFileName(project.ProjectFilePath)})";
+
+            _settings.AddRecentProject(project.ProjectFilePath);
+            UpdateRecentMenus();
+
             AppLogger.Info($"Proyecto cargado: {project.ProjectFilePath}");
         }
         catch (Exception ex)
@@ -481,6 +563,31 @@ public partial class MainWindow : Window
         dlg.Show();
     }
 
+    private void MenuFindInProject_Click(object sender, RoutedEventArgs e)
+    {
+        if (_currentProject == null)
+        {
+            MessageBox.Show("Debes abrir un proyecto .vbp para buscar en todo el proyecto.", "Buscar en Proyecto", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var dlg = new FindInProjectDialog(_currentProject, (filePath, line) =>
+        {
+            var tab = OpenFile(filePath);
+            if (tab != null)
+            {
+                var lineObj = tab.Editor.Document.GetLineByNumber(Math.Min(line, tab.Editor.Document.LineCount));
+                tab.Editor.CaretOffset = lineObj.Offset;
+                tab.Editor.ScrollToLine(line);
+                tab.Editor.Focus();
+            }
+        })
+        {
+            Owner = this
+        };
+        dlg.Show();
+    }
+
     private void MenuGoToLine_Click(object sender, RoutedEventArgs e)
     {
         if (ActiveEditor == null) return;
@@ -502,12 +609,34 @@ public partial class MainWindow : Window
     #region Menu View Actions
     private void MenuToggleProjectExplorer_Click(object sender, RoutedEventArgs e)
     {
-        ColProjectExplorer.Width = MenuToggleProjectExplorer.IsChecked ? new GridLength(260) : new GridLength(0);
+        ColProjectExplorer.Width = MenuToggleProjectExplorer.IsChecked ? new GridLength(_settings.ProjectExplorerWidth) : new GridLength(0);
     }
 
     private void MenuToggleStatusBar_Click(object sender, RoutedEventArgs e)
     {
         MainStatusBar.Visibility = MenuToggleStatusBar.IsChecked ? Visibility.Visible : Visibility.Collapsed;
+    }
+
+    private void MenuToggleOutput_Click(object sender, RoutedEventArgs e)
+    {
+        SetOutputPanelVisibility(MenuToggleOutput.IsChecked);
+    }
+
+    private void SetOutputPanelVisibility(bool isVisible)
+    {
+        RowOutput.Height = isVisible ? new GridLength(_settings.OutputPanelHeight) : new GridLength(0);
+        RowOutputSplitter.Height = isVisible ? new GridLength(4) : new GridLength(0);
+    }
+
+    private void BtnClearOutput_Click(object sender, RoutedEventArgs e)
+    {
+        TxtOutputLog.Clear();
+    }
+
+    private void BtnCloseOutput_Click(object sender, RoutedEventArgs e)
+    {
+        MenuToggleOutput.IsChecked = false;
+        SetOutputPanelVisibility(false);
     }
 
     private void MenuOpenLogsFolder_Click(object sender, RoutedEventArgs e)
@@ -524,6 +653,27 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             AppLogger.Error("No se pudo abrir la carpeta de logs", ex);
+        }
+    }
+    #endregion
+
+    #region Tools & Options
+    private void MenuOptions_Click(object sender, RoutedEventArgs e)
+    {
+        var opt = new OptionsWindow(_settings) { Owner = this };
+        if (opt.ShowDialog() == true)
+        {
+            // Aplicar cambios a las pestañas abiertas
+            foreach (var item in DocumentsTabControl.Items)
+            {
+                if (item is EditorTabItem tab)
+                {
+                    tab.Editor.FontFamily = new FontFamily(_settings.FontFamily);
+                    tab.Editor.FontSize = _settings.FontSize;
+                    tab.Editor.ShowLineNumbers = _settings.ShowLineNumbers;
+                    tab.Editor.Options.IndentationSize = _settings.TabSize;
+                }
+            }
         }
     }
     #endregion

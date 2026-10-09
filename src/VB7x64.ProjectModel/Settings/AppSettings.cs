@@ -1,8 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 
-namespace VB7x64.IDE.Settings;
+namespace VB7x64.ProjectModel.Settings;
 
 public class AppSettings
 {
@@ -15,11 +16,20 @@ public class AppSettings
     public bool CreateBackupBeforeSave { get; set; } = true;
     public string DefaultEncoding { get; set; } = "Windows-1252";
     public string Theme { get; set; } = "Classic";
+    
     public double WindowWidth { get; set; } = 1100;
-    public double WindowHeight { get; set; } = 700;
+    public double WindowHeight { get; set; } = 720;
     public double WindowLeft { get; set; } = 100;
     public double WindowTop { get; set; } = 100;
     public bool IsMaximized { get; set; } = false;
+
+    public double ProjectExplorerWidth { get; set; } = 260.0;
+    public bool ShowProjectExplorer { get; set; } = true;
+    public bool ShowOutputPanel { get; set; } = false;
+    public double OutputPanelHeight { get; set; } = 140.0;
+
+    public List<string> RecentProjects { get; set; } = [];
+    public List<string> RecentFiles { get; set; } = [];
 
     static AppSettings()
     {
@@ -59,5 +69,21 @@ public class AppSettings
         {
             // Silencioso ante fallos de persistencia
         }
+    }
+
+    public void AddRecentProject(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return;
+        RecentProjects.RemoveAll(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase));
+        RecentProjects.Insert(0, path);
+        if (RecentProjects.Count > 10) RecentProjects.RemoveRange(10, RecentProjects.Count - 10);
+    }
+
+    public void AddRecentFile(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return;
+        RecentFiles.RemoveAll(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase));
+        RecentFiles.Insert(0, path);
+        if (RecentFiles.Count > 10) RecentFiles.RemoveRange(10, RecentFiles.Count - 10);
     }
 }

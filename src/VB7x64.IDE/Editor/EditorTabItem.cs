@@ -5,10 +5,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using ICSharpCode.AvalonEdit;
-using VB7x64.IDE.Settings;
 using VB7x64.IDE.SyntaxHighlighting;
 using VB7x64.ProjectModel.Documents;
 using VB7x64.ProjectModel.Navigation;
+using VB7x64.ProjectModel.Settings;
 
 namespace VB7x64.IDE.Editor;
 

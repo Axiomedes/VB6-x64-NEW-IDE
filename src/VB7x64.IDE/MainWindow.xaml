@@ -187,30 +187,6 @@
                                     </Setter>
                                 </Style>
                             </TabControl.ItemContainerStyle>
-                            <TabControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding IconText}" Margin="0,0,6,0" VerticalAlignment="Center" FontSize="11"/>
-                                        <TextBlock Text="{Binding HeaderText}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12"/>
-                                        <Button Content="✕" Width="18" Height="18" FontSize="10" Padding="0"
-                                                VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                Background="Transparent" BorderThickness="0" Cursor="Hand"
-                                                Tag="{Binding}" Click="BtnCloseTab_Click" ToolTip="Cerrar documento">
-                                            <Button.Style>
-                                                <Style TargetType="Button">
-                                                    <Setter Property="Foreground" Value="#777777"/>
-                                                    <Style.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter Property="Foreground" Value="#D32F2F"/>
-                                                            <Setter Property="Background" Value="#FFEBEE"/>
-                                                        </Trigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Button.Style>
-                                        </Button>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </TabControl.ItemTemplate>
                         </TabControl>
 
                         <!-- Mensaje cuando no hay documentos abiertos -->

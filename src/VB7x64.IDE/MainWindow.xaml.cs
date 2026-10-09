@@ -915,12 +915,49 @@ public partial class MainWindow : Window
     private void MenuToggleOutput_Click(object sender, RoutedEventArgs e)
     {
         SetOutputPanelVisibility(MenuToggleOutput.IsChecked);
+        if (MenuToggleOutput.IsChecked)
+        {
+            ShowBottomTab("Output");
+        }
     }
 
     private void SetOutputPanelVisibility(bool isVisible)
     {
-        RowOutput.Height = isVisible ? new GridLength(_settings.OutputPanelHeight) : new GridLength(0);
+        double h = _settings.OutputPanelHeight > 50 ? _settings.OutputPanelHeight : 160;
+        RowOutput.Height = isVisible ? new GridLength(h) : new GridLength(0);
         RowOutputSplitter.Height = isVisible ? new GridLength(4) : new GridLength(0);
+        MenuToggleOutput.IsChecked = isVisible;
+    }
+
+    private void BottomTabRadio_Click(object sender, RoutedEventArgs e)
+    {
+        if (TabRadioOutput.IsChecked == true) ShowBottomTab("Output");
+        else if (TabRadioReferences.IsChecked == true) ShowBottomTab("References");
+        else if (TabRadioTasks.IsChecked == true) ShowBottomTab("Tasks");
+    }
+
+    public void ShowBottomTab(string tabName)
+    {
+        ViewOutput.Visibility = (tabName == "Output") ? Visibility.Visible : Visibility.Collapsed;
+        ViewReferences.Visibility = (tabName == "References") ? Visibility.Visible : Visibility.Collapsed;
+        ViewTasks.Visibility = (tabName == "Tasks") ? Visibility.Visible : Visibility.Collapsed;
+
+        TabRadioOutput.IsChecked = (tabName == "Output");
+        TabRadioReferences.IsChecked = (tabName == "References");
+        TabRadioTasks.IsChecked = (tabName == "Tasks");
+
+        SetOutputPanelVisibility(true);
+    }
+
+    private void MenuToggleReferences_Click(object sender, RoutedEventArgs e)
+    {
+        ShowBottomTab("References");
+    }
+
+    private void MenuToggleTasks_Click(object sender, RoutedEventArgs e)
+    {
+        ShowBottomTab("Tasks");
+        RefreshTaskList();
     }
 
     private void BtnClearOutput_Click(object sender, RoutedEventArgs e)
@@ -986,6 +1023,60 @@ public partial class MainWindow : Window
 
     private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        // 0. Navegación Atrás / Adelante: Alt+Left o Ctrl+- / Alt+Right o Ctrl+Shift+-
+        if ((e.Key == Key.Left && Keyboard.Modifiers == ModifierKeys.Alt) ||
+            (e.Key == Key.OemMinus && Keyboard.Modifiers == ModifierKeys.Control))
+        {
+            NavigateBackward();
+            e.Handled = true;
+            return;
+        }
+
+        if ((e.Key == Key.Right && Keyboard.Modifiers == ModifierKeys.Alt) ||
+            (e.Key == Key.OemMinus && (Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Shift)) == (ModifierKeys.Control | ModifierKeys.Shift)))
+        {
+            NavigateForward();
+            e.Handled = true;
+            return;
+        }
+
+        // Buscar todas las referencias: Shift+F12
+        if (e.Key == Key.F12 && (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+        {
+            FindReferencesForCurrentSymbol();
+            e.Handled = true;
+            return;
+        }
+
+        // Marcadores directos: Ctrl+F2 (alternar), F2 (siguiente), Shift+F2 (anterior), Ctrl+Shift+F2 (limpiar)
+        if (e.Key == Key.F2)
+        {
+            if ((Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Shift)) == (ModifierKeys.Control | ModifierKeys.Shift))
+            {
+                ClearAllBookmarks();
+                e.Handled = true;
+                return;
+            }
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                ToggleBookmarkAtCurrentLine();
+                e.Handled = true;
+                return;
+            }
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {
+                GoToPreviousBookmark();
+                e.Handled = true;
+                return;
+            }
+            if (Keyboard.Modifiers == ModifierKeys.None)
+            {
+                GoToNextBookmark();
+                e.Handled = true;
+                return;
+            }
+        }
+
         // 1. Invertir Asignaciones: Ctrl+Shift+R
         if (e.Key == Key.R && (Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Shift)) == (ModifierKeys.Control | ModifierKeys.Shift))
         {
@@ -998,7 +1089,7 @@ public partial class MainWindow : Window
             }
         }
 
-        // 2. Secuencia acorde Ctrl+K, Ctrl+C / Ctrl+K, Ctrl+U
+        // 2. Secuencia acorde Ctrl+K
         if (_isChordCtrlK)
         {
             _isChordCtrlK = false;
@@ -1022,12 +1113,36 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 return;
             }
+            if (e.Key == Key.K)
+            {
+                ToggleBookmarkAtCurrentLine();
+                e.Handled = true;
+                return;
+            }
+            if (e.Key == Key.N)
+            {
+                GoToNextBookmark();
+                e.Handled = true;
+                return;
+            }
+            if (e.Key == Key.P)
+            {
+                GoToPreviousBookmark();
+                e.Handled = true;
+                return;
+            }
+            if (e.Key == Key.L)
+            {
+                ClearAllBookmarks();
+                e.Handled = true;
+                return;
+            }
             SetStatusMessage("Combinación Ctrl+K cancelada.");
         }
         else if (e.Key == Key.K && Keyboard.Modifiers == ModifierKeys.Control)
         {
             _isChordCtrlK = true;
-            SetStatusMessage("Ctrl+K presionado. Esperando segunda tecla (C para comentar, U para descomentar)...");
+            SetStatusMessage("Ctrl+K presionado. Esperando segunda tecla (K: Marcador, N: Siguiente, P: Anterior, L: Limpiar, C: Comentar, U: Descomentar)...");
             e.Handled = true;
             return;
         }
@@ -1303,6 +1418,378 @@ public partial class MainWindow : Window
         ActiveEditor.Focus();
         SetStatusMessage($"{operationDesc} insertado exitosamente.");
     }
+    #region Navegación e Historial (Alt+← / Alt+→)
+    private void MenuNavBackward_Click(object sender, RoutedEventArgs e)
+    {
+        NavigateBackward();
+    }
+
+    private void MenuNavForward_Click(object sender, RoutedEventArgs e)
+    {
+        NavigateForward();
+    }
+
+    public void NavigateBackward()
+    {
+        string curFile = ActiveTab?.Document.FilePath ?? "";
+        int curLine = ActiveEditor?.TextArea.Caret.Line ?? 1;
+        int curCol = ActiveEditor?.TextArea.Caret.Column ?? 1;
+
+        var target = NavigationHistory.Instance.NavigateBackward(curFile, curLine, curCol);
+        if (target != null)
+        {
+            var tab = OpenFile(target.FilePath);
+            if (tab != null && target.LineNumber > 0 && target.LineNumber <= tab.Editor.Document.LineCount)
+            {
+                var lineObj = tab.Editor.Document.GetLineByNumber(target.LineNumber);
+                int targetOffset = Math.Min(lineObj.Offset + Math.Max(0, target.ColumnNumber - 1), lineObj.EndOffset);
+                tab.Editor.CaretOffset = targetOffset;
+                tab.Editor.ScrollToLine(target.LineNumber);
+                tab.Editor.Focus();
+                SetStatusMessage($"Navegación atrás: {Path.GetFileName(target.FilePath)} (Línea {target.LineNumber})");
+            }
+        }
+        else
+        {
+            SetStatusMessage("No hay más ubicaciones anteriores en el historial de navegación.");
+        }
+    }
+
+    public void NavigateForward()
+    {
+        string curFile = ActiveTab?.Document.FilePath ?? "";
+        int curLine = ActiveEditor?.TextArea.Caret.Line ?? 1;
+        int curCol = ActiveEditor?.TextArea.Caret.Column ?? 1;
+
+        var target = NavigationHistory.Instance.NavigateForward(curFile, curLine, curCol);
+        if (target != null)
+        {
+            var tab = OpenFile(target.FilePath);
+            if (tab != null && target.LineNumber > 0 && target.LineNumber <= tab.Editor.Document.LineCount)
+            {
+                var lineObj = tab.Editor.Document.GetLineByNumber(target.LineNumber);
+                int targetOffset = Math.Min(lineObj.Offset + Math.Max(0, target.ColumnNumber - 1), lineObj.EndOffset);
+                tab.Editor.CaretOffset = targetOffset;
+                tab.Editor.ScrollToLine(target.LineNumber);
+                tab.Editor.Focus();
+                SetStatusMessage($"Navegación adelante: {Path.GetFileName(target.FilePath)} (Línea {target.LineNumber})");
+            }
+        }
+        else
+        {
+            SetStatusMessage("No hay más ubicaciones posteriores en el historial de navegación.");
+        }
+    }
+    #endregion
+
+    #region Marcadores (Bookmarks)
+    private void MenuToggleBookmark_Click(object sender, RoutedEventArgs e)
+    {
+        ToggleBookmarkAtCurrentLine();
+    }
+
+    private void MenuNextBookmark_Click(object sender, RoutedEventArgs e)
+    {
+        GoToNextBookmark();
+    }
+
+    private void MenuPrevBookmark_Click(object sender, RoutedEventArgs e)
+    {
+        GoToPreviousBookmark();
+    }
+
+    private void MenuClearBookmarks_Click(object sender, RoutedEventArgs e)
+    {
+        ClearAllBookmarks();
+    }
+
+    public void ToggleBookmarkAtCurrentLine()
+    {
+        if (ActiveTab == null) return;
+        int line = ActiveTab.Editor.TextArea.Caret.Line;
+        bool added = BookmarkManager.Instance.ToggleBookmark(ActiveTab.Document.FilePath, line);
+        ActiveTab.BookmarkMargin?.InvalidateVisual();
+        SetStatusMessage(added ? $"Marcador agregado en línea {line}." : $"Marcador eliminado de línea {line}.");
+    }
+
+    public void GoToNextBookmark()
+    {
+        string curFile = ActiveTab?.Document.FilePath ?? "";
+        int curLine = ActiveEditor?.TextArea.Caret.Line ?? 0;
+
+        var next = BookmarkManager.Instance.GetNextBookmark(curFile, curLine);
+        if (next != null)
+        {
+            RecordCurrentNavigation();
+            var tab = OpenFile(next.Value.FilePath);
+            if (tab != null && next.Value.Line <= tab.Editor.Document.LineCount)
+            {
+                var lineObj = tab.Editor.Document.GetLineByNumber(next.Value.Line);
+                tab.Editor.CaretOffset = lineObj.Offset;
+                tab.Editor.ScrollToLine(next.Value.Line);
+                tab.Editor.Focus();
+                SetStatusMessage($"Marcador: {Path.GetFileName(next.Value.FilePath)} (Línea {next.Value.Line})");
+            }
+        }
+        else
+        {
+            SetStatusMessage("No hay marcadores activos en el proyecto.");
+        }
+    }
+
+    public void GoToPreviousBookmark()
+    {
+        string curFile = ActiveTab?.Document.FilePath ?? "";
+        int curLine = ActiveEditor?.TextArea.Caret.Line ?? 0;
+
+        var prev = BookmarkManager.Instance.GetPreviousBookmark(curFile, curLine);
+        if (prev != null)
+        {
+            RecordCurrentNavigation();
+            var tab = OpenFile(prev.Value.FilePath);
+            if (tab != null && prev.Value.Line <= tab.Editor.Document.LineCount)
+            {
+                var lineObj = tab.Editor.Document.GetLineByNumber(prev.Value.Line);
+                tab.Editor.CaretOffset = lineObj.Offset;
+                tab.Editor.ScrollToLine(prev.Value.Line);
+                tab.Editor.Focus();
+                SetStatusMessage($"Marcador: {Path.GetFileName(prev.Value.FilePath)} (Línea {prev.Value.Line})");
+            }
+        }
+        else
+        {
+            SetStatusMessage("No hay marcadores activos en el proyecto.");
+        }
+    }
+
+    public void ClearAllBookmarks()
+    {
+        BookmarkManager.Instance.ClearAllBookmarks();
+        foreach (var item in DocumentsTabControl.Items)
+        {
+            if (item is EditorTabItem tab)
+            {
+                tab.BookmarkMargin?.InvalidateVisual();
+            }
+        }
+        SetStatusMessage("Todos los marcadores han sido borrados.");
+    }
+    #endregion
+
+    #region Búsqueda de Referencias (Find References)
+    private void MenuFindReferences_Click(object sender, RoutedEventArgs e)
+    {
+        FindReferencesForCurrentSymbol();
+    }
+
+    private void BtnSearchReferencesPrompt_Click(object sender, RoutedEventArgs e)
+    {
+        FindReferencesForCurrentSymbol();
+    }
+
+    private void BtnClearReferences_Click(object sender, RoutedEventArgs e)
+    {
+        LstReferences.ItemsSource = null;
+        TxtReferencesStatus.Text = "Búsqueda limpiada.";
+    }
+
+    public void FindReferencesForCurrentSymbol()
+    {
+        string symbol = ActiveTab?.GetWordUnderCaret() ?? string.Empty;
+
+        if (string.IsNullOrWhiteSpace(symbol))
+        {
+            var dlg = new InputPromptDialog("Buscar todas las referencias", "Ingresa el nombre del símbolo, rutina o variable a buscar:")
+            {
+                Owner = this
+            };
+            if (dlg.ShowDialog() == true && !string.IsNullOrWhiteSpace(dlg.InputValue))
+            {
+                symbol = dlg.InputValue;
+            }
+            else
+            {
+                return;
+            }
+        }
+
+        var projectFiles = GetSearchableFiles();
+        if (projectFiles.Count == 0)
+        {
+            MessageBox.Show("Debes abrir un proyecto o archivo de código para buscar referencias.", "Buscar Referencias", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        SetStatusMessage($"Buscando referencias de '{symbol}'...");
+
+        var results = ReferenceFinder.FindReferences(symbol, projectFiles, path => GetOpenDocumentText(path));
+        LstReferences.ItemsSource = results;
+        int fileCount = results.Select(r => r.FilePath).Distinct().Count();
+        TxtReferencesStatus.Text = $"Referencias de '{symbol}': {results.Count} coincidencia(s) encontrada(s) en {fileCount} archivo(s).";
+
+        ShowBottomTab("References");
+        SetStatusMessage($"Referencias de '{symbol}': {results.Count} encontrada(s).");
+    }
+
+    private void LstReferences_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (LstReferences.SelectedItem is ReferenceMatch match)
+        {
+            RecordCurrentNavigation();
+            var tab = OpenFile(match.FilePath);
+            if (tab != null && match.LineNumber > 0 && match.LineNumber <= tab.Editor.Document.LineCount)
+            {
+                var lineObj = tab.Editor.Document.GetLineByNumber(match.LineNumber);
+                int tokenOffset = lineObj.Offset + Math.Max(0, match.ColumnNumber - 1);
+                tab.Editor.CaretOffset = tokenOffset;
+                tab.Editor.ScrollToLine(match.LineNumber);
+                tab.Editor.Focus();
+            }
+        }
+    }
+    #endregion
+
+    #region Explorador de Tareas (TODO Explorer)
+    private List<TaskItem> _allTasks = [];
+
+    private void BtnRefreshTasks_Click(object sender, RoutedEventArgs e)
+    {
+        RefreshTaskList();
+    }
+
+    private void CmbTaskFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        ApplyTaskFilter();
+    }
+
+    public void RefreshTaskList()
+    {
+        var projectFiles = GetSearchableFiles();
+        if (projectFiles.Count == 0)
+        {
+            LstTasks.ItemsSource = null;
+            TxtTasksStatus.Text = "No hay archivos de proyecto cargados.";
+            return;
+        }
+
+        SetStatusMessage("Escaneando tareas en el proyecto...");
+        _allTasks = TaskScanner.ScanTasks(projectFiles, path => GetOpenDocumentText(path));
+        ApplyTaskFilter();
+        SetStatusMessage($"Lista de tareas actualizada: {_allTasks.Count} tarea(s) encontrada(s).");
+    }
+
+    private void ApplyTaskFilter()
+    {
+        string filter = (CmbTaskFilter?.SelectedItem is ComboBoxItem cbi) ? (cbi.Content?.ToString() ?? "Todas") : "Todas";
+
+        IEnumerable<TaskItem> filtered = _allTasks;
+        if (filter != "Todas")
+        {
+            filtered = _allTasks.Where(t => string.Equals(t.Tag, filter, StringComparison.OrdinalIgnoreCase));
+        }
+
+        var list = filtered.ToList();
+        LstTasks.ItemsSource = list;
+        TxtTasksStatus.Text = $"{list.Count} tarea(s) visible(s) ({_allTasks.Count} en total).";
+    }
+
+    private void LstTasks_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (LstTasks.SelectedItem is TaskItem task)
+        {
+            RecordCurrentNavigation();
+            var tab = OpenFile(task.FilePath);
+            if (tab != null && task.LineNumber > 0 && task.LineNumber <= tab.Editor.Document.LineCount)
+            {
+                var lineObj = tab.Editor.Document.GetLineByNumber(task.LineNumber);
+                tab.Editor.CaretOffset = lineObj.Offset;
+                tab.Editor.ScrollToLine(task.LineNumber);
+                tab.Editor.Focus();
+            }
+        }
+    }
+    #endregion
+
+    #region Utilidades de Navegación y Documentos
+    private List<string> GetSearchableFiles()
+    {
+        var files = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        if (_currentProjectGroup != null)
+        {
+            foreach (var proj in _currentProjectGroup.Projects)
+            {
+                foreach (var item in proj.Items)
+                {
+                    if (item.IsEditable && !string.IsNullOrWhiteSpace(item.AbsolutePath))
+                    {
+                        files.Add(item.AbsolutePath);
+                    }
+                }
+            }
+        }
+        else if (_currentProject != null)
+        {
+            foreach (var item in _currentProject.Items)
+            {
+                if (item.IsEditable && !string.IsNullOrWhiteSpace(item.AbsolutePath))
+                {
+                    files.Add(item.AbsolutePath);
+                }
+            }
+        }
+
+        foreach (var item in DocumentsTabControl.Items)
+        {
+            if (item is EditorTabItem tab && !string.IsNullOrWhiteSpace(tab.Document.FilePath))
+            {
+                files.Add(tab.Document.FilePath);
+            }
+        }
+
+        return files.ToList();
+    }
+
+    private string? GetOpenDocumentText(string filePath)
+    {
+        foreach (var item in DocumentsTabControl.Items)
+        {
+            if (item is EditorTabItem tab && string.Equals(Path.GetFullPath(tab.Document.FilePath), Path.GetFullPath(filePath), StringComparison.OrdinalIgnoreCase))
+            {
+                return tab.Editor.Text;
+            }
+        }
+        return null;
+    }
+
+    private void RecordCurrentNavigation()
+    {
+        if (ActiveTab != null)
+        {
+            int line = ActiveEditor?.TextArea.Caret.Line ?? 1;
+            int col = ActiveEditor?.TextArea.Caret.Column ?? 1;
+            NavigationHistory.Instance.RecordNavigation(ActiveTab.Document.FilePath, line, col);
+        }
+    }
+
+    public void CommentSelection()
+    {
+        if (ActiveEditor != null)
+        {
+            EditorOperationsHelper.CommentSelection(ActiveEditor);
+            SetStatusMessage("Líneas comentadas.");
+        }
+    }
+
+    public void UncommentSelection()
+    {
+        if (ActiveEditor != null)
+        {
+            EditorOperationsHelper.UncommentSelection(ActiveEditor);
+            SetStatusMessage("Líneas descomentadas.");
+        }
+    }
+    #endregion
     #endregion
 
     private void BtnCloseTab_Click(object sender, RoutedEventArgs e)

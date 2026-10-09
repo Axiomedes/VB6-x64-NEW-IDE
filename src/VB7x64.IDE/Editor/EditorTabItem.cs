@@ -21,6 +21,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
     public CurrentLineHighlighter CurrentLineHighlighter { get; }
     public BranchLinesRenderer BranchLinesRenderer { get; }
     public EndOfLineDetailsRenderer EndOfLineDetailsRenderer { get; }
+    public BookmarkMargin BookmarkMargin { get; }
     private readonly ComboBox _cmbProcedures;
 
     public event Action<int, int>? CaretPositionChanged;
@@ -65,6 +66,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         CurrentLineHighlighter = new CurrentLineHighlighter(Editor);
         BranchLinesRenderer = new BranchLinesRenderer(Editor);
         EndOfLineDetailsRenderer = new EndOfLineDetailsRenderer(Editor);
+        BookmarkMargin = new BookmarkMargin(Editor, document.FilePath);
 
         Editor.TextArea.TextView.BackgroundRenderers.Add(CurrentLineHighlighter);
         Editor.TextArea.TextView.BackgroundRenderers.Add(BranchLinesRenderer);
@@ -76,6 +78,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         Editor.Text = document.Text;
 
         InitializeHeader();
+        SetupContextMenu();
 
         // Barra superior de navegación de procedimientos
         _cmbProcedures = new ComboBox
@@ -293,11 +296,19 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         }
     }
 
+    private int _lastNavLine = 1;
+
     private void Caret_PositionChanged(object? sender, EventArgs e)
     {
         int line = Editor.TextArea.Caret.Line;
         int col = Editor.TextArea.Caret.Column;
         CaretPositionChanged?.Invoke(line, col);
+
+        if (Math.Abs(line - _lastNavLine) >= 10)
+        {
+            _lastNavLine = line;
+            NavigationHistory.Instance.RecordNavigation(Document.FilePath, line, col);
+        }
     }
 
     public SaveResult Save(bool createBackup)
@@ -390,6 +401,12 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         {
             Editor.TextArea.TextView.ClipToBounds = false;
 
+            // Asegurar el margen de marcadores interactivo en el extremo izquierdo
+            if (BookmarkMargin != null && !Editor.TextArea.LeftMargins.Contains(BookmarkMargin))
+            {
+                Editor.TextArea.LeftMargins.Insert(0, BookmarkMargin);
+            }
+
             // Eliminar la línea separadora punteada/continua que AvalonEdit inserta por defecto (DottedLineMargin / Line)
             // para que no quede superpuesta con las líneas guía de bloques
             for (int i = Editor.TextArea.LeftMargins.Count - 1; i >= 0; i--)
@@ -424,6 +441,130 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
                 Editor.TextArea.LeftMargins.Remove(_spacerMargin);
             }
         }
+    }
+
+    public string GetWordUnderCaret()
+    {
+        if (Editor.SelectionLength > 0)
+        {
+            string sel = Editor.SelectedText.Trim();
+            if (System.Text.RegularExpressions.Regex.IsMatch(sel, @"^[a-zA-Z_][a-zA-Z0-9_]*$"))
+            {
+                return sel;
+            }
+        }
+
+        if (Editor.Document == null) return string.Empty;
+        int offset = Editor.CaretOffset;
+        if (offset < 0 || offset > Editor.Document.TextLength) return string.Empty;
+
+        var line = Editor.Document.GetLineByOffset(offset);
+        string text = Editor.Document.GetText(line.Offset, line.Length);
+        int colInLine = offset - line.Offset;
+
+        if (colInLine < 0 || colInLine > text.Length) return string.Empty;
+
+        int start = colInLine;
+        while (start > 0 && (char.IsLetterOrDigit(text[start - 1]) || text[start - 1] == '_'))
+        {
+            start--;
+        }
+
+        int end = colInLine;
+        while (end < text.Length && (char.IsLetterOrDigit(text[end]) || text[end] == '_'))
+        {
+            end++;
+        }
+
+        if (end > start)
+        {
+            string word = text[start..end];
+            if (System.Text.RegularExpressions.Regex.IsMatch(word, @"^[a-zA-Z_][a-zA-Z0-9_]*$"))
+            {
+                return word;
+            }
+        }
+
+        return string.Empty;
+    }
+
+    private void SetupContextMenu()
+    {
+        var menu = new ContextMenu();
+
+        var miCut = new MenuItem { Header = "Cortar", InputGestureText = "Ctrl+X" };
+        miCut.Click += (_, _) => ApplicationCommands.Cut.Execute(null, Editor);
+        var miCopy = new MenuItem { Header = "Copiar", InputGestureText = "Ctrl+C" };
+        miCopy.Click += (_, _) => ApplicationCommands.Copy.Execute(null, Editor);
+        var miPaste = new MenuItem { Header = "Pegar", InputGestureText = "Ctrl+V" };
+        miPaste.Click += (_, _) => ApplicationCommands.Paste.Execute(null, Editor);
+
+        var miFindRefs = new MenuItem { Header = "Buscar todas las referencias...", InputGestureText = "Shift+F12" };
+        miFindRefs.Click += (_, _) =>
+        {
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                mw.FindReferencesForCurrentSymbol();
+            }
+        };
+
+        var miToggleBm = new MenuItem { Header = "Alternar Marcador", InputGestureText = "Ctrl+F2" };
+        miToggleBm.Click += (_, _) =>
+        {
+            int line = Editor.TextArea.Caret.Line;
+            BookmarkManager.Instance.ToggleBookmark(Document.FilePath, line);
+        };
+
+        var miNextBm = new MenuItem { Header = "Siguiente Marcador", InputGestureText = "F2" };
+        miNextBm.Click += (_, _) =>
+        {
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                mw.GoToNextBookmark();
+            }
+        };
+
+        var miPrevBm = new MenuItem { Header = "Marcador Anterior", InputGestureText = "Shift+F2" };
+        miPrevBm.Click += (_, _) =>
+        {
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                mw.GoToPreviousBookmark();
+            }
+        };
+
+        var miComment = new MenuItem { Header = "Comentar Bloque", InputGestureText = "Ctrl+K, Ctrl+C" };
+        miComment.Click += (_, _) =>
+        {
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                mw.CommentSelection();
+            }
+        };
+
+        var miUncomment = new MenuItem { Header = "Descomentar Bloque", InputGestureText = "Ctrl+K, Ctrl+U" };
+        miUncomment.Click += (_, _) =>
+        {
+            if (Application.Current.MainWindow is MainWindow mw)
+            {
+                mw.UncommentSelection();
+            }
+        };
+
+        menu.Items.Add(miCut);
+        menu.Items.Add(miCopy);
+        menu.Items.Add(miPaste);
+        menu.Items.Add(new Separator());
+        menu.Items.Add(miFindRefs);
+        menu.Items.Add(new Separator());
+        menu.Items.Add(miToggleBm);
+        menu.Items.Add(miNextBm);
+        menu.Items.Add(miPrevBm);
+        menu.Items.Add(new Separator());
+        menu.Items.Add(miComment);
+        menu.Items.Add(miUncomment);
+
+        Editor.ContextMenu = menu;
     }
 
     public void SetCurrentLineHighlightEnabled(bool enabled)

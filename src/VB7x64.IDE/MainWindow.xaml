@@ -16,6 +16,38 @@
         <KeyBinding Gesture="Ctrl+W" Command="{Binding CloseCurrentCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
     </Window.InputBindings>
 
+    <Window.Resources>
+        <Style x:Key="BottomTabRadioStyle" TargetType="RadioButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#555555"/>
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="Padding" Value="10,3,10,3"/>
+            <Setter Property="Margin" Value="0,0,2,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="TabBd" Background="{TemplateBinding Background}" CornerRadius="3,3,0,0" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="TabBd" Property="Background" Value="#FFFFFF"/>
+                                <Setter TargetName="TabBd" Property="BorderBrush" Value="#007ACC"/>
+                                <Setter TargetName="TabBd" Property="BorderThickness" Value="0,2,0,0"/>
+                                <Setter Property="Foreground" Value="#007ACC"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="TabBd" Property="Background" Value="#EAEAEA"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/> <!-- Menú Superior -->
@@ -52,12 +84,19 @@
                 <MenuItem Header="_Buscar..." InputGestureText="Ctrl+F" Click="MenuFind_Click"/>
                 <MenuItem Header="_Reemplazar..." InputGestureText="Ctrl+H" Click="MenuReplace_Click"/>
                 <MenuItem Header="Buscar en todo el _proyecto..." InputGestureText="Ctrl+Shift+F" Click="MenuFindInProject_Click"/>
+                <MenuItem Header="Buscar todas las _referencias..." InputGestureText="Shift+F12" Click="MenuFindReferences_Click"/>
                 <MenuItem Header="_Ir a línea..." InputGestureText="Ctrl+G" Click="MenuGoToLine_Click"/>
             </MenuItem>
             <MenuItem Header="_Ver">
+                <MenuItem Header="Navegar hacia a_trás" InputGestureText="Alt+←" Click="MenuNavBackward_Click"/>
+                <MenuItem Header="Navegar hacia a_delante" InputGestureText="Alt+→" Click="MenuNavForward_Click"/>
+                <Separator/>
                 <MenuItem x:Name="MenuToggleProjectExplorer" Header="_Explorador de Proyectos" IsCheckable="True" IsChecked="True" Click="MenuToggleProjectExplorer_Click"/>
                 <MenuItem x:Name="MenuExplorerMode" Header="Modo de Explorador: _Avanzado" IsCheckable="True" IsChecked="True" Click="MenuExplorerMode_Click"/>
+                <Separator/>
                 <MenuItem x:Name="MenuToggleOutput" Header="Panel de _Salida / Logs" IsCheckable="True" IsChecked="False" Click="MenuToggleOutput_Click"/>
+                <MenuItem x:Name="MenuToggleReferences" Header="Panel de _Referencias y Usos" Click="MenuToggleReferences_Click"/>
+                <MenuItem x:Name="MenuToggleTasks" Header="Lista de _Tareas (TODO)" Click="MenuToggleTasks_Click"/>
                 <MenuItem x:Name="MenuToggleStatusBar" Header="_Barra de Estado" IsCheckable="True" IsChecked="True" Click="MenuToggleStatusBar_Click"/>
                 <Separator/>
                 <MenuItem Header="Abrir Carpeta de _Logs" Click="MenuOpenLogsFolder_Click"/>
@@ -74,6 +113,14 @@
                 <MenuItem Header="Convertir a _MAYÚSCULAS" Click="MenuCaseUpper_Click"/>
                 <MenuItem Header="Convertir a m_inúsculas" Click="MenuCaseLower_Click"/>
                 <MenuItem Header="Convertir a Tipo _Título" Click="MenuCaseTitle_Click"/>
+                <Separator/>
+                <MenuItem Header="Buscar todas las _Referencias..." InputGestureText="Shift+F12" Click="MenuFindReferences_Click"/>
+                <MenuItem Header="Explorador de _Tareas (TODO)..." Click="MenuToggleTasks_Click"/>
+                <Separator/>
+                <MenuItem Header="_Alternar Marcador" InputGestureText="Ctrl+F2" Click="MenuToggleBookmark_Click"/>
+                <MenuItem Header="_Siguiente Marcador" InputGestureText="F2" Click="MenuNextBookmark_Click"/>
+                <MenuItem Header="Marcador _Anterior" InputGestureText="Shift+F2" Click="MenuPrevBookmark_Click"/>
+                <MenuItem Header="_Borrar Todos los Marcadores" InputGestureText="Ctrl+Shift+F2" Click="MenuClearBookmarks_Click"/>
                 <Separator/>
                 <MenuItem Header="Asistente de _Propiedades (Property Builder)..." Click="MenuPropertyBuilder_Click"/>
                 <MenuItem Header="Asistente de _Procedimientos (Sub / Function Builder)..." Click="MenuProcedureBuilder_Click"/>
@@ -105,6 +152,13 @@
                     <TextBlock Text="🗄️" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
                 <Separator/>
+                <Button x:Name="BtnToolbarNavBack" ToolTip="Navegar hacia atrás (Alt+←)" Click="MenuNavBackward_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="◀" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button x:Name="BtnToolbarNavForward" ToolTip="Navegar hacia adelante (Alt+→)" Click="MenuNavForward_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="▶" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Separator/>
                 <Button ToolTip="Deshacer (Ctrl+Z)" Click="MenuUndo_Click" Width="28" Height="24" Padding="0">
                     <TextBlock Text="↩" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
@@ -127,6 +181,12 @@
                 </Button>
                 <Button ToolTip="Buscar en Todo el Proyecto (Ctrl+Shift+F)" Click="MenuFindInProject_Click" Width="28" Height="24" Padding="0">
                     <TextBlock Text="🔎" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button ToolTip="Buscar Referencias del Símbolo (Shift+F12)" Click="MenuFindReferences_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="🔎*" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button ToolTip="Lista de Tareas (TODO Explorer)" Click="MenuToggleTasks_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="📝" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
             </ToolBar>
 
@@ -163,6 +223,19 @@
                         <MenuItem Header="Convertir a Tipo Título" Click="MenuCaseTitle_Click"/>
                     </MenuItem>
                 </Menu>
+                <Separator/>
+                <Button ToolTip="Alternar Marcador (Ctrl+F2)" Click="MenuToggleBookmark_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="🔖" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button ToolTip="Siguiente Marcador (F2)" Click="MenuNextBookmark_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="🔖↓" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button ToolTip="Marcador Anterior (Shift+F2)" Click="MenuPrevBookmark_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="🔖↑" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button ToolTip="Borrar Todos los Marcadores (Ctrl+Shift+F2)" Click="MenuClearBookmarks_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="🔖✕" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
                 <Separator/>
                 <Button x:Name="BtnToolbarPropertyBuilder" ToolTip="Asistente de Propiedades (Property Builder)" Click="MenuPropertyBuilder_Click" Width="28" Height="24" Padding="0">
                     <TextBlock Text="🔧⁺" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -293,7 +366,7 @@
             <!-- Splitter para el Panel Inferior de Salida -->
             <GridSplitter Grid.Row="1" Height="4" HorizontalAlignment="Stretch" Background="#E0E0E0" Cursor="SizeNS"/>
 
-            <!-- Panel Inferior de Salida / Logs -->
+            <!-- Panel Inferior Multiuso (Salida, Referencias, Lista de Tareas) -->
             <Border Grid.Row="2" Background="#FAFAFA" BorderBrush="#D0D0D0" BorderThickness="0,1,0,0">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -301,18 +374,110 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Border Grid.Row="0" Background="#F0F0F0" BorderBrush="#D8D8D8" BorderThickness="0,0,0,1" Padding="6,2">
-                        <DockPanel>
-                            <TextBlock Text="Salida / Registro de Eventos" FontWeight="SemiBold" FontSize="11.5" Foreground="#333333" VerticalAlignment="Center"/>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                <Button Content="Limpiar" Padding="6,1" FontSize="11" Margin="0,0,4,0" Click="BtnClearOutput_Click"/>
-                                <Button Content="✕" Width="18" Height="18" FontSize="10" Padding="0" Click="BtnCloseOutput_Click" ToolTip="Ocultar panel"/>
+                    <!-- Cabecera de Pestañas del Panel Inferior y botón de cierre -->
+                    <Border Grid.Row="0" Background="#F0F0F0" BorderBrush="#D8D8D8" BorderThickness="0,0,0,1" Padding="4,2">
+                        <DockPanel LastChildFill="True">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Content="✕" Width="18" Height="18" FontSize="10" Padding="0" Click="BtnCloseOutput_Click" ToolTip="Ocultar panel inferior"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton x:Name="TabRadioOutput" Content="📋 Registro de Salida" GroupName="BottomPanelTabs" IsChecked="True"
+                                             Style="{StaticResource BottomTabRadioStyle}" Click="BottomTabRadio_Click"/>
+                                <RadioButton x:Name="TabRadioReferences" Content="🔍 Referencias y Usos" GroupName="BottomPanelTabs"
+                                             Style="{StaticResource BottomTabRadioStyle}" Click="BottomTabRadio_Click"/>
+                                <RadioButton x:Name="TabRadioTasks" Content="📝 Lista de Tareas (TODO)" GroupName="BottomPanelTabs"
+                                             Style="{StaticResource BottomTabRadioStyle}" Click="BottomTabRadio_Click"/>
                             </StackPanel>
                         </DockPanel>
                     </Border>
 
-                    <TextBox x:Name="TxtOutputLog" Grid.Row="1" IsReadOnly="True" BorderThickness="0" Background="#FFFFFF"
-                             FontFamily="Consolas" FontSize="11" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                    <!-- Contenido de las pestañas -->
+                    <Grid Grid.Row="1">
+                        <!-- 1. Vista de Salida / Logs -->
+                        <Grid x:Name="ViewOutput" Visibility="Visible">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0" Background="#F7F7F7" BorderBrush="#E5E5E5" BorderThickness="0,0,0,1" Padding="6,2">
+                                <DockPanel>
+                                    <TextBlock Text="Registro de eventos del IDE y compilación" FontSize="11" Foreground="#666666" VerticalAlignment="Center"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Content="Limpiar" Padding="6,1" FontSize="11" Margin="0,0,4,0" Click="BtnClearOutput_Click"/>
+                                        <Button Content="Abrir Carpeta" Padding="6,1" FontSize="11" Click="MenuOpenLogsFolder_Click"/>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Border>
+                            <TextBox x:Name="TxtOutputLog" Grid.Row="1" IsReadOnly="True" BorderThickness="0" Background="#FFFFFF"
+                                     FontFamily="Consolas" FontSize="11" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                        </Grid>
+
+                        <!-- 2. Vista de Referencias y Usos -->
+                        <Grid x:Name="ViewReferences" Visibility="Collapsed">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0" Background="#F7F7F7" BorderBrush="#E5E5E5" BorderThickness="0,0,0,1" Padding="6,2">
+                                <DockPanel>
+                                    <TextBlock x:Name="TxtReferencesStatus" Text="No hay búsqueda activa. Coloca el cursor sobre un identificador y pulsa Shift+F12." FontSize="11" Foreground="#444444" VerticalAlignment="Center"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Content="Buscar..." Padding="6,1" FontSize="11" Margin="0,0,4,0" Click="BtnSearchReferencesPrompt_Click"/>
+                                        <Button Content="Limpiar" Padding="6,1" FontSize="11" Click="BtnClearReferences_Click"/>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Border>
+                            <ListView x:Name="LstReferences" Grid.Row="1" BorderThickness="0" MouseDoubleClick="LstReferences_MouseDoubleClick">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Archivo" Width="140" DisplayMemberBinding="{Binding FileName}"/>
+                                        <GridViewColumn Header="Contenedor / Rutina" Width="170" DisplayMemberBinding="{Binding ContainerName}"/>
+                                        <GridViewColumn Header="Línea" Width="55" DisplayMemberBinding="{Binding LineNumber}"/>
+                                        <GridViewColumn Header="Tipo" Width="110" DisplayMemberBinding="{Binding DisplayType}"/>
+                                        <GridViewColumn Header="Código coincidente" Width="450" DisplayMemberBinding="{Binding LineText}"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </Grid>
+
+                        <!-- 3. Vista de Lista de Tareas (TODO Explorer) -->
+                        <Grid x:Name="ViewTasks" Visibility="Collapsed">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0" Background="#F7F7F7" BorderBrush="#E5E5E5" BorderThickness="0,0,0,1" Padding="6,2">
+                                <DockPanel>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock x:Name="TxtTasksStatus" Text="0 tareas encontradas" FontSize="11" Foreground="#444444" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                        <TextBlock Text="Filtro:" FontSize="11" Foreground="#666666" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                        <ComboBox x:Name="CmbTaskFilter" Width="100" Height="22" FontSize="11" SelectionChanged="CmbTaskFilter_SelectionChanged">
+                                            <ComboBoxItem Content="Todas" IsSelected="True"/>
+                                            <ComboBoxItem Content="TODO"/>
+                                            <ComboBoxItem Content="FIXME"/>
+                                            <ComboBoxItem Content="BUG"/>
+                                            <ComboBoxItem Content="NOTE"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Content="🔄 Actualizar" Padding="6,1" FontSize="11" Click="BtnRefreshTasks_Click"/>
+                                    </StackPanel>
+                                </DockPanel>
+                            </Border>
+                            <ListView x:Name="LstTasks" Grid.Row="1" BorderThickness="0" MouseDoubleClick="LstTasks_MouseDoubleClick">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Pri." Width="50" DisplayMemberBinding="{Binding PriorityIcon}"/>
+                                        <GridViewColumn Header="Etiqueta" Width="70" DisplayMemberBinding="{Binding Tag}"/>
+                                        <GridViewColumn Header="Descripción" Width="360" DisplayMemberBinding="{Binding Description}"/>
+                                        <GridViewColumn Header="Archivo" Width="140" DisplayMemberBinding="{Binding FileName}"/>
+                                        <GridViewColumn Header="Línea" Width="55" DisplayMemberBinding="{Binding LineNumber}"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                        </Grid>
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>

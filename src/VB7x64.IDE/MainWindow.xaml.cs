@@ -923,21 +923,25 @@ public partial class MainWindow : Window
 
     private void SetOutputPanelVisibility(bool isVisible)
     {
+        if (RowOutput == null || RowOutputSplitter == null) return;
         double h = _settings.OutputPanelHeight > 50 ? _settings.OutputPanelHeight : 160;
         RowOutput.Height = isVisible ? new GridLength(h) : new GridLength(0);
         RowOutputSplitter.Height = isVisible ? new GridLength(4) : new GridLength(0);
-        MenuToggleOutput.IsChecked = isVisible;
+        if (MenuToggleOutput != null) MenuToggleOutput.IsChecked = isVisible;
     }
 
     private void BottomTabRadio_Click(object sender, RoutedEventArgs e)
     {
-        if (TabRadioOutput.IsChecked == true) ShowBottomTab("Output");
-        else if (TabRadioReferences.IsChecked == true) ShowBottomTab("References");
-        else if (TabRadioTasks.IsChecked == true) ShowBottomTab("Tasks");
+        if (TabRadioOutput?.IsChecked == true) ShowBottomTab("Output");
+        else if (TabRadioReferences?.IsChecked == true) ShowBottomTab("References");
+        else if (TabRadioTasks?.IsChecked == true) ShowBottomTab("Tasks");
     }
 
     public void ShowBottomTab(string tabName)
     {
+        if (ViewOutput == null || ViewReferences == null || ViewTasks == null) return;
+        if (TabRadioOutput == null || TabRadioReferences == null || TabRadioTasks == null) return;
+
         ViewOutput.Visibility = (tabName == "Output") ? Visibility.Visible : Visibility.Collapsed;
         ViewReferences.Visibility = (tabName == "References") ? Visibility.Visible : Visibility.Collapsed;
         ViewTasks.Visibility = (tabName == "Tasks") ? Visibility.Visible : Visibility.Collapsed;
@@ -1680,6 +1684,8 @@ public partial class MainWindow : Window
 
     private void ApplyTaskFilter()
     {
+        if (LstTasks == null || TxtTasksStatus == null) return;
+
         string filter = (CmbTaskFilter?.SelectedItem is ComboBoxItem cbi) ? (cbi.Content?.ToString() ?? "Todas") : "Todas";
 
         IEnumerable<TaskItem> filtered = _allTasks;

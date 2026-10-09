@@ -452,8 +452,8 @@
                                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                         <TextBlock x:Name="TxtTasksStatus" Text="0 tareas encontradas" FontSize="11" Foreground="#444444" VerticalAlignment="Center" Margin="0,0,12,0"/>
                                         <TextBlock Text="Filtro:" FontSize="11" Foreground="#666666" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                                        <ComboBox x:Name="CmbTaskFilter" Width="100" Height="22" FontSize="11" SelectionChanged="CmbTaskFilter_SelectionChanged">
-                                            <ComboBoxItem Content="Todas" IsSelected="True"/>
+                                        <ComboBox x:Name="CmbTaskFilter" Width="100" Height="22" FontSize="11" SelectedIndex="0" SelectionChanged="CmbTaskFilter_SelectionChanged">
+                                            <ComboBoxItem Content="Todas"/>
                                             <ComboBoxItem Content="TODO"/>
                                             <ComboBoxItem Content="FIXME"/>
                                             <ComboBoxItem Content="BUG"/>

@@ -25,8 +25,21 @@ public static class AppLogger
     public static void Warn(string message) => Log("WARN", message);
     public static void Error(string message, Exception? ex = null)
     {
-        string text = ex != null ? $"{message} - {ex.GetType().Name}: {ex.Message}{Environment.NewLine}{ex.StackTrace}" : message;
-        Log("ERROR", text);
+        var sb = new System.Text.StringBuilder();
+        sb.Append(message);
+        var cur = ex;
+        while (cur != null)
+        {
+            sb.AppendLine();
+            sb.Append($" ---> {cur.GetType().FullName}: {cur.Message}");
+            if (!string.IsNullOrWhiteSpace(cur.StackTrace))
+            {
+                sb.AppendLine();
+                sb.Append(cur.StackTrace);
+            }
+            cur = cur.InnerException;
+        }
+        Log("ERROR", sb.ToString());
     }
 
     private static void Log(string level, string message)

@@ -11,6 +11,7 @@ public class VB6Block
     public string Header { get; set; } = string.Empty;
     public VB6Block? Parent { get; set; }
     public List<VB6Block> Children { get; set; } = [];
+    public List<int> IntermediateLines { get; set; } = [];
 
     public override string ToString() => $"{BlockType} (L{StartLine}-L{EndLine}, Col {StartColumn}): {Header}";
 }

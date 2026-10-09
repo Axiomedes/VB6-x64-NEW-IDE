@@ -8,6 +8,12 @@ using VB7x64.ProjectModel.Advanced;
 
 namespace VB7x64.IDE.Editor;
 
+/// <summary>
+/// Renderiza las guías de estructura de bloques de VB6 (Branch Lines).
+/// Dibuja una línea vertical estilizada posicionada un espacio antes de las palabras clave (If, End If, For, etc.)
+/// con conectores en ángulo recto (┌ y └) en la apertura y cierre del bloque, y ramificaciones (├──)
+/// en sentencias intermedias (Else, ElseIf, Case).
+/// </summary>
 public class BranchLinesRenderer : IBackgroundRenderer
 {
     private readonly TextEditor _editor;
@@ -23,10 +29,9 @@ public class BranchLinesRenderer : IBackgroundRenderer
     {
         _editor = editor ?? throw new ArgumentNullException(nameof(editor));
 
-        var penBrush = new SolidColorBrush(Color.FromRgb(208, 208, 208));
+        var penBrush = new SolidColorBrush(Color.FromRgb(200, 200, 200)); // Gris sutil, limpio
         penBrush.Freeze();
         var pen = new Pen(penBrush, 1);
-        pen.DashStyle = DashStyles.Dot; // Línea punteada sutil
         pen.Freeze();
         LinePen = pen;
 
@@ -45,7 +50,6 @@ public class BranchLinesRenderer : IBackgroundRenderer
         var penBrush = new SolidColorBrush(color);
         penBrush.Freeze();
         var pen = new Pen(penBrush, 1);
-        pen.DashStyle = DashStyles.Dot;
         pen.Freeze();
         LinePen = pen;
 
@@ -101,17 +105,14 @@ public class BranchLinesRenderer : IBackgroundRenderer
     {
         foreach (var block in blocks)
         {
-            // Ignorar bloques de una sola línea
             if (block.StartLine < block.EndLine)
             {
-                // Solo si el bloque solapa el rango visible en pantalla
                 if (block.EndLine >= firstVisibleLine && block.StartLine <= lastVisibleLine)
                 {
-                    DrawSingleBlockGuide(block, textView, drawingContext, charWidth);
+                    DrawSingleBlockGuide(block, textView, drawingContext, firstVisibleLine, lastVisibleLine, charWidth);
                 }
             }
 
-            // Procesar bloques hijos
             if (block.Children.Count > 0)
             {
                 RenderBlockList(block.Children, textView, drawingContext, firstVisibleLine, lastVisibleLine, charWidth);
@@ -123,40 +124,104 @@ public class BranchLinesRenderer : IBackgroundRenderer
         VB6Block block,
         TextView textView,
         DrawingContext drawingContext,
+        int firstVisibleLine,
+        int lastVisibleLine,
         double charWidth)
     {
-        double x = (block.StartColumn * charWidth) + 3.0;
-
-        double topY;
         var startVLine = textView.GetVisualLine(block.StartLine);
+        var endVLine = textView.GetVisualLine(block.EndLine);
+
+        // 1. Determinar coordenada X de la palabra clave en pantalla
+        double keywordX;
         if (startVLine != null)
         {
-            topY = startVLine.VisualTop - textView.VerticalOffset + startVLine.Height;
-            // Pequeño conector horizontal en el inicio
-            drawingContext.DrawLine(LinePen, new Point(x, topY - (startVLine.Height / 2)), new Point(x + 5.0, topY - (startVLine.Height / 2)));
+            int col = Math.Min(block.StartColumn, Math.Max(0, startVLine.VisualLength));
+            keywordX = startVLine.GetVisualPosition(col, VisualYPosition.LineMiddle).X;
+        }
+        else if (endVLine != null)
+        {
+            int col = Math.Min(block.StartColumn, Math.Max(0, endVLine.VisualLength));
+            keywordX = endVLine.GetVisualPosition(col, VisualYPosition.LineMiddle).X;
+        }
+        else if (textView.VisualLines.Count > 0)
+        {
+            int col = Math.Min(block.StartColumn, Math.Max(0, textView.VisualLines[0].VisualLength));
+            keywordX = textView.VisualLines[0].GetVisualPosition(col, VisualYPosition.LineMiddle).X;
         }
         else
         {
-            topY = 0; // Inicio fuera de pantalla arriba
+            keywordX = (block.StartColumn * charWidth) - textView.HorizontalOffset + 2.0;
+        }
+
+        // Posición de la guía vertical: un espacio antes de la palabra clave
+        double spaceWidth = charWidth > 0 ? charWidth : 8.0;
+        double guideX = keywordX - (spaceWidth * 0.75);
+        if (guideX < 2.0) guideX = 2.0;
+
+        // Snap a píxel exacto (+0.5) para que las líneas de 1px sean completamente nítidas
+        double snapGuideX = Math.Floor(guideX) + 0.5;
+        // La línea horizontal termina 2px antes de la primera letra para no tocarla
+        double snapKeywordX = Math.Floor(keywordX - 2.0) + 0.5;
+
+        if (snapKeywordX <= snapGuideX)
+        {
+            snapKeywordX = snapGuideX + 4.0;
+        }
+
+        // 2. Límites verticales y esquinas en ángulo recto
+        double topY;
+        if (startVLine != null)
+        {
+            int col = Math.Min(block.StartColumn, Math.Max(0, startVLine.VisualLength));
+            topY = Math.Floor(startVLine.GetVisualPosition(col, VisualYPosition.LineMiddle).Y) + 0.5;
+
+            // Pequeña línea horizontal que forma ángulo recto superior (┌)
+            drawingContext.DrawLine(LinePen, new Point(snapGuideX, topY), new Point(snapKeywordX, topY));
+        }
+        else
+        {
+            topY = -1.0; // Bloque inicia más arriba de la zona visible
         }
 
         double bottomY;
-        var endVLine = textView.GetVisualLine(block.EndLine);
         if (endVLine != null)
         {
-            bottomY = endVLine.VisualTop - textView.VerticalOffset + (endVLine.Height / 2);
-            // Pequeño conector horizontal en el cierre
-            drawingContext.DrawLine(LinePen, new Point(x, bottomY), new Point(x + 5.0, bottomY));
+            int col = Math.Min(block.StartColumn, Math.Max(0, endVLine.VisualLength));
+            bottomY = Math.Floor(endVLine.GetVisualPosition(col, VisualYPosition.LineMiddle).Y) + 0.5;
+
+            // Pequeña línea horizontal que forma ángulo recto inferior (└)
+            drawingContext.DrawLine(LinePen, new Point(snapGuideX, bottomY), new Point(snapKeywordX, bottomY));
         }
         else
         {
-            bottomY = textView.ActualHeight; // Cierre fuera de pantalla abajo
+            bottomY = textView.ActualHeight + 1.0; // Bloque termina más abajo de la zona visible
         }
 
+        // 3. Ramas intermedias (ElseIf, Else, Case) formando un empalme en T (├──)
+        if (block.IntermediateLines.Count > 0)
+        {
+            foreach (int interLine in block.IntermediateLines)
+            {
+                if (interLine >= firstVisibleLine && interLine <= lastVisibleLine)
+                {
+                    var interVLine = textView.GetVisualLine(interLine);
+                    if (interVLine != null)
+                    {
+                        int interCol = Math.Min(block.StartColumn, Math.Max(0, interVLine.VisualLength));
+                        double interY = Math.Floor(interVLine.GetVisualPosition(interCol, VisualYPosition.LineMiddle).Y) + 0.5;
+                        if (interY >= topY && interY <= bottomY)
+                        {
+                            drawingContext.DrawLine(LinePen, new Point(snapGuideX, interY), new Point(snapKeywordX, interY));
+                        }
+                    }
+                }
+            }
+        }
+
+        // 4. Línea vertical principal que conecta la apertura con el cierre
         if (bottomY > topY)
         {
-            // Línea vertical que une apertura y cierre
-            drawingContext.DrawLine(LinePen, new Point(x, topY), new Point(x, bottomY));
+            drawingContext.DrawLine(LinePen, new Point(snapGuideX, topY), new Point(snapGuideX, bottomY));
         }
     }
 }

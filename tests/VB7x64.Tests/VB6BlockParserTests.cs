@@ -79,21 +79,26 @@ public class VB6BlockParserTests
     }
 
     [Fact]
-    public void ParseBlocks_IgnoresKeywordsInStringsAndComments()
+    public void ParseBlocks_DetectsIntermediateLines()
     {
         string code = """
             Public Sub Test()
-                ' If x > 0 Then
-                Dim s As String
-                s = "End Sub"
+                If x > 10 Then
+                    MsgBox 1
+                ElseIf x > 5 Then
+                    MsgBox 2
+                Else
+                    MsgBox 3
+                End If
             End Sub
             """;
 
         var blocks = VB6BlockParser.ParseBlocks(code);
 
         Assert.Single(blocks);
-        Assert.Equal(1, blocks[0].StartLine);
-        Assert.Equal(5, blocks[0].EndLine);
-        Assert.Empty(blocks[0].Children);
+        var ifBlock = blocks[0].Children[0];
+        Assert.Equal(2, ifBlock.IntermediateLines.Count);
+        Assert.Equal(4, ifBlock.IntermediateLines[0]); // ElseIf
+        Assert.Equal(6, ifBlock.IntermediateLines[1]); // Else
     }
 }

@@ -51,7 +51,8 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         {
             WordWrap = false,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+            Padding = new Thickness(6, 0, 0, 0)
         };
 
         Editor.Options.ConvertTabsToSpaces = false;

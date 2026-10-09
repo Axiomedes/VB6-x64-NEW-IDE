@@ -84,7 +84,14 @@ public static class VB6BlockParser
                 continue;
             }
 
-            // 2. Detectar aperturas de bloques
+            // 2. Detectar ramas intermedias (Else, ElseIf, Case)
+            if (blockStack.Count > 0 && TryMatchBlockIntermediate(cleanTrimmed, blockStack.Peek().BlockType))
+            {
+                blockStack.Peek().IntermediateLines.Add(lineNumber);
+                continue;
+            }
+
+            // 3. Detectar aperturas de bloques
             if (TryMatchBlockOpen(rawLine, cleanTrimmed, column, lineNumber, out VB6Block? newBlock) && newBlock != null)
             {
                 if (blockStack.Count > 0)
@@ -306,6 +313,28 @@ public static class VB6BlockParser
     private static bool CanClose(string openedType, string closeType)
     {
         return string.Equals(openedType, closeType, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool TryMatchBlockIntermediate(string cleanLine, string currentBlockType)
+    {
+        string upper = cleanLine.ToUpperInvariant();
+        if (string.Equals(currentBlockType, "If", StringComparison.OrdinalIgnoreCase))
+        {
+            if (upper == "ELSE" || upper.StartsWith("ELSE ", StringComparison.Ordinal) ||
+                upper.StartsWith("ELSEIF ", StringComparison.Ordinal) ||
+                (upper.StartsWith("ELSEIF", StringComparison.Ordinal) && upper.EndsWith("THEN", StringComparison.Ordinal)))
+            {
+                return true;
+            }
+        }
+        else if (string.Equals(currentBlockType, "Select", StringComparison.OrdinalIgnoreCase))
+        {
+            if (upper.StartsWith("CASE ", StringComparison.Ordinal) || upper == "CASE ELSE")
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static int GetIndentColumn(string rawLine)

@@ -172,10 +172,10 @@
                         <Border x:Name="EmptyDocsNotice" Background="#FDFDFD" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Visibility="Visible">
                             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                 <TextBlock Text="VB7-x64 IDE" FontSize="26" FontWeight="Bold" Foreground="#888888" HorizontalAlignment="Center"/>
-                                <TextBlock Text="Abre un proyecto .vbp / grupo .vbg o archivo .bas/.frm/.cls para comenzar" FontSize="13" Foreground="#999999" Margin="0,8,0,0" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Abre un proyecto .vbp / grupo .vbg o archivo de código (.bas, .cls, .frm, .ctl, etc.)" FontSize="13" Foreground="#999999" Margin="0,8,0,0" HorizontalAlignment="Center"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
                                     <Button Content="Abrir Proyecto / Grupo (.vbp, .vbg)" Padding="10,5" Margin="5" Click="MenuOpenProject_Click"/>
-                                    <Button Content="Abrir Archivo (.bas / .frm / .cls)" Padding="10,5" Margin="5" Click="MenuOpenFile_Click"/>
+                                    <Button Content="Abrir Archivo de Código VB6" Padding="10,5" Margin="5" Click="MenuOpenFile_Click"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>

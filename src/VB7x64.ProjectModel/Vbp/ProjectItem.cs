@@ -20,6 +20,8 @@ public class ProjectItem
         ProjectItemType.Class => true,
         ProjectItemType.UserControl => true,
         ProjectItemType.PropertyPage => true,
+        ProjectItemType.UserDocument => true,
+        ProjectItemType.Designer => true,
         _ => false
     };
 

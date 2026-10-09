@@ -509,7 +509,7 @@ public partial class MainWindow : Window
         var dialog = new OpenFileDialog
         {
             Title = "Abrir Archivo de Código VB6",
-            Filter = "Archivos VB6 (*.bas;*.cls;*.frm)|*.bas;*.cls;*.frm|Módulos (*.bas)|*.bas|Módulos de Clase (*.cls)|*.cls|Formularios (*.frm)|*.frm|Todos los archivos (*.*)|*.*"
+            Filter = "Archivos de Código VB6 (*.bas;*.cls;*.frm;*.ctl;*.pag;*.dob;*.dsr)|*.bas;*.cls;*.frm;*.ctl;*.pag;*.dob;*.dsr|Módulos (*.bas)|*.bas|Clases (*.cls)|*.cls|Formularios (*.frm)|*.frm|User Controls (*.ctl)|*.ctl|Páginas de Propiedades (*.pag)|*.pag|Documentos de Usuario (*.dob)|*.dob|Diseñadores (*.dsr)|*.dsr|Todos los archivos (*.*)|*.*"
         };
 
         if (dialog.ShowDialog() == true)

@@ -107,6 +107,14 @@ public static class VbpParser
                     ParseFormItem(project, line, lineNumber, value, projectDirectory, ProjectItemType.PropertyPage);
                     break;
 
+                case "USERDOCUMENT":
+                    ParseFormItem(project, line, lineNumber, value, projectDirectory, ProjectItemType.UserDocument);
+                    break;
+
+                case "DESIGNER":
+                    ParseFormItem(project, line, lineNumber, value, projectDirectory, ProjectItemType.Designer);
+                    break;
+
                 case "REFERENCE":
                     ParseReferenceItem(project, line, value, projectDirectory);
                     break;

@@ -18,6 +18,11 @@ public record SaveResult(SaveStatus Status, string Message, string? BackupPath =
 
 public static class SafeFileStorage
 {
+    private static readonly HashSet<string> BinaryResourceExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".frx", ".ctx", ".pgx", ".dox", ".dsx", ".res"
+    };
+
     public static EditorDocument LoadDocument(string filePath, Encoding? defaultFallbackEncoding = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
@@ -27,10 +32,12 @@ public static class SafeFileStorage
             throw new FileNotFoundException($"El archivo no existe: {filePath}", filePath);
         }
 
-        // Regla de oro 5: Archivos .frx nunca deben abrirse como texto
-        if (string.Equals(Path.GetExtension(filePath), ".frx", StringComparison.OrdinalIgnoreCase))
+        string ext = Path.GetExtension(filePath);
+
+        // Regla de oro 5: Archivos de recursos binarios nunca deben abrirse como texto
+        if (BinaryResourceExtensions.Contains(ext))
         {
-            throw new InvalidOperationException("Los archivos .frx contienen recursos binarios y no deben abrirse como texto.");
+            throw new InvalidOperationException($"Los archivos '{ext}' contienen recursos binarios y no deben abrirse como texto.");
         }
 
         FileInfo fileInfo = new(filePath);
@@ -41,21 +48,24 @@ public static class SafeFileStorage
         string text = detection.Encoding.GetString(bytes.AsSpan(detection.PreambleLength));
 
         bool isReadOnly = (fileInfo.Attributes & FileAttributes.ReadOnly) != 0;
-        string? designHeader = null;
+        string? header = null;
 
-        // Si es un formulario .frm, separar quirúrgicamente la cabecera de diseño del código fuente
-        if (string.Equals(Path.GetExtension(filePath), ".frm", StringComparison.OrdinalIgnoreCase))
+        // Si es un archivo de código VB6 (.frm, .ctl, .pag, .dob, .dsr, .cls, .bas), separar la cabecera técnica del código de usuario
+        if (VbHeaderHandler.IsVbCodeFile(ext))
         {
-            var split = FrmDocumentHandler.SplitFrmContent(text);
-            if (split.IsSafelyDelimited)
+            var split = VbHeaderHandler.SplitFileContent(text, ext);
+            if (split.HasHeader)
             {
-                designHeader = split.HeaderAndDesign;
-                text = split.Code;
-            }
-            else
-            {
-                // Si la delimitación no es segura, abrir en modo de solo lectura para evitar corrupción
-                isReadOnly = true;
+                if (split.IsSafelyDelimited)
+                {
+                    header = split.Header;
+                    text = split.Code;
+                }
+                else
+                {
+                    // Si la delimitación no es segura, abrir en modo de solo lectura para evitar corrupción
+                    isReadOnly = true;
+                }
             }
         }
 
@@ -69,7 +79,7 @@ public static class SafeFileStorage
             sha256Hash: hash,
             lastModifiedTimeUtc: fileInfo.LastWriteTimeUtc,
             fileSize: fileInfo.Length,
-            designHeader: designHeader
+            header: header
         );
     }
 
@@ -121,9 +131,9 @@ public static class SafeFileStorage
                 File.Copy(filePath, backupPath, overwrite: true);
             }
 
-            // Preparar contenido reconstruyendo el archivo si es un .frm con diseño serializado
-            string textToSave = document.IsFormFile
-                ? FrmDocumentHandler.CombineFrmContent(document.DesignHeader!, document.Text, document.NewLineConvention)
+            // Preparar contenido reconstruyendo el archivo si contiene cabecera técnica separada
+            string textToSave = document.HasHeader
+                ? VbHeaderHandler.CombineContent(document.Header!, document.Text, document.NewLineConvention)
                 : document.Text;
 
             string normalizedText = EditorDocument.NormalizeNewLines(textToSave, document.NewLineConvention);

@@ -21,8 +21,10 @@ public class EditorDocument
     public DateTime LastModifiedTimeUtc { get; private set; }
     public long FileSize { get; private set; }
 
-    public string? DesignHeader { get; set; }
-    public bool IsFormFile => !string.IsNullOrEmpty(DesignHeader);
+    public string? Header { get; set; }
+    public string? DesignHeader { get => Header; set => Header = value; }
+    public bool HasHeader => !string.IsNullOrEmpty(Header);
+    public bool IsFormFile => HasHeader;
 
     public string Text
     {
@@ -53,7 +55,7 @@ public class EditorDocument
         string sha256Hash,
         DateTime lastModifiedTimeUtc,
         long fileSize,
-        string? designHeader = null)
+        string? header = null)
     {
         FilePath = filePath;
         DisplayName = Path.GetFileName(filePath);
@@ -66,7 +68,7 @@ public class EditorDocument
         LastSavedHash = sha256Hash;
         LastModifiedTimeUtc = lastModifiedTimeUtc;
         FileSize = fileSize;
-        DesignHeader = designHeader;
+        Header = header;
         _isDirty = false;
     }
 
@@ -80,8 +82,8 @@ public class EditorDocument
 
     public string CalculateCurrentContentHash()
     {
-        string textToHash = IsFormFile
-            ? FrmDocumentHandler.CombineFrmContent(DesignHeader!, _text, NewLineConvention)
+        string textToHash = HasHeader
+            ? VbHeaderHandler.CombineContent(Header!, _text, NewLineConvention)
             : _text;
 
         string normalized = NormalizeNewLines(textToHash, NewLineConvention);

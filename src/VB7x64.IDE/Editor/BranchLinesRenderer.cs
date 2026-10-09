@@ -10,16 +10,17 @@ namespace VB7x64.IDE.Editor;
 
 /// <summary>
 /// Renderiza las guías de estructura de bloques de VB6 (Branch Lines) dentro de TextView.
-/// Dibuja una línea vertical estilizada posicionada un espacio antes de las palabras clave (If, End If, For, etc.)
+/// Dibuja una línea vertical estilizada posicionada un espacio antes de las palabras clave (Sub, End Sub, If, End If, For, etc.)
 /// con conectores en ángulo recto (┌ y └) en la apertura y cierre del bloque, y ramificaciones (├──)
 /// en sentencias intermedias (Else, ElseIf, Case).
+/// Todas las líneas (tanto de procedimientos principales como de bloques internos) se dibujan dinámicamente
+/// desplazándose coordinadas en sincronía con el texto tanto vertical como horizontalmente.
 /// </summary>
 public class BranchLinesRenderer : IBackgroundRenderer
 {
     private readonly TextEditor _editor;
     private List<VB6Block> _blocks = [];
     private bool _needsParse = true;
-    private BranchLinesMargin? _margin;
 
     public KnownLayer Layer => KnownLayer.Background;
 
@@ -51,14 +52,8 @@ public class BranchLinesRenderer : IBackgroundRenderer
             if (IsEnabled && _editor.TextArea?.TextView != null)
             {
                 _editor.TextArea.TextView.InvalidateLayer(KnownLayer.Background);
-                _margin?.InvalidateVisual();
             }
         };
-    }
-
-    public void SetMargin(BranchLinesMargin margin)
-    {
-        _margin = margin;
     }
 
     public void UpdateColor(Color color)
@@ -70,14 +65,12 @@ public class BranchLinesRenderer : IBackgroundRenderer
         LinePen = pen;
 
         _editor.TextArea?.TextView?.InvalidateLayer(KnownLayer.Background);
-        _margin?.InvalidateVisual();
     }
 
     public void InvalidateBlocks()
     {
         _needsParse = true;
         _editor.TextArea?.TextView?.InvalidateLayer(KnownLayer.Background);
-        _margin?.InvalidateVisual();
     }
 
     private void EnsureBlocks()
@@ -114,23 +107,23 @@ public class BranchLinesRenderer : IBackgroundRenderer
 
         double charWidth = textView.WideSpaceWidth > 0 ? textView.WideSpaceWidth : 8.0;
 
-        foreach (var rootBlock in _blocks)
-        {
-            // Si el bloque raíz tiene indentación (columna > 0), se dibuja aquí en TextView
-            if (rootBlock.StartColumn > 0 && rootBlock.EndLine >= firstVisibleLine && rootBlock.StartLine <= lastVisibleLine)
-            {
-                DrawSingleBlockGuide(rootBlock, textView, drawingContext, firstVisibleLine, lastVisibleLine, charWidth);
-            }
+        // Clip de protección para permitir dibujar en el margen izquierdo (X hasta -14) sin invadir los números de línea
+        double clipWidth = Math.Max(0, (textView.ActualWidth > 0 ? textView.ActualWidth : 2000) + 16);
+        double clipHeight = Math.Max(0, textView.ActualHeight > 0 ? textView.ActualHeight : 2000);
+        var clipRect = new Rect(-14, 0, clipWidth, clipHeight);
+        drawingContext.PushClip(new RectangleGeometry(clipRect));
 
-            // Los bloques hijos (If, Select, For, Do, While, With) se dibujan siempre dentro de TextView
-            if (rootBlock.Children.Count > 0)
-            {
-                RenderChildBlocks(rootBlock.Children, textView, drawingContext, firstVisibleLine, lastVisibleLine, charWidth);
-            }
+        try
+        {
+            RenderBlockHierarchy(_blocks, textView, drawingContext, firstVisibleLine, lastVisibleLine, charWidth);
+        }
+        finally
+        {
+            drawingContext.Pop();
         }
     }
 
-    private void RenderChildBlocks(
+    private void RenderBlockHierarchy(
         List<VB6Block> blocks,
         TextView textView,
         DrawingContext drawingContext,
@@ -150,7 +143,7 @@ public class BranchLinesRenderer : IBackgroundRenderer
 
             if (block.Children.Count > 0)
             {
-                RenderChildBlocks(block.Children, textView, drawingContext, firstVisibleLine, lastVisibleLine, charWidth);
+                RenderBlockHierarchy(block.Children, textView, drawingContext, firstVisibleLine, lastVisibleLine, charWidth);
             }
         }
     }
@@ -166,7 +159,7 @@ public class BranchLinesRenderer : IBackgroundRenderer
         var startVLine = textView.GetVisualLine(block.StartLine);
         var endVLine = textView.GetVisualLine(block.EndLine);
 
-        // 1. Determinar coordenada X de la palabra clave en pantalla (restando HorizontalOffset para soportar desplazamiento)
+        // 1. Determinar coordenada X de la palabra clave en pantalla (restando HorizontalOffset para soportar desplazamiento horizontal)
         double keywordX;
         if (startVLine != null)
         {
@@ -180,15 +173,14 @@ public class BranchLinesRenderer : IBackgroundRenderer
         }
         else
         {
-            keywordX = (block.StartColumn * charWidth) - textView.HorizontalOffset + 2.0;
+            keywordX = (block.StartColumn * charWidth) - textView.HorizontalOffset;
         }
 
-        // Posición de la guía vertical: un espacio antes de la palabra clave
+        // Posición de la guía vertical: exactamente un ancho de espacio antes de la palabra clave
         double spaceWidth = charWidth > 0 ? charWidth : 8.0;
-        double guideX = keywordX - (spaceWidth * 0.75);
-        if (guideX < 2.0) guideX = 2.0;
+        double guideX = keywordX - spaceWidth;
 
-        // Snap a píxel exacto (+0.5) para que las líneas de 1px sean completamente nítidas
+        // Snap a píxel exacto (+0.5) para nitidez absoluta
         double snapGuideX = Math.Floor(guideX) + 0.5;
         // La línea horizontal termina 2px antes de la primera letra para no tocarla
         double snapKeywordX = Math.Floor(keywordX - 2.0) + 0.5;

@@ -127,6 +127,40 @@ public partial class PropertyGridPanel : UserControl
         }
     }
 
+    public void ClearModel()
+    {
+        _model = null;
+        _currentSelectedTarget = null;
+        _allProperties.Clear();
+
+        _isUpdatingSelectionInternal = true;
+        if (CmbObjects != null)
+        {
+            CmbObjects.ItemsSource = null;
+        }
+        _isUpdatingSelectionInternal = false;
+
+        if (PropertiesListView != null)
+        {
+            PropertiesListView.ItemsSource = null;
+        }
+
+        if (TxtHeaderTitle != null)
+        {
+            TxtHeaderTitle.Text = "Propiedades";
+        }
+
+        if (TxtHelpPropName != null)
+        {
+            TxtHelpPropName.Text = "Propiedad";
+        }
+
+        if (TxtHelpDescription != null)
+        {
+            TxtHelpDescription.Text = "No hay ningún objeto o formulario activo.";
+        }
+    }
+
     public void RefreshObjectList()
     {
         if (_model == null || CmbObjects == null) return;

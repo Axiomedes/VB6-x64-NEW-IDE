@@ -118,6 +118,7 @@ public class DesignerSelectionFrame : Canvas
         }
 
         Visibility = Visibility.Visible;
+        visual.UpdateLayout();
         UpdateLayoutFromControl();
     }
 
@@ -133,8 +134,34 @@ public class DesignerSelectionFrame : Canvas
         double w = Math.Max(15, BoundControl.WidthPixels);
         double h = Math.Max(15, BoundControl.HeightPixels);
 
-        // Si el control está dentro de un contenedor (Frame/PictureBox), sumar la posición del contenedor
-        if (BoundControl.ParentControl != null)
+        // Si el control visual está alojado dentro de un contenedor (ej: Frame con GroupBox, PictureBox, etc.)
+        // proyectar el origen exacto del contenedor visual sobre el GridCanvas para no omitir el encabezado, bordes y padding del Frame.
+        if (BoundVisual != null && Parent is Visual gridCanvas)
+        {
+            try
+            {
+                if (BoundVisual.Parent is Visual containerVisual && containerVisual != gridCanvas && containerVisual.IsDescendantOf(gridCanvas))
+                {
+                    Point origin = ((UIElement)containerVisual).TranslatePoint(new Point(0, 0), (UIElement)gridCanvas);
+                    x = origin.X + BoundControl.LeftPixels;
+                    y = origin.Y + BoundControl.TopPixels;
+                }
+                else if (BoundVisual.IsDescendantOf(gridCanvas))
+                {
+                    x = BoundControl.LeftPixels;
+                    y = BoundControl.TopPixels;
+                }
+            }
+            catch
+            {
+                if (BoundControl.ParentControl != null)
+                {
+                    x += BoundControl.ParentControl.LeftPixels;
+                    y += BoundControl.ParentControl.TopPixels;
+                }
+            }
+        }
+        else if (BoundControl.ParentControl != null)
         {
             x += BoundControl.ParentControl.LeftPixels;
             y += BoundControl.ParentControl.TopPixels;

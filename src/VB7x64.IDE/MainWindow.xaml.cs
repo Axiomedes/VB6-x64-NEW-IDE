@@ -330,6 +330,11 @@ public partial class MainWindow : Window
                 MainToolboxPanel.ResetToPointer();
             };
         }
+        else
+        {
+            MainPropertyGridPanel.ClearModel();
+            MainToolboxPanel.ResetToPointer();
+        }
     }
 
     private void UpdateDocumentsVisibility()
@@ -426,10 +431,53 @@ public partial class MainWindow : Window
             }
         }
 
+        int index = DocumentsTabControl.Items.IndexOf(tab);
         DocumentsTabControl.Items.Remove(tab);
+
+        if (DocumentsTabControl.Items.Count > 0)
+        {
+            int nextIndex = Math.Min(index, DocumentsTabControl.Items.Count - 1);
+            DocumentsTabControl.SelectedIndex = Math.Max(0, nextIndex);
+        }
+        else
+        {
+            DocumentsTabControl.SelectedItem = null;
+        }
+
         UpdateDocumentsVisibility();
         UpdateStatusFromActiveTab();
+        SyncDesignerPanelsWithActiveTab();
         return true;
+    }
+
+    public bool CloseAllDocuments()
+    {
+        var tabs = DocumentsTabControl.Items.OfType<EditorTabItem>().ToList();
+        foreach (var tab in tabs)
+        {
+            if (!CloseTab(tab))
+            {
+                return false; // El usuario canceló
+            }
+        }
+        return true;
+    }
+
+    public void CloseProjectAndAllDocuments()
+    {
+        if (!CloseAllDocuments()) return;
+
+        _currentProject = null;
+        _currentProjectGroup = null;
+
+        ProjectTreeView.Items.Clear();
+
+        MainPropertyGridPanel.ClearModel();
+        MainToolboxPanel.ResetToPointer();
+
+        Title = "VB7-x64 IDE - Entorno de Desarrollo VB6 Clásico";
+        SetStatusMessage("Proyecto y documentos cerrados.");
+        AppLogger.Info("Proyecto y todos los documentos cerrados.");
     }
 
     #region Project Handling (Milestone 5 & VBG Groups)
@@ -1211,6 +1259,11 @@ public partial class MainWindow : Window
         }
     }
 
+    private void MenuCloseAll_Click(object sender, RoutedEventArgs e)
+    {
+        CloseProjectAndAllDocuments();
+    }
+
     private void MenuExit_Click(object sender, RoutedEventArgs e)
     {
         Close();
@@ -1505,6 +1558,44 @@ public partial class MainWindow : Window
             else
             {
                 MenuNewForm_Click(this, new RoutedEventArgs());
+            }
+            e.Handled = true;
+            return;
+        }
+
+        // Ctrl+O: Abrir Proyecto o Grupo
+        if (e.Key == Key.O && Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            MenuOpenProject_Click(this, new RoutedEventArgs());
+            e.Handled = true;
+            return;
+        }
+
+        // Ctrl+S / Ctrl+Shift+S: Guardar / Guardar Todo
+        if (e.Key == Key.S && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {
+                MenuSaveAll_Click(this, new RoutedEventArgs());
+            }
+            else
+            {
+                MenuSave_Click(this, new RoutedEventArgs());
+            }
+            e.Handled = true;
+            return;
+        }
+
+        // Ctrl+W: Cerrar Documento / Ctrl+Shift+W: Cerrar Todo
+        if (e.Key == Key.W && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {
+                MenuCloseAll_Click(this, new RoutedEventArgs());
+            }
+            else
+            {
+                MenuCloseDoc_Click(this, new RoutedEventArgs());
             }
             e.Handled = true;
             return;

@@ -9,13 +9,6 @@
         Height="720" Width="1100"
         MinHeight="400" MinWidth="600"
         WindowStartupLocation="CenterScreen">
-    
-    <Window.InputBindings>
-        <KeyBinding Gesture="Ctrl+O" Command="{Binding OpenProjectCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
-        <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveCurrentCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
-        <KeyBinding Gesture="Ctrl+Shift+S" Command="{Binding SaveAllCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
-        <KeyBinding Gesture="Ctrl+W" Command="{Binding CloseCurrentCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
-    </Window.InputBindings>
 
     <Window.Resources>
         <Style x:Key="BottomTabRadioStyle" TargetType="RadioButton">
@@ -73,6 +66,7 @@
                 <MenuItem x:Name="MenuSaveAs" Header="Guardar c_omo..." Click="MenuSaveAs_Click"/>
                 <MenuItem x:Name="MenuSaveAll" Header="Guardar _todo" InputGestureText="Ctrl+Shift+S" Click="MenuSaveAll_Click"/>
                 <MenuItem x:Name="MenuCloseDoc" Header="_Cerrar documento" InputGestureText="Ctrl+W" Click="MenuCloseDoc_Click"/>
+                <MenuItem x:Name="MenuCloseAll" Header="Cerrar _todo (Proyecto y Documentos)" InputGestureText="Ctrl+Shift+W" Click="MenuCloseAll_Click"/>
                 <Separator/>
                 <MenuItem Header="_Salir" InputGestureText="Alt+F4" Click="MenuExit_Click"/>
             </MenuItem>

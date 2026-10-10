@@ -129,7 +129,7 @@ public partial class PropertyGridPanel : UserControl
 
     public void RefreshObjectList()
     {
-        if (_model == null) return;
+        if (_model == null || CmbObjects == null) return;
 
         var items = new List<ObjectSelectorItem>
         {
@@ -165,7 +165,7 @@ public partial class PropertyGridPanel : UserControl
 
     public void SelectForm()
     {
-        if (_model == null) return;
+        if (_model == null || CmbObjects == null) return;
         _currentSelectedTarget = _model;
 
         _isUpdatingSelectionInternal = true;
@@ -175,7 +175,10 @@ public partial class PropertyGridPanel : UserControl
         }
         _isUpdatingSelectionInternal = false;
 
-        TxtHeaderTitle.Text = $"Propiedades - {_model.Name}";
+        if (TxtHeaderTitle != null)
+        {
+            TxtHeaderTitle.Text = $"Propiedades - {_model.Name}";
+        }
         LoadPropertiesForTarget(_model);
     }
 
@@ -187,6 +190,8 @@ public partial class PropertyGridPanel : UserControl
             return;
         }
 
+        if (CmbObjects == null) return;
+
         _currentSelectedTarget = control;
 
         _isUpdatingSelectionInternal = true;
@@ -196,7 +201,10 @@ public partial class PropertyGridPanel : UserControl
         }
         _isUpdatingSelectionInternal = false;
 
-        TxtHeaderTitle.Text = $"Propiedades - {control.Name}";
+        if (TxtHeaderTitle != null)
+        {
+            TxtHeaderTitle.Text = $"Propiedades - {control.Name}";
+        }
         LoadPropertiesForTarget(control);
     }
 
@@ -242,6 +250,11 @@ public partial class PropertyGridPanel : UserControl
 
     private void ApplyFilterAndSorting()
     {
+        if (TxtFilter == null || RadioCategorized == null || PropertiesListView == null)
+        {
+            return;
+        }
+
         IEnumerable<PropertyItemViewModel> query = _allProperties;
 
         string filter = TxtFilter.Text.Trim();
@@ -268,6 +281,7 @@ public partial class PropertyGridPanel : UserControl
     private void CmbObjects_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_isUpdatingSelectionInternal) return;
+        if (CmbObjects == null || TxtHeaderTitle == null) return;
 
         if (CmbObjects.SelectedItem is ObjectSelectorItem item)
         {
@@ -299,6 +313,8 @@ public partial class PropertyGridPanel : UserControl
 
     private void PropertiesListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (PropertiesListView == null || TxtHelpPropName == null || TxtHelpDescription == null) return;
+
         if (PropertiesListView.SelectedItem is PropertyItemViewModel prop)
         {
             TxtHelpPropName.Text = prop.DisplayName;

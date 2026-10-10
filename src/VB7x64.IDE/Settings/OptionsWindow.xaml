@@ -51,6 +51,12 @@
                     <CheckBox x:Name="ChkBranchLines" Content="Habilitar guías de estructura de bloques (Branch Lines)" Margin="0,0,0,8" FontSize="12"/>
                     <CheckBox x:Name="ChkEndOfLineDetails" Content="Habilitar detalles de fin de bloque (Inlay Hints)" Margin="0,0,0,8" FontSize="12"/>
                     <Separator Margin="0,6,0,10"/>
+                    <TextBlock Text="IntelliSense &amp; Autocompletado:" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6" Foreground="#004488"/>
+                    <CheckBox x:Name="ChkEnableIntelliSense" Content="Habilitar IntelliSense y autocompletado de código" Margin="0,0,0,8" FontSize="12"/>
+                    <CheckBox x:Name="ChkAutoListMembers" Content="Listar miembros automáticamente (Auto List Members)" Margin="16,0,0,8" FontSize="12"/>
+                    <CheckBox x:Name="ChkAutoQuickInfo" Content="Información rápida de parámetros automática (Parameter Info)" Margin="16,0,0,8" FontSize="12"/>
+                    <CheckBox x:Name="ChkCompleteWordOnTabOrEnter" Content="Aceptar sugerencia con Tab y Enter" Margin="16,0,0,8" FontSize="12"/>
+                    <Separator Margin="0,6,0,10"/>
                     <TextBlock Text="Explorador de Proyectos:" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6" Foreground="#004488"/>
                     <Grid Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>

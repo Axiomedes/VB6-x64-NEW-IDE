@@ -52,6 +52,12 @@ public partial class OptionsWindow : Window
         ChkCurrentLineHighlight.IsChecked = _settings.EnableCurrentLineHighlight;
         ChkBranchLines.IsChecked = _settings.EnableBranchLines;
         ChkEndOfLineDetails.IsChecked = _settings.EnableEndOfLineDetails;
+
+        ChkEnableIntelliSense.IsChecked = _settings.EnableIntelliSense;
+        ChkAutoListMembers.IsChecked = _settings.AutoListMembers;
+        ChkAutoQuickInfo.IsChecked = _settings.AutoQuickInfo;
+        ChkCompleteWordOnTabOrEnter.IsChecked = _settings.CompleteWordOnTabOrEnter;
+
         CmbProjectExplorerMode.SelectedIndex = _settings.ProjectExplorerMode == ProjectExplorerMode.Standard ? 0 : 1;
 
         // 4. Codificaciones comunes
@@ -322,6 +328,12 @@ public partial class OptionsWindow : Window
         _settings.EnableCurrentLineHighlight = ChkCurrentLineHighlight.IsChecked == true;
         _settings.EnableBranchLines = ChkBranchLines.IsChecked == true;
         _settings.EnableEndOfLineDetails = ChkEndOfLineDetails.IsChecked == true;
+
+        _settings.EnableIntelliSense = ChkEnableIntelliSense.IsChecked == true;
+        _settings.AutoListMembers = ChkAutoListMembers.IsChecked == true;
+        _settings.AutoQuickInfo = ChkAutoQuickInfo.IsChecked == true;
+        _settings.CompleteWordOnTabOrEnter = ChkCompleteWordOnTabOrEnter.IsChecked == true;
+
         _settings.ProjectExplorerMode = CmbProjectExplorerMode.SelectedIndex == 0 ? ProjectExplorerMode.Standard : ProjectExplorerMode.Advanced;
         if (CmbEncoding.SelectedItem is string enc) _settings.DefaultEncoding = enc;
 

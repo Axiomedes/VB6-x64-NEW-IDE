@@ -38,6 +38,12 @@ public class AppSettings
     public string EndOfLineDetailsColor { get; set; } = "#8A8A8A";
     public int EndOfLineDetailsMinLines { get; set; } = 5;
 
+    // Opciones de IntelliSense & Auto List Members
+    public bool EnableIntelliSense { get; set; } = true;
+    public bool AutoListMembers { get; set; } = true;
+    public bool AutoQuickInfo { get; set; } = true;
+    public bool CompleteWordOnTabOrEnter { get; set; } = true;
+
     // Modo del Explorador de Proyectos: Estándar vs Avanzado
     public ProjectExplorerMode ProjectExplorerMode { get; set; } = ProjectExplorerMode.Advanced;
     

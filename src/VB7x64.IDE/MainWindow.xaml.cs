@@ -1619,6 +1619,32 @@ public partial class MainWindow : Window
             }
         }
 
+        // IntelliSense: Ctrl+J (List Members), Ctrl+I (Parameter Info), Ctrl+Espacio (Complete Word)
+        if (ActiveTab != null && !ActiveTab.IsDesignerActive)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.J)
+            {
+                ActiveTab.Editor.Focus();
+                ActiveTab.IntelliSenseController.ShowCompletionWindow(explicitTrigger: true);
+                e.Handled = true;
+                return;
+            }
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.I)
+            {
+                ActiveTab.Editor.Focus();
+                ActiveTab.IntelliSenseController.ShowParameterInsight(explicitTrigger: true);
+                e.Handled = true;
+                return;
+            }
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Space)
+            {
+                ActiveTab.Editor.Focus();
+                ActiveTab.IntelliSenseController.ShowCompletionWindow(explicitTrigger: true);
+                e.Handled = true;
+                return;
+            }
+        }
+
         // F4: Mostrar / Enfocar Ventana de Propiedades
         if (e.Key == Key.F4 && Keyboard.Modifiers == ModifierKeys.None)
         {
@@ -2043,6 +2069,35 @@ public partial class MainWindow : Window
         ActiveEditor.Focus();
         SetStatusMessage($"{operationDesc} insertado exitosamente.");
     }
+
+    #region IntelliSense & Auto List Members
+    private void MenuListMembers_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveTab != null && !ActiveTab.IsDesignerActive)
+        {
+            ActiveTab.Editor.Focus();
+            ActiveTab.IntelliSenseController.ShowCompletionWindow(explicitTrigger: true);
+        }
+    }
+
+    private void MenuParameterInfo_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveTab != null && !ActiveTab.IsDesignerActive)
+        {
+            ActiveTab.Editor.Focus();
+            ActiveTab.IntelliSenseController.ShowParameterInsight(explicitTrigger: true);
+        }
+    }
+
+    private void MenuCompleteWord_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveTab != null && !ActiveTab.IsDesignerActive)
+        {
+            ActiveTab.Editor.Focus();
+            ActiveTab.IntelliSenseController.ShowCompletionWindow(explicitTrigger: true);
+        }
+    }
+    #endregion
 
     #region Fase 4: Formato, Ordenación, Diff y Estadísticas
     private void MenuFormatDocument_Click(object sender, RoutedEventArgs e)

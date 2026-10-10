@@ -84,6 +84,10 @@
                 <MenuItem Header="Buscar todas las _referencias..." InputGestureText="Shift+F12" Click="MenuFindReferences_Click"/>
                 <MenuItem Header="_Ir a línea..." InputGestureText="Ctrl+G" Click="MenuGoToLine_Click"/>
                 <Separator/>
+                <MenuItem Header="Listar _Miembros" InputGestureText="Ctrl+J" Click="MenuListMembers_Click"/>
+                <MenuItem Header="Información de _Parámetros" InputGestureText="Ctrl+I" Click="MenuParameterInfo_Click"/>
+                <MenuItem Header="_Completar Palabra" InputGestureText="Ctrl+Espacio" Click="MenuCompleteWord_Click"/>
+                <Separator/>
                 <MenuItem Header="_Formatear Documento" InputGestureText="Ctrl+K, Ctrl+D" Click="MenuFormatDocument_Click"/>
             </MenuItem>
             <MenuItem Header="_Ver">

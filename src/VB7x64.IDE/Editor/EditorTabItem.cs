@@ -14,6 +14,7 @@ using VB7x64.ProjectModel.Documents;
 using VB7x64.IDE.Logging;
 using VB7x64.ProjectModel.Navigation;
 using VB7x64.ProjectModel.Settings;
+using VB7x64.IDE.Editor.IntelliSense;
 
 namespace VB7x64.IDE.Editor;
 
@@ -21,6 +22,8 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
 {
     public EditorDocument Document { get; }
     public TextEditor Editor { get; }
+    public AppSettings Settings { get; private set; }
+    public IntelliSenseController IntelliSenseController { get; }
     public CurrentLineHighlighter CurrentLineHighlighter { get; }
     public BranchLinesRenderer BranchLinesRenderer { get; }
     public EndOfLineDetailsRenderer EndOfLineDetailsRenderer { get; }
@@ -62,6 +65,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
     public EditorTabItem(EditorDocument document, AppSettings settings)
     {
         Document = document;
+        Settings = settings;
 
         Editor = new TextEditor
         {
@@ -86,6 +90,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         EnsureLeftMargins();
 
         ApplyThemeSettings(settings);
+        IntelliSenseController = new IntelliSenseController(this);
 
         Editor.Text = document.Text;
 
@@ -387,6 +392,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
 
     public void ApplyThemeSettings(AppSettings settings)
     {
+        Settings = settings;
         Editor.FontFamily = new FontFamily(settings.FontFamily);
         Editor.FontSize = settings.FontSize;
         Editor.ShowLineNumbers = settings.ShowLineNumbers;

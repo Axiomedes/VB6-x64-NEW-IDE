@@ -98,8 +98,24 @@
 
                         <!-- 2. Área cliente del Formulario con rejilla de puntos y controles -->
                         <Border Grid.Row="1" x:Name="FormClientArea" Background="#F0F0F0">
-                            <local:DesignGridCanvas x:Name="GridCanvas" Width="312" Height="213">
-                                <!-- Los controles se instancian y posicionan aquí dinámicamente -->
+                            <local:DesignGridCanvas x:Name="GridCanvas" Width="312" Height="213"
+                                                    Focusable="True"
+                                                    MouseLeftButtonDown="GridCanvas_MouseLeftButtonDown"
+                                                    MouseMove="GridCanvas_MouseMove"
+                                                    MouseLeftButtonUp="GridCanvas_MouseLeftButtonUp"
+                                                    KeyDown="GridCanvas_KeyDown">
+                                <!-- Rectángulo de selección por área (Rubber-band marquee) -->
+                                <Rectangle x:Name="MarqueeRectangle"
+                                           Stroke="#0078D7" StrokeThickness="1"
+                                           StrokeDashArray="3,3"
+                                           Fill="#250078D7"
+                                           Visibility="Collapsed"
+                                           Panel.ZIndex="998"
+                                           IsHitTestVisible="False"/>
+
+                                <!-- Marco con 8 tiradores de dimensionamiento (Sizing Handles) -->
+                                <local:DesignerSelectionFrame x:Name="SelectionFrame"
+                                                               Panel.ZIndex="999"/>
                             </local:DesignGridCanvas>
                         </Border>
                     </Grid>

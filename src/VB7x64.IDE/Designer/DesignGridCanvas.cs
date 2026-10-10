@@ -2,6 +2,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using VB7x64.ProjectModel.Designers;
 
 namespace VB7x64.IDE.Designer;
 

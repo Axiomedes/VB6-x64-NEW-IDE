@@ -108,4 +108,60 @@ public class FormDesignerVisualTests
         Assert.Equal(16.0, GridSnapHelper.Snap(10.0, step: 16.0));
         Assert.Equal(32.0, GridSnapHelper.Snap(25.0, step: 16.0));
     }
+
+    [Fact]
+    public void FormDesignerControl_SetBoundsPixels_ConvertsTwipsAccurately()
+    {
+        var control = new FormDesignerControl();
+        control.SetBoundsPixels(100.0, 50.0, 200.0, 30.0);
+
+        Assert.Equal(1500, control.Left);
+        Assert.Equal(750, control.Top);
+        Assert.Equal(3000, control.Width);
+        Assert.Equal(450, control.Height);
+
+        Assert.Equal(100.0, control.LeftPixels);
+        Assert.Equal(50.0, control.TopPixels);
+        Assert.Equal(200.0, control.WidthPixels);
+        Assert.Equal(30.0, control.HeightPixels);
+    }
+
+    [Fact]
+    public void FormDesignerControl_Clone_DuplicatesPropertiesAndChildren()
+    {
+        var parent = new FormDesignerControl
+        {
+            TypeName = "VB.Frame",
+            Name = "Frame1",
+            Left = 1000,
+            Top = 500,
+            Width = 3000,
+            Height = 2000,
+            Caption = "My Frame"
+        };
+
+        var child = new FormDesignerControl
+        {
+            TypeName = "VB.CommandButton",
+            Name = "Command1",
+            Left = 200,
+            Top = 300,
+            Caption = "Click Me",
+            ParentControl = parent
+        };
+        parent.Children.Add(child);
+
+        var clonedParent = parent.Clone();
+
+        Assert.NotSame(parent, clonedParent);
+        Assert.Equal("Frame1", clonedParent.Name);
+        Assert.Equal("My Frame", clonedParent.Caption);
+        Assert.Single(clonedParent.Children);
+
+        var clonedChild = clonedParent.Children[0];
+        Assert.NotSame(child, clonedChild);
+        Assert.Same(clonedParent, clonedChild.ParentControl);
+        Assert.Equal("Command1", clonedChild.Name);
+        Assert.Equal("Click Me", clonedChild.Caption);
+    }
 }

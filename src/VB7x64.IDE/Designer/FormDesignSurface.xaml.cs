@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -9,7 +11,8 @@ using VB7x64.ProjectModel.Designers;
 namespace VB7x64.IDE.Designer;
 
 /// <summary>
-/// Superficie de diseño interactiva para formularios de Visual Basic 6.0.
+/// Superficie de diseño interactiva para formularios de Visual Basic 6.0 con soporte completo para
+/// selección simple/múltiple, 8 tiradores de redimensión, arrastre con ajuste a cuadrícula, selección por área y teclado.
 /// </summary>
 public partial class FormDesignSurface : UserControl
 {
@@ -19,15 +22,44 @@ public partial class FormDesignSurface : UserControl
     public FormDesignModel? CurrentModel { get; private set; }
 
     public event Action<FormDesignerControl>? ControlSelected;
+    public event Action<List<FormDesignerControl>>? SelectionChanged;
     public event Action<FormDesignerControl>? ControlDoubleClicked;
     public event Action? ModelModified;
 
-    public FormDesignerControl? SelectedControl { get; private set; }
+    // Colección de controles seleccionados actualmente
+    private readonly HashSet<FormDesignerControl> _selectedControls = new();
+    private FormDesignerControl? _primarySelectedControl;
+
+    public IReadOnlyCollection<FormDesignerControl> SelectedControls => _selectedControls;
+    public FormDesignerControl? SelectedControl => _primarySelectedControl;
+
+    // Mapa de control a su elemento visual en WPF
+    private readonly Dictionary<FormDesignerControl, FrameworkElement> _visualMap = new();
+
+    // Estado de arrastre de controles (Drag & Move)
+    private bool _isDraggingControls;
+    private Point _dragStartPoint;
+    private readonly Dictionary<FormDesignerControl, (double Left, double Top)> _initialPositions = new();
+
+    // Estado de selección por área (Rubber-band marquee)
+    private bool _isMarqueeSelecting;
+    private Point _marqueeStartPoint;
 
     public FormDesignSurface()
     {
         InitializeComponent();
         Loaded += FormDesignSurface_Loaded;
+
+        SelectionFrame.SnapFunction = (val) => GridCanvas.SnapValue(val);
+        SelectionFrame.Resizing += (ctrl) =>
+        {
+            UpdateDimensionText();
+        };
+        SelectionFrame.ResizeCompleted += (ctrl) =>
+        {
+            UpdateDimensionText();
+            ModelModified?.Invoke();
+        };
     }
 
     private void FormDesignSurface_Loaded(object sender, RoutedEventArgs e)
@@ -41,6 +73,7 @@ public partial class FormDesignSurface : UserControl
     public void LoadModel(FormDesignModel model)
     {
         CurrentModel = model;
+        ClearSelection();
 
         TxtFormCaption.Text = string.IsNullOrEmpty(model.Caption) ? model.Name : model.Caption;
         TxtFormTitle.Text = $"Diseñador: {model.Name}";
@@ -65,7 +98,17 @@ public partial class FormDesignSurface : UserControl
     /// </summary>
     public void RefreshCanvas()
     {
-        GridCanvas.Children.Clear();
+        // Guardar elementos especiales (Marquee y SelectionFrame)
+        var specialElements = new List<UIElement> { MarqueeRectangle, SelectionFrame };
+
+        // Remover solo los controles
+        var toRemove = GridCanvas.Children.Cast<UIElement>().Where(el => !specialElements.Contains(el)).ToList();
+        foreach (var el in toRemove)
+        {
+            GridCanvas.Children.Remove(el);
+        }
+
+        _visualMap.Clear();
 
         if (CurrentModel == null) return;
 
@@ -73,12 +116,17 @@ public partial class FormDesignSurface : UserControl
         {
             var visual = ControlVisualRenderer.CreateVisual(control, OnChildVisualCreated);
             AttachControlEvents(visual, control);
+            _visualMap[control] = visual;
             GridCanvas.Children.Add(visual);
         }
+
+        // Actualizar marco de selección
+        UpdateSelectionFrame();
     }
 
     private void OnChildVisualCreated(FormDesignerControl childControl, FrameworkElement childVisual)
     {
+        _visualMap[childControl] = childVisual;
         AttachControlEvents(childVisual, childControl);
     }
 
@@ -86,31 +134,359 @@ public partial class FormDesignSurface : UserControl
     {
         visual.MouseLeftButtonDown += (s, e) =>
         {
-            SelectControl(control);
+            GridCanvas.Focus();
 
             if (e.ClickCount == 2)
             {
                 ControlDoubleClicked?.Invoke(control);
                 e.Handled = true;
+                return;
             }
-        };
 
-        visual.Cursor = Cursors.SizeAll;
+            bool isShiftOrCtrl = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ||
+                                 Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+
+            if (isShiftOrCtrl)
+            {
+                ToggleControlSelection(control);
+            }
+            else
+            {
+                if (!_selectedControls.Contains(control))
+                {
+                    SelectSingleControl(control);
+                }
+                else
+                {
+                    _primarySelectedControl = control;
+                    UpdateSelectionFrame();
+                }
+            }
+
+            // Iniciar arrastre si hay controles seleccionados
+            if (_selectedControls.Count > 0)
+            {
+                _isDraggingControls = true;
+                _dragStartPoint = e.GetPosition(GridCanvas);
+
+                _initialPositions.Clear();
+                foreach (var sel in _selectedControls)
+                {
+                    _initialPositions[sel] = (sel.LeftPixels, sel.TopPixels);
+                }
+
+                GridCanvas.CaptureMouse();
+            }
+
+            e.Handled = true;
+        };
     }
 
-    public void SelectControl(FormDesignerControl? control)
+    #region Gestión de Selección
+    public void SelectSingleControl(FormDesignerControl control)
     {
-        SelectedControl = control;
-        if (control != null)
+        _selectedControls.Clear();
+        _selectedControls.Add(control);
+        _primarySelectedControl = control;
+
+        UpdateSelectionFrame();
+        NotifySelectionChanged();
+    }
+
+    public void ToggleControlSelection(FormDesignerControl control)
+    {
+        if (_selectedControls.Contains(control))
         {
-            TxtDesignerStatus.Text = $"Seleccionado: {control.Name} ({control.DisplayType}) | Pos: X={control.LeftPixels:F0}, Y={control.TopPixels:F0} | Dim: {control.WidthPixels:F0} × {control.HeightPixels:F0} px";
-            ControlSelected?.Invoke(control);
+            _selectedControls.Remove(control);
+            if (_primarySelectedControl == control)
+            {
+                _primarySelectedControl = _selectedControls.LastOrDefault();
+            }
+        }
+        else
+        {
+            _selectedControls.Add(control);
+            _primarySelectedControl = control;
+        }
+
+        UpdateSelectionFrame();
+        NotifySelectionChanged();
+    }
+
+    public void ClearSelection()
+    {
+        _selectedControls.Clear();
+        _primarySelectedControl = null;
+
+        UpdateSelectionFrame();
+        NotifySelectionChanged();
+    }
+
+    public void SelectAllControls()
+    {
+        if (CurrentModel == null) return;
+
+        _selectedControls.Clear();
+        foreach (var ctrl in CurrentModel.GetAllControls())
+        {
+            _selectedControls.Add(ctrl);
+        }
+
+        _primarySelectedControl = _selectedControls.FirstOrDefault();
+        UpdateSelectionFrame();
+        NotifySelectionChanged();
+    }
+
+    private void UpdateSelectionFrame()
+    {
+        if (_primarySelectedControl != null && _visualMap.TryGetValue(_primarySelectedControl, out var visual))
+        {
+            SelectionFrame.BindTo(_primarySelectedControl, visual);
+        }
+        else
+        {
+            SelectionFrame.BindTo(null, null);
+        }
+    }
+
+    private void NotifySelectionChanged()
+    {
+        if (_primarySelectedControl != null)
+        {
+            TxtDesignerStatus.Text = _selectedControls.Count == 1
+                ? $"Seleccionado: {_primarySelectedControl.Name} ({_primarySelectedControl.DisplayType}) | Pos: X={_primarySelectedControl.LeftPixels:F0}, Y={_primarySelectedControl.TopPixels:F0} | Dim: {_primarySelectedControl.WidthPixels:F0} × {_primarySelectedControl.HeightPixels:F0} px"
+                : $"{_selectedControls.Count} controles seleccionados. Primario: {_primarySelectedControl.Name}";
+
+            ControlSelected?.Invoke(_primarySelectedControl);
         }
         else
         {
             TxtDesignerStatus.Text = "Formulario seleccionado.";
         }
+
+        SelectionChanged?.Invoke(_selectedControls.ToList());
     }
+    #endregion
+
+    #region Manejo del Ratón en GridCanvas (Mover y Selección por Área)
+    private void GridCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        GridCanvas.Focus();
+
+        // Clic en espacio vacío: deseleccionar o iniciar selección por área
+        bool isShiftOrCtrl = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ||
+                             Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+
+        if (!isShiftOrCtrl)
+        {
+            ClearSelection();
+        }
+
+        // Iniciar Rubber-band Marquee
+        _isMarqueeSelecting = true;
+        _marqueeStartPoint = e.GetPosition(GridCanvas);
+
+        Canvas.SetLeft(MarqueeRectangle, _marqueeStartPoint.X);
+        Canvas.SetTop(MarqueeRectangle, _marqueeStartPoint.Y);
+        MarqueeRectangle.Width = 0;
+        MarqueeRectangle.Height = 0;
+        MarqueeRectangle.Visibility = Visibility.Visible;
+
+        GridCanvas.CaptureMouse();
+    }
+
+    private void GridCanvas_MouseMove(object sender, MouseEventArgs e)
+    {
+        Point curPoint = e.GetPosition(GridCanvas);
+
+        // 1. Arrastre de controles seleccionados
+        if (_isDraggingControls && _selectedControls.Count > 0)
+        {
+            double rawDeltaX = curPoint.X - _dragStartPoint.X;
+            double rawDeltaY = curPoint.Y - _dragStartPoint.Y;
+
+            double snappedDeltaX = GridCanvas.SnapToGrid ? GridCanvas.SnapValue(rawDeltaX) : rawDeltaX;
+            double snappedDeltaY = GridCanvas.SnapToGrid ? GridCanvas.SnapValue(rawDeltaY) : rawDeltaY;
+
+            foreach (var ctrl in _selectedControls)
+            {
+                if (_initialPositions.TryGetValue(ctrl, out var initial))
+                {
+                    double newLeft = Math.Max(0, initial.Left + snappedDeltaX);
+                    double newTop = Math.Max(0, initial.Top + snappedDeltaY);
+
+                    if (GridCanvas.SnapToGrid)
+                    {
+                        newLeft = GridCanvas.SnapValue(newLeft);
+                        newTop = GridCanvas.SnapValue(newTop);
+                    }
+
+                    ctrl.LeftPixels = newLeft;
+                    ctrl.TopPixels = newTop;
+
+                    if (_visualMap.TryGetValue(ctrl, out var vis))
+                    {
+                        Canvas.SetLeft(vis, newLeft);
+                        Canvas.SetTop(vis, newTop);
+                    }
+                }
+            }
+
+            SelectionFrame.UpdateLayoutFromControl();
+            if (_primarySelectedControl != null)
+            {
+                TxtDesignerStatus.Text = $"Moviendo {_selectedControls.Count} control(es) | X={_primarySelectedControl.LeftPixels:F0}, Y={_primarySelectedControl.TopPixels:F0}";
+            }
+            return;
+        }
+
+        // 2. Selección por área (Marquee)
+        if (_isMarqueeSelecting)
+        {
+            double x = Math.Min(_marqueeStartPoint.X, curPoint.X);
+            double y = Math.Min(_marqueeStartPoint.Y, curPoint.Y);
+            double w = Math.Abs(curPoint.X - _marqueeStartPoint.X);
+            double h = Math.Abs(curPoint.Y - _marqueeStartPoint.Y);
+
+            Canvas.SetLeft(MarqueeRectangle, x);
+            Canvas.SetTop(MarqueeRectangle, y);
+            MarqueeRectangle.Width = w;
+            MarqueeRectangle.Height = h;
+        }
+    }
+
+    private void GridCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (_isDraggingControls)
+        {
+            _isDraggingControls = false;
+            GridCanvas.ReleaseMouseCapture();
+            NotifySelectionChanged();
+            ModelModified?.Invoke();
+        }
+
+        if (_isMarqueeSelecting)
+        {
+            _isMarqueeSelecting = false;
+            MarqueeRectangle.Visibility = Visibility.Collapsed;
+            GridCanvas.ReleaseMouseCapture();
+
+            double mx = Canvas.GetLeft(MarqueeRectangle);
+            double my = Canvas.GetTop(MarqueeRectangle);
+            var marqueeRect = new Rect(mx, my, MarqueeRectangle.Width, MarqueeRectangle.Height);
+
+            if (marqueeRect.Width > 4 && marqueeRect.Height > 4 && CurrentModel != null)
+            {
+                foreach (var ctrl in CurrentModel.GetAllControls())
+                {
+                    var ctrlRect = new Rect(ctrl.LeftPixels, ctrl.TopPixels, ctrl.WidthPixels, ctrl.HeightPixels);
+                    if (marqueeRect.IntersectsWith(ctrlRect))
+                    {
+                        _selectedControls.Add(ctrl);
+                        _primarySelectedControl = ctrl;
+                    }
+                }
+
+                UpdateSelectionFrame();
+                NotifySelectionChanged();
+            }
+        }
+    }
+    #endregion
+
+    #region Manejo de Teclado (Flechas para Mover/Redimensionar, Supr, Ctrl+A, Esc)
+    private void GridCanvas_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (CurrentModel == null || _selectedControls.Count == 0) return;
+
+        double step = GridCanvas.SnapToGrid ? GridCanvas.GridSize : 1.0;
+        bool isShift = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
+        bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+
+        if (e.Key == Key.Delete)
+        {
+            // Eliminar controles seleccionados
+            var controlsToDelete = _selectedControls.ToList();
+            foreach (var ctrl in controlsToDelete)
+            {
+                CurrentModel.RemoveControl(ctrl);
+            }
+
+            ClearSelection();
+            RefreshCanvas();
+            ModelModified?.Invoke();
+            TxtDesignerStatus.Text = $"{controlsToDelete.Count} control(es) eliminado(s).";
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.A && isCtrl)
+        {
+            SelectAllControls();
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.Escape)
+        {
+            ClearSelection();
+            e.Handled = true;
+            return;
+        }
+
+        // Flechas del cursor
+        double dx = 0, dy = 0, dw = 0, dh = 0;
+
+        switch (e.Key)
+        {
+            case Key.Left:
+                if (isShift) dw = -step; else dx = -step;
+                break;
+            case Key.Right:
+                if (isShift) dw = step; else dx = step;
+                break;
+            case Key.Up:
+                if (isShift) dh = -step; else dy = -step;
+                break;
+            case Key.Down:
+                if (isShift) dh = step; else dy = step;
+                break;
+            default:
+                return;
+        }
+
+        foreach (var ctrl in _selectedControls)
+        {
+            if (isShift)
+            {
+                ctrl.WidthPixels = Math.Max(15, ctrl.WidthPixels + dw);
+                ctrl.HeightPixels = Math.Max(15, ctrl.HeightPixels + dh);
+
+                if (_visualMap.TryGetValue(ctrl, out var vis))
+                {
+                    vis.Width = ctrl.WidthPixels;
+                    vis.Height = ctrl.HeightPixels;
+                }
+            }
+            else
+            {
+                ctrl.LeftPixels = Math.Max(0, ctrl.LeftPixels + dx);
+                ctrl.TopPixels = Math.Max(0, ctrl.TopPixels + dy);
+
+                if (_visualMap.TryGetValue(ctrl, out var vis))
+                {
+                    Canvas.SetLeft(vis, ctrl.LeftPixels);
+                    Canvas.SetTop(vis, ctrl.TopPixels);
+                }
+            }
+        }
+
+        SelectionFrame.UpdateLayoutFromControl();
+        NotifySelectionChanged();
+        ModelModified?.Invoke();
+        e.Handled = true;
+    }
+    #endregion
 
     private void UpdateDimensionText()
     {
@@ -123,15 +499,12 @@ public partial class FormDesignSurface : UserControl
         double formW = GridCanvas.Width + (WindowBorderThickness * 2);
         double formH = GridCanvas.Height + TitleBarHeight + (WindowBorderThickness * 2);
 
-        // Tirador de la esquina inferior derecha
         Canvas.SetLeft(ThumbResizeCorner, formW);
         Canvas.SetTop(ThumbResizeCorner, formH);
 
-        // Tirador del borde derecho (centrado verticalmente)
         Canvas.SetLeft(ThumbResizeRight, formW);
         Canvas.SetTop(ThumbResizeRight, formH / 2);
 
-        // Tirador del borde inferior (centrado horizontalmente)
         Canvas.SetLeft(ThumbResizeBottom, formW / 2);
         Canvas.SetTop(ThumbResizeBottom, formH);
     }

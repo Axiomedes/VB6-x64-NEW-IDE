@@ -91,10 +91,10 @@
                                       Width="{Binding ElementName=ToolsItemsControl, Path=DataContext.ItemWidth}"
                                       Height="26">
                             <DockPanel LastChildFill="True" Margin="2,0">
-                                <TextBlock Text="{Binding Glyph}" FontSize="12" Width="18" TextAlignment="Center"
-                                           VerticalAlignment="Center" FontWeight="Bold" Foreground="#334455"/>
+                                <Image Source="{Binding IconSource}" Width="16" Height="16"
+                                       VerticalAlignment="Center" Margin="2,0,3,0"/>
                                 <TextBlock Text="{Binding DisplayName}" FontSize="11" VerticalAlignment="Center"
-                                           Margin="4,0,0,0" TextTrimming="CharacterEllipsis"
+                                           Margin="3,0,0,0" TextTrimming="CharacterEllipsis"
                                            Visibility="{Binding ElementName=ToolsItemsControl, Path=DataContext.TextVisibility}"/>
                             </DockPanel>
                         </ToggleButton>

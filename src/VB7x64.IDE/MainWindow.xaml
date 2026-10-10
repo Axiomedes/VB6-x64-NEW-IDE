@@ -166,92 +166,95 @@
         <ToolBarTray Grid.Row="1" Background="#F0F0F0">
             <ToolBar Band="0" BandIndex="0">
                 <Button ToolTip="Nuevo Proyecto (Ctrl+Shift+N)" Click="MenuNewProject_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="✨" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_OpenFile}" Width="16" Height="16"/>
                 </Button>
                 <Button ToolTip="Nuevo Formulario (Ctrl+N)" Click="MenuNewForm_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🗔" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_NewForm}" Width="16" Height="16"/>
                 </Button>
                 <Separator/>
                 <Button ToolTip="Abrir Proyecto o Grupo (Ctrl+O)" Click="MenuOpenProject_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="📂" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_OpenProject}" Width="16" Height="16"/>
                 </Button>
                 <Button ToolTip="Abrir Archivo" Click="MenuOpenFile_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="📄" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_OpenFile}" Width="16" Height="16"/>
                 </Button>
                 <Separator/>
                 <Button x:Name="BtnSaveToolbar" ToolTip="Guardar (Ctrl+S)" Click="MenuSave_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="💾" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_Save}" Width="16" Height="16"/>
                 </Button>
                 <Button x:Name="BtnSaveAllToolbar" ToolTip="Guardar Todo (Ctrl+Shift+S)" Click="MenuSaveAll_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🗄️" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_SaveAll}" Width="16" Height="16"/>
                 </Button>
                 <Separator/>
                 <Button x:Name="BtnToolbarNavBack" ToolTip="Navegar hacia atrás (Alt+←)" Click="MenuNavBackward_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="◀" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_NavBackward}" Width="16" Height="16"/>
                 </Button>
                 <Button x:Name="BtnToolbarNavForward" ToolTip="Navegar hacia adelante (Alt+→)" Click="MenuNavForward_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="▶" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_NavForward}" Width="16" Height="16"/>
                 </Button>
                 <Separator/>
                 <Button ToolTip="Deshacer (Ctrl+Z)" Click="MenuUndo_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="↩" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_Undo}" Width="16" Height="16"/>
                 </Button>
                 <Button ToolTip="Rehacer (Ctrl+Y)" Click="MenuRedo_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="↪" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_Redo}" Width="16" Height="16"/>
                 </Button>
                 <Separator/>
                 <Button ToolTip="Cortar (Ctrl+X)" Click="MenuCut_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="✂" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_Cut}" Width="16" Height="16"/>
                 </Button>
                 <Button ToolTip="Copiar (Ctrl+C)" Click="MenuCopy_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="📋" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_Copy}" Width="16" Height="16"/>
                 </Button>
                 <Button ToolTip="Pegar (Ctrl+V)" Click="MenuPaste_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="📑" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_Paste}" Width="16" Height="16"/>
                 </Button>
                 <Separator/>
                 <Button ToolTip="Buscar (Ctrl+F)" Click="MenuFind_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🔍" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_Find}" Width="16" Height="16"/>
                 </Button>
                 <Button ToolTip="Buscar en Todo el Proyecto (Ctrl+Shift+F)" Click="MenuFindInProject_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🔎" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_FindInProject}" Width="16" Height="16"/>
                 </Button>
                 <Button ToolTip="Buscar Referencias del Símbolo (Shift+F12)" Click="MenuFindReferences_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🔎*" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_FindReferences}" Width="16" Height="16"/>
                 </Button>
                 <Button ToolTip="Lista de Tareas (TODO Explorer)" Click="MenuToggleTasks_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="📝" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_TaskList}" Width="16" Height="16"/>
                 </Button>
             </ToolBar>
 
             <!-- Barra de Herramientas: Funciones Avanzadas -->
             <ToolBar Band="1" BandIndex="0">
                 <Border ToolTip="Funciones Avanzadas" Background="#E6EEF8" CornerRadius="3" Padding="5,2" Margin="0,0,4,0" VerticalAlignment="Center">
-                    <TextBlock Text="⚡" FontWeight="Bold" FontSize="13" Foreground="#004488"/>
+                    <Image Source="{StaticResource Icon_ExplorerMode}" Width="14" Height="14"/>
                 </Border>
                 <Button x:Name="BtnToolbarComment" ToolTip="Comentar Bloque Seleccionado (Ctrl+K, Ctrl+C)" Click="MenuCommentBlock_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="💬⁺" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_CommentBlock}" Width="16" Height="16"/>
                 </Button>
                 <Button x:Name="BtnToolbarUncomment" ToolTip="Descomentar Bloque Seleccionado (Ctrl+K, Ctrl+U)" Click="MenuUncommentBlock_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="💬⁻" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_UncommentBlock}" Width="16" Height="16"/>
                 </Button>
                 <Separator/>
                 <Button x:Name="BtnToolbarSwitchAssignment" ToolTip="Invertir Asignaciones A = B ⇄ B = A (Ctrl+Shift+R)" Click="MenuSwitchAssignment_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="⇄" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_SwitchAssignment}" Width="16" Height="16"/>
                 </Button>
                 <Separator/>
                 <ToggleButton x:Name="BtnToolbarToggleLineHighlight" ToolTip="Alternar Resaltado de Línea Activa" IsChecked="True" Click="BtnToolbarToggleLineHighlight_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="💡" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_HighlightLine}" Width="16" Height="16"/>
                 </ToggleButton>
                 <ToggleButton x:Name="BtnToolbarToggleBranchLines" ToolTip="Alternar Guías de Estructura de Bloques (Branch Lines)" IsChecked="True" Click="BtnToolbarToggleBranchLines_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🌿" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_BranchLines}" Width="16" Height="16"/>
                 </ToggleButton>
                 <ToggleButton x:Name="BtnToolbarToggleEndOfLineDetails" ToolTip="Alternar Detalles de Fin de Bloque (Inlay Hints)" IsChecked="True" Click="BtnToolbarToggleEndOfLineDetails_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🏷️" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_InlayHints}" Width="16" Height="16"/>
                 </ToggleButton>
                 <Separator/>
                 <Menu Background="Transparent" VerticalAlignment="Center">
-                    <MenuItem ToolTip="Cambiar Mayúsculas / Minúsculas" Header="🔤" Padding="4,2" FontSize="13">
+                    <MenuItem ToolTip="Cambiar Mayúsculas / Minúsculas" Padding="4,2">
+                        <MenuItem.Header>
+                            <Image Source="{StaticResource Icon_CaseChange}" Width="16" Height="16"/>
+                        </MenuItem.Header>
                         <MenuItem Header="Convertir a MAYÚSCULAS" Click="MenuCaseUpper_Click"/>
                         <MenuItem Header="Convertir a minúsculas" Click="MenuCaseLower_Click"/>
                         <MenuItem Header="Convertir a Tipo Título" Click="MenuCaseTitle_Click"/>
@@ -259,59 +262,59 @@
                 </Menu>
                 <Separator/>
                 <Button ToolTip="Alternar Marcador (Ctrl+F2)" Click="MenuToggleBookmark_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🔖" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_BookmarkToggle}" Width="16" Height="16"/>
                 </Button>
                 <Button ToolTip="Siguiente Marcador (F2)" Click="MenuNextBookmark_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🔖↓" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_BookmarkNext}" Width="16" Height="16"/>
                 </Button>
                 <Button ToolTip="Marcador Anterior (Shift+F2)" Click="MenuPrevBookmark_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🔖↑" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_BookmarkPrev}" Width="16" Height="16"/>
                 </Button>
                 <Button ToolTip="Borrar Todos los Marcadores (Ctrl+Shift+F2)" Click="MenuClearBookmarks_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🔖✕" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_BookmarkClear}" Width="16" Height="16"/>
                 </Button>
                 <Separator/>
                 <Button x:Name="BtnToolbarPropertyBuilder" ToolTip="Asistente de Propiedades (Property Builder)" Click="MenuPropertyBuilder_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🔧⁺" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_PropertyBuilder}" Width="16" Height="16"/>
                 </Button>
                 <Button x:Name="BtnToolbarProcedureBuilder" ToolTip="Asistente de Procedimientos (Sub / Function Builder)" Click="MenuProcedureBuilder_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="⚡⁺" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_ProcedureBuilder}" Width="16" Height="16"/>
                 </Button>
                 <Button x:Name="BtnToolbarInsertSnippet" ToolTip="Insertar Snippet (AutoText)" Click="MenuInsertSnippet_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="📑⁺" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_Snippet}" Width="16" Height="16"/>
                 </Button>
                 <Button x:Name="BtnToolbarClipboardRing" ToolTip="Historial del Portapapeles (Ctrl+Shift+V)" Click="MenuClipboardRing_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="📋°" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_ClipboardRing}" Width="16" Height="16"/>
                 </Button>
                 <Separator/>
                 <Button x:Name="BtnToolbarFormatDocument" ToolTip="Formatear Documento (Ctrl+K, Ctrl+D)" Click="MenuFormatDocument_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🧹" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_FormatDocument}" Width="16" Height="16"/>
                 </Button>
                 <Button x:Name="BtnToolbarSortProcedures" ToolTip="Ordenar Procedimientos del Módulo..." Click="MenuSortProcedures_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="↕" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
+                    <Image Source="{StaticResource Icon_SortProcedures}" Width="16" Height="16"/>
                 </Button>
                 <Button x:Name="BtnToolbarShowDiff" ToolTip="Comparar Diferencias con el Disco (Diff)..." Click="MenuShowDiff_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="⚖️" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_ShowDiff}" Width="16" Height="16"/>
                 </Button>
                 <Button x:Name="BtnToolbarCodeStatistics" ToolTip="Estadísticas de Código y Métricas..." Click="MenuCodeStatistics_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="📊" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_CodeStatistics}" Width="16" Height="16"/>
                 </Button>
                 <Separator/>
                 <Button x:Name="BtnToolbarErrorHandler" ToolTip="Gestor de Manejo de Errores (Error Handling Engine)..." Click="MenuErrorHandler_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🛡️" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_ErrorHandler}" Width="16" Height="16"/>
                 </Button>
                 <Button x:Name="BtnToolbarTracing" ToolTip="Inyección y Retiro de Trazas (Tracing Subsystem)..." Click="MenuTracing_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="👣" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_Tracing}" Width="16" Height="16"/>
                 </Button>
                 <Separator/>
                 <Button x:Name="BtnToolbarTabOrder" ToolTip="Diseñador de Orden de Tabulación (Tab Order)..." Click="MenuTabOrder_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🔢" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_TabOrder}" Width="16" Height="16"/>
                 </Button>
                 <Button x:Name="BtnToolbarHotkeys" ToolTip="Verificador de Teclas Rápidas (Hotkeys / Aceleradores)..." Click="MenuHotkeys_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="⌨️" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_Hotkeys}" Width="16" Height="16"/>
                 </Button>
                 <Button x:Name="BtnToolbarCodeAnalyzer" ToolTip="Analizador de Calidad de Código (Code Analyzer)..." Click="MenuRunAnalysis_Click" Width="28" Height="24" Padding="0">
-                    <TextBlock Text="🩺" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{StaticResource Icon_CodeAnalyzer}" Width="16" Height="16"/>
                 </Button>
             </ToolBar>
         </ToolBarTray>
@@ -426,13 +429,13 @@
                                 <DockPanel LastChildFill="True">
                                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                                         <Button x:Name="BtnViewCode" ToolTip="Ver Código (F7)" Width="22" Height="22" Margin="0,0,2,0" Padding="0" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="BtnViewCode_Click">
-                                            <TextBlock Text="📜" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            <Image Source="{StaticResource Icon_ViewCode}" Width="14" Height="14"/>
                                         </Button>
                                         <Button x:Name="BtnViewObject" ToolTip="Ver Objeto / Diseñador (Shift+F7)" Width="22" Height="22" Margin="0,0,4,0" Padding="0" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="BtnViewObject_Click">
-                                            <TextBlock Text="🗔" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            <Image Source="{StaticResource Icon_ViewObject}" Width="14" Height="14"/>
                                         </Button>
                                         <Button x:Name="BtnToggleExplorerMode" ToolTip="Alternar Modo de Explorador (Estándar / Avanzado)" Width="22" Height="22" Padding="0" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="BtnToggleExplorerMode_Click">
-                                            <TextBlock x:Name="TxtExplorerModeIcon" Text="⚡" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            <Image Source="{StaticResource Icon_ExplorerMode}" Width="14" Height="14"/>
                                         </Button>
                                     </StackPanel>
                                     <TextBlock Text="Explorador de Proyectos" FontWeight="SemiBold" FontSize="12" Foreground="#102A45" VerticalAlignment="Center"/>

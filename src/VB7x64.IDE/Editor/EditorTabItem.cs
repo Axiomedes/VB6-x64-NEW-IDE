@@ -46,19 +46,17 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
     public string HeaderText => Document.IsDirty ? $"{TitleWithoutExtension} *" : TitleWithoutExtension;
     public string ToolTipText => $"{Document.DisplayName}\n{Document.FilePath}";
     public string FileExtension => System.IO.Path.GetExtension(Document.FilePath).ToLowerInvariant();
-    public string IconText => FileExtension switch
+    public ImageSource? FileIconSource => FileExtension switch
     {
-        ".frm" => "🗔",
-        ".cls" => "🧩",
-        ".bas" => "📜",
-        ".ctl" => "🎛️",
-        ".pag" => "📑",
-        ".dob" => "📄",
-        ".dsr" => "📊",
-        _ => "📄"
+        ".frm" => Application.Current?.TryFindResource("Icon_FileForm") as ImageSource,
+        ".cls" => Application.Current?.TryFindResource("Icon_FileClass") as ImageSource,
+        ".bas" => Application.Current?.TryFindResource("Icon_FileModule") as ImageSource,
+        ".ctl" => Application.Current?.TryFindResource("Icon_FileUserControl") as ImageSource,
+        ".pag" => Application.Current?.TryFindResource("Icon_FilePropertyPage") as ImageSource,
+        _ => Application.Current?.TryFindResource("Icon_FileGeneric") as ImageSource
     };
 
-    private TextBlock _lblIcon = null!;
+    private Image _imgIcon = null!;
     private TextBlock _lblTitle = null!;
     private Button _btnClose = null!;
 
@@ -128,12 +126,26 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
 
         if (DesignSurface != null)
         {
+            var btnIcon = new Image
+            {
+                Source = Application.Current?.TryFindResource("Icon_ViewObject") as ImageSource,
+                Width = 14,
+                Height = 14,
+                Margin = new Thickness(0, 0, 5, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            RenderOptions.SetBitmapScalingMode(btnIcon, BitmapScalingMode.HighQuality);
+
+            var btnStack = new StackPanel { Orientation = Orientation.Horizontal };
+            btnStack.Children.Add(btnIcon);
+            btnStack.Children.Add(new TextBlock { Text = "Diseñador (Shift+F7)", VerticalAlignment = VerticalAlignment.Center });
+
             _btnToggleView = new Button
             {
-                Content = "🗔 Diseñador (Shift+F7)",
+                Content = btnStack,
                 ToolTip = "Cambiar a la vista del Diseñador Visual",
                 FontSize = 11,
-                Padding = new Thickness(8, 1, 8, 1),
+                Padding = new Thickness(7, 2, 7, 2),
                 Margin = new Thickness(2, 0, 8, 0),
                 VerticalAlignment = VerticalAlignment.Center,
                 Cursor = Cursors.Hand
@@ -261,13 +273,16 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             VerticalAlignment = VerticalAlignment.Center
         };
 
-        _lblIcon = new TextBlock
+        _imgIcon = new Image
         {
-            Text = IconText,
-            FontSize = 11,
+            Source = FileIconSource,
+            Width = 14,
+            Height = 14,
             VerticalAlignment = VerticalAlignment.Center,
-            Margin = new Thickness(0, 0, 6, 0)
+            Margin = new Thickness(0, 0, 6, 0),
+            SnapsToDevicePixels = true
         };
+        RenderOptions.SetBitmapScalingMode(_imgIcon, BitmapScalingMode.HighQuality);
 
         _lblTitle = new TextBlock
         {
@@ -310,7 +325,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             }
         };
 
-        panel.Children.Add(_lblIcon);
+        panel.Children.Add(_imgIcon);
         panel.Children.Add(_lblTitle);
         panel.Children.Add(_btnClose);
 
@@ -324,9 +339,9 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         {
             _lblTitle.Text = HeaderText;
         }
-        if (_lblIcon != null)
+        if (_imgIcon != null)
         {
-            _lblIcon.Text = IconText;
+            _imgIcon.Source = FileIconSource;
         }
         ToolTip = ToolTipText;
         OnPropertyChanged(nameof(HeaderText));

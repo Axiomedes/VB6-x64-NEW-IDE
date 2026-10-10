@@ -834,7 +834,7 @@ public partial class MainWindow : Window
         bool isAdvanced = _settings.ProjectExplorerMode == ProjectExplorerMode.Advanced;
         MenuExplorerMode.IsChecked = isAdvanced;
         MenuExplorerMode.Header = isAdvanced ? "Modo de Explorador: _Avanzado (activo)" : "Modo de Explorador: _Estándar (activo)";
-        TxtExplorerModeIcon.Text = isAdvanced ? "⚡" : "📁";
+        BtnToggleExplorerMode.Opacity = isAdvanced ? 1.0 : 0.6;
         BtnToggleExplorerMode.ToolTip = isAdvanced
             ? "Modo de Explorador: Avanzado (clic para cambiar a Estándar)"
             : "Modo de Explorador: Estándar (clic para cambiar a Avanzado)";

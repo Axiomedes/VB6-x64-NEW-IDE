@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
 using VB7x64.ProjectModel.Designers;
 
 namespace VB7x64.IDE.Designer;
@@ -19,6 +20,7 @@ public partial class ToolboxPanel : UserControl, INotifyPropertyChanged
         public string TypeName { get; init; } = string.Empty;
         public string DisplayName { get; init; } = string.Empty;
         public string Glyph { get; init; } = string.Empty;
+        public ImageSource? IconSource { get; init; }
         public string ToolTip { get; init; } = string.Empty;
 
         public bool IsSelected
@@ -81,11 +83,43 @@ public partial class ToolboxPanel : UserControl, INotifyPropertyChanged
                 TypeName = tool.TypeName,
                 DisplayName = tool.DisplayName,
                 Glyph = tool.Glyph,
+                IconSource = GetToolIcon(tool.TypeName),
                 ToolTip = tool.ToolTip,
                 IsSelected = tool.TypeName == ControlToolboxRegistry.PointerTool
             });
         }
         ToolsItemsControl.ItemsSource = Tools;
+    }
+
+    private static ImageSource? GetToolIcon(string typeName)
+    {
+        string resourceKey = typeName switch
+        {
+            ControlToolboxRegistry.PointerTool => "Icon_Tool_Pointer",
+            "VB.PictureBox" => "Icon_Tool_PictureBox",
+            "VB.Label" => "Icon_Tool_Label",
+            "VB.TextBox" => "Icon_Tool_TextBox",
+            "VB.Frame" => "Icon_Tool_Frame",
+            "VB.CommandButton" => "Icon_Tool_CommandButton",
+            "VB.CheckBox" => "Icon_Tool_CheckBox",
+            "VB.OptionButton" => "Icon_Tool_OptionButton",
+            "VB.ComboBox" => "Icon_Tool_ComboBox",
+            "VB.ListBox" => "Icon_Tool_ListBox",
+            "VB.HScrollBar" => "Icon_Tool_HScrollBar",
+            "VB.VScrollBar" => "Icon_Tool_VScrollBar",
+            "VB.Timer" => "Icon_Tool_Timer",
+            "VB.DriveListBox" => "Icon_Tool_DriveListBox",
+            "VB.DirListBox" => "Icon_Tool_DirListBox",
+            "VB.FileListBox" => "Icon_Tool_FileListBox",
+            "VB.Shape" => "Icon_Tool_Shape",
+            "VB.Line" => "Icon_Tool_Line",
+            "VB.Image" => "Icon_Tool_Image",
+            "VB.Data" => "Icon_Tool_Data",
+            "VB.OLE" => "Icon_Tool_OLE",
+            _ => "Icon_Tool_CommandButton"
+        };
+
+        return Application.Current?.TryFindResource(resourceKey) as ImageSource;
     }
 
     public void ResetToPointer()

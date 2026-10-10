@@ -1,0 +1,1356 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- =================================================================== -->
+    <!-- MICROSOFT VISUAL STUDIO IMAGE LIBRARY - VECTOR ICONS (16x16)       -->
+    <!-- VB7-x64 IDE - Native Hardware-Accelerated Vector Graphics           -->
+    <!-- =================================================================== -->
+
+    <!-- ======================== 1. TOOLBOX CONTROLS ====================== -->
+
+    <!-- Puntero de selección (Pointer Tool) -->
+    <DrawingImage x:Key="Icon_Tool_Pointer">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 1.5,1.5 L 1.5,13.5 L 5.2,9.8 L 7.8,15.2 L 9.8,14.2 L 7.2,8.8 L 12.2,8.8 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#1E1E1E" Thickness="1" StartLineCap="Round" EndLineCap="Round" LineJoin="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- PictureBox -->
+    <DrawingImage x:Key="Icon_Tool_PictureBox">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Marco exterior -->
+                <GeometryDrawing Brush="#F4F4F4" Geometry="M 1,2 L 15,2 L 15,14 L 1,14 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#686868" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Cielo -->
+                <GeometryDrawing Brush="#79C1EC" Geometry="M 2,3 L 14,3 L 14,13 L 2,13 Z"/>
+                <!-- Sol -->
+                <GeometryDrawing Brush="#FFCC00" Geometry="M 4,4.5 C 4,3.7 4.7,3 5.5,3 C 6.3,3 7,3.7 7,4.5 C 7,5.3 6.3,6 5.5,6 C 4.7,6 4,5.3 4,4.5 Z"/>
+                <!-- Montaña/Colina -->
+                <GeometryDrawing Brush="#388E3C" Geometry="M 2,13 L 6,7.5 L 10,11.5 L 12,9.5 L 14,11.5 L 14,13 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Label (Etiqueta 'A') -->
+    <DrawingImage x:Key="Icon_Tool_Label">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#004578" Geometry="M 8,1.5 L 2.5,14.5 L 5.5,14.5 L 6.8,11.5 L 11.2,11.5 L 12.5,14.5 L 15.5,14.5 Z M 8,4.5 L 10.3,9.5 L 7.7,9.5 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- TextBox (ab|) -->
+    <DrawingImage x:Key="Icon_Tool_TextBox">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 1,3 L 15,3 L 15,13 L 1,13 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#7A9EB9" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Letra 'a' -->
+                <GeometryDrawing Brush="#2B2B2B" Geometry="M 4.5,7 C 3.7,7 3,7.6 3,8.5 C 3,9.4 3.7,10 4.5,10 C 5.3,10 6,9.4 6,8.5 L 6,6.5 L 4.5,6.5 M 6,8.5 L 6,10"/>
+                <!-- Letra 'b' -->
+                <GeometryDrawing Brush="#2B2B2B" Geometry="M 7.5,5.5 L 7.5,10 M 7.5,7.5 C 8,7 9.5,7 9.5,8.5 C 9.5,10 8,10 7.5,10"/>
+                <!-- Cursor vertical activo -->
+                <GeometryDrawing Brush="#0055EA" Geometry="M 12,5 L 12,11">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1.2"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Frame -->
+    <DrawingImage x:Key="Icon_Tool_Frame">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Borde agrupador con corte superior -->
+                <GeometryDrawing Brush="Transparent" Geometry="M 1,4.5 L 3.5,4.5 M 10.5,4.5 L 15,4.5 L 15,14.5 L 1,14.5 L 1,4.5 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#808080" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Texto superior del Frame [...] -->
+                <GeometryDrawing Brush="#003366" Geometry="M 4,2 L 10,2 L 10,4.5 L 4,4.5 Z"/>
+                <!-- Barra horizontal de contenido sugerido -->
+                <GeometryDrawing Brush="#B0C4DE" Geometry="M 3,8 L 13,8 M 3,11 L 10,11">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#B0C4DE" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- CommandButton -->
+    <DrawingImage x:Key="Icon_Tool_CommandButton">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Superficie 3D clásica -->
+                <GeometryDrawing Brush="#ECE9D8" Geometry="M 1.5,3.5 L 14.5,3.5 L 14.5,12.5 L 1.5,12.5 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#404040" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Bisel interior superior/izquierdo -->
+                <GeometryDrawing Brush="Transparent" Geometry="M 2.5,11.5 L 2.5,4.5 L 13.5,4.5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#FFFFFF" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Bisel interior inferior/derecho -->
+                <GeometryDrawing Brush="Transparent" Geometry="M 13.5,4.5 L 13.5,11.5 L 2.5,11.5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#A0A0A0" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Texto centrado del botón -->
+                <GeometryDrawing Brush="#000000" Geometry="M 5,8 L 11,8">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#000000" Thickness="1.5"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- CheckBox -->
+    <DrawingImage x:Key="Icon_Tool_CheckBox">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 1.5,2.5 L 11.5,2.5 L 11.5,12.5 L 1.5,12.5 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#404040" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Checkmark verde clásico de VS -->
+                <GeometryDrawing Brush="Transparent" Geometry="M 3.5,7.5 L 6,10 L 14,2">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#107C41" Thickness="2" StartLineCap="Round" EndLineCap="Round" LineJoin="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- OptionButton (Radio Button) -->
+    <DrawingImage x:Key="Icon_Tool_OptionButton">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Círculo exterior -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 7,1.5 C 3.96,1.5 1.5,3.96 1.5,7 C 1.5,10.04 3.96,12.5 7,12.5 C 10.04,12.5 12.5,10.04 12.5,7 C 12.5,3.96 10.04,1.5 7,1.5 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#404040" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Punto central negro/azul seleccionado -->
+                <GeometryDrawing Brush="#0055EA" Geometry="M 7,4.5 C 5.62,4.5 4.5,5.62 4.5,7 C 4.5,8.38 5.62,9.5 7,9.5 C 8.38,9.5 9.5,8.38 9.5,7 C 9.5,5.62 8.38,4.5 7,4.5 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- ComboBox -->
+    <DrawingImage x:Key="Icon_Tool_ComboBox">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 1,4 L 15,4 L 15,12 L 1,12 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#7A9EB9" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Botón desplegable derecho -->
+                <GeometryDrawing Brush="#ECE9D8" Geometry="M 10,4 L 15,4 L 15,12 L 10,12 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#7A9EB9" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Flecha hacia abajo -->
+                <GeometryDrawing Brush="#202020" Geometry="M 11.5,7 L 13.5,7 L 12.5,8.5 Z"/>
+                <!-- Texto/Línea interior -->
+                <GeometryDrawing Brush="#333333" Geometry="M 3,8 L 8,8">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#333333" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- ListBox -->
+    <DrawingImage x:Key="Icon_Tool_ListBox">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 1,2 L 15,2 L 15,14 L 1,14 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#7A9EB9" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Elementos de lista -->
+                <GeometryDrawing Brush="#0055EA" Geometry="M 3,4.5 L 9,4.5 M 3,7.5 L 8,7.5 M 3,10.5 L 9,10.5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Barra de desplazamiento simulada -->
+                <GeometryDrawing Brush="#F0F0F0" Geometry="M 11,2 L 15,2 L 15,14 L 11,14 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#D0D0D0" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#A0A0A0" Geometry="M 11.5,5 L 14.5,5 L 14.5,8 L 11.5,8 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- HScrollBar -->
+    <DrawingImage x:Key="Icon_Tool_HScrollBar">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#F0F0F0" Geometry="M 1,5 L 15,5 L 15,11 L 1,11 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Flecha izquierda -->
+                <GeometryDrawing Brush="#202020" Geometry="M 3.5,8 L 5,6.5 L 5,9.5 Z"/>
+                <!-- Flecha derecha -->
+                <GeometryDrawing Brush="#202020" Geometry="M 12.5,8 L 11,6.5 L 11,9.5 Z"/>
+                <!-- Thumb central -->
+                <GeometryDrawing Brush="#C8C8C8" Geometry="M 6.5,5 L 9.5,5 L 9.5,11 L 6.5,11 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- VScrollBar -->
+    <DrawingImage x:Key="Icon_Tool_VScrollBar">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#F0F0F0" Geometry="M 5,1 L 11,1 L 11,15 L 5,15 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Flecha arriba -->
+                <GeometryDrawing Brush="#202020" Geometry="M 8,3.5 L 6.5,5 L 9.5,5 Z"/>
+                <!-- Flecha abajo -->
+                <GeometryDrawing Brush="#202020" Geometry="M 8,12.5 L 6.5,11 L 9.5,11 Z"/>
+                <!-- Thumb central -->
+                <GeometryDrawing Brush="#C8C8C8" Geometry="M 5,6.5 L 11,6.5 L 11,9.5 L 5,9.5 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Timer (Cronómetro clásico de VB) -->
+    <DrawingImage x:Key="Icon_Tool_Timer">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Pulsador superior -->
+                <GeometryDrawing Brush="#404040" Geometry="M 6.5,1 L 9.5,1 L 9.5,3 L 6.5,3 Z"/>
+                <!-- Esfera del reloj -->
+                <GeometryDrawing Brush="#FFFFEB" Geometry="M 8,3 C 4.13,3 1,6.13 1,10 C 1,13.87 4.13,17 8,17 C 11.87,17 15,13.87 15,10 C 15,6.13 11.87,3 8,3 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#2A2A2A" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Agujas del reloj indicando las 10:10 -->
+                <GeometryDrawing Brush="Transparent" Geometry="M 8,10 L 8,6 M 8,10 L 11,10">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#D83B01" Thickness="1.5" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Punto central -->
+                <GeometryDrawing Brush="#2A2A2A" Geometry="M 7.5,10 C 7.5,9.72 7.72,9.5 8,9.5 C 8.28,9.5 8.5,9.72 8.5,10 C 8.5,10.28 8.28,10.5 8,10.5 C 7.72,10.5 7.5,10.28 7.5,10 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- DriveListBox -->
+    <DrawingImage x:Key="Icon_Tool_DriveListBox">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#ECE9D8" Geometry="M 1,4 L 15,4 L 15,12 L 1,12 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#606060" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Ranura de disco -->
+                <GeometryDrawing Brush="#000000" Geometry="M 3,8 L 9,8">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#000000" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Indicador LED verde -->
+                <GeometryDrawing Brush="#107C41" Geometry="M 11,7.5 C 11,7.2 11.2,7 11.5,7 C 11.8,7 12,7.2 12,7.5 C 12,7.8 11.8,8 11.5,8 C 11.2,8 11,7.8 11,7.5 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- DirListBox -->
+    <DrawingImage x:Key="Icon_Tool_DirListBox">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Solapa trasera -->
+                <GeometryDrawing Brush="#E6B800" Geometry="M 1,4 L 6,4 L 7.5,6 L 15,6 L 15,13 L 1,13 Z"/>
+                <!-- Carpeta frontal -->
+                <GeometryDrawing Brush="#FFD13B" Geometry="M 1,6 L 15,6 L 14,13 L 1,13 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#D4A000" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- FileListBox -->
+    <DrawingImage x:Key="Icon_Tool_FileListBox">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Hoja con esquina doblada -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 2,1 L 10,1 L 14,5 L 14,15 L 2,15 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#606060" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#D0D0D0" Geometry="M 10,1 L 10,5 L 14,5 Z"/>
+                <!-- Líneas de texto azules -->
+                <GeometryDrawing Brush="#0055EA" Geometry="M 4,7 L 11,7 M 4,10 L 11,10 M 4,13 L 8,13">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Shape -->
+    <DrawingImage x:Key="Icon_Tool_Shape">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Rectángulo azul -->
+                <GeometryDrawing Brush="#9FD5F6" Geometry="M 1,4 L 10,4 L 10,12 L 1,12 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Círculo naranja/rojo superpuesto -->
+                <GeometryDrawing Brush="#FF8C00" Geometry="M 10.5,5 C 8.5,5 7,6.5 7,8.5 C 7,10.5 8.5,12 10.5,12 C 12.5,12 14,10.5 14,8.5 C 14,6.5 12.5,5 10.5,5 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#D83B01" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Line -->
+    <DrawingImage x:Key="Icon_Tool_Line">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="Transparent" Geometry="M 2.5,13.5 L 13.5,2.5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#000000" Thickness="2"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0055EA" Geometry="M 1.5,13.5 C 1.5,12.9 2,12.5 2.5,12.5 C 3.1,12.5 3.5,12.9 3.5,13.5 C 3.5,14.1 3.1,14.5 2.5,14.5 C 2,14.5 1.5,14.1 1.5,13.5 Z M 12.5,2.5 C 12.5,1.9 13,1.5 13.5,1.5 C 14.1,1.5 14.5,1.9 14.5,2.5 C 14.5,3.1 14.1,3.5 13.5,3.5 C 13,3.5 12.5,3.1 12.5,2.5 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Image -->
+    <DrawingImage x:Key="Icon_Tool_Image">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 1.5,2.5 L 14.5,2.5 L 14.5,13.5 L 1.5,13.5 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1" DashStyle="{x:Static DashStyles.Dash}"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#A0A0A0" Geometry="M 4,11 L 7,6.5 L 10,9.5 L 12,7.5 L 13,9.5"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Data -->
+    <DrawingImage x:Key="Icon_Tool_Data">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#E5F1FB" Geometry="M 2,4 C 2,2.5 14,2.5 14,4 L 14,10 C 14,11.5 2,11.5 2,10 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#70A0D0" Geometry="M 2,4 C 2,5.5 14,5.5 14,4 M 2,7 C 2,8.5 14,8.5 14,7">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Botones de navegación |< < > >| -->
+                <GeometryDrawing Brush="#003366" Geometry="M 5,13 L 7,13 M 9,13 L 11,13">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#003366" Thickness="1.5"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- OLE -->
+    <DrawingImage x:Key="Icon_Tool_OLE">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Ventana trasera -->
+                <GeometryDrawing Brush="#F0F0F0" Geometry="M 4,1 L 15,1 L 15,10 L 4,10 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Ventana frontal -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 1,5 L 12,5 L 12,15 L 1,15 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0055EA" Geometry="M 1,5 L 12,5 L 12,8 L 1,8 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+
+    <!-- ===================== 2. MAIN TOOLBAR ACCIONES ==================== -->
+
+    <!-- Nuevo Formulario -->
+    <DrawingImage x:Key="Icon_NewForm">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Ventana -->
+                <GeometryDrawing Brush="#ECE9D8" Geometry="M 1,1 L 13,1 L 13,12 L 1,12 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0A246A" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Barra de título azul -->
+                <GeometryDrawing Brush="#0A246A" Geometry="M 1,1 L 13,1 L 13,4 L 1,4 Z"/>
+                <!-- Insignia verde '+' -->
+                <GeometryDrawing Brush="#107C41" Geometry="M 11,8 L 15,8 L 15,14 L 11,14 Z"/>
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 13,9 L 13,13 M 11.5,11 L 14.5,11">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#FFFFFF" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Abrir Proyecto / Grupo -->
+    <DrawingImage x:Key="Icon_OpenProject">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#E6B800" Geometry="M 1,3 L 6,3 L 7.5,5 L 15,5 L 15,13 L 1,13 Z"/>
+                <GeometryDrawing Brush="#FFD13B" Geometry="M 1,6 L 15,6 L 13.5,13 L 1,13 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#D4A000" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Abrir Archivo -->
+    <DrawingImage x:Key="Icon_OpenFile">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 2,1 L 10,1 L 14,5 L 14,15 L 2,15 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#D0D0D0" Geometry="M 10,1 L 10,5 L 14,5 Z"/>
+                <GeometryDrawing Brush="#0055EA" Geometry="M 4,7 L 11,7 M 4,10 L 11,10">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Guardar (Floppy Disk clásico) -->
+    <DrawingImage x:Key="Icon_Save">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Cuerpo del disquete azul -->
+                <GeometryDrawing Brush="#1F4E79" Geometry="M 2,1 L 12,1 L 14,3 L 14,15 L 2,15 Z"/>
+                <!-- Corredera metálica superior -->
+                <GeometryDrawing Brush="#D9D9D9" Geometry="M 4,1 L 11,1 L 11,6 L 4,6 Z"/>
+                <GeometryDrawing Brush="#595959" Geometry="M 8,2 L 10,2 L 10,5 L 8,5 Z"/>
+                <!-- Etiqueta blanca inferior -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 4,8 L 12,8 L 12,14 L 4,14 Z"/>
+                <!-- Líneas en la etiqueta -->
+                <GeometryDrawing Brush="#2F5597" Geometry="M 5.5,10 L 10.5,10 M 5.5,12 L 10.5,12">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#2F5597" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Guardar Todo (Floppy Disks superpuestos) -->
+    <DrawingImage x:Key="Icon_SaveAll">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Disquete trasero -->
+                <GeometryDrawing Brush="#3B6F9A" Geometry="M 4,1 L 13,1 L 15,3 L 15,13 L 4,13 Z"/>
+                <!-- Disquete delantero -->
+                <GeometryDrawing Brush="#1F4E79" Geometry="M 1,3 L 10,3 L 12,5 L 12,15 L 1,15 Z"/>
+                <GeometryDrawing Brush="#D9D9D9" Geometry="M 3,3 L 9,3 L 9,7 L 3,7 Z"/>
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 3,9 L 10,9 L 10,14 L 3,14 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Navegar Atrás -->
+    <DrawingImage x:Key="Icon_NavBackward">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#0055EA" Geometry="M 10,3 L 4,8 L 10,13 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#003D99" Thickness="1" LineJoin="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Navegar Adelante -->
+    <DrawingImage x:Key="Icon_NavForward">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#0055EA" Geometry="M 6,3 L 12,8 L 6,13 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#003D99" Thickness="1" LineJoin="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Deshacer (Undo) -->
+    <DrawingImage x:Key="Icon_Undo">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="Transparent" Geometry="M 13,12 C 13,7 10,5 5,5 M 5,5 L 8,2 M 5,5 L 8,8">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="2" StartLineCap="Round" EndLineCap="Round" LineJoin="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Rehacer (Redo) -->
+    <DrawingImage x:Key="Icon_Redo">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="Transparent" Geometry="M 3,12 C 3,7 6,5 11,5 M 11,5 L 8,2 M 11,5 L 8,8">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="2" StartLineCap="Round" EndLineCap="Round" LineJoin="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Cortar (Cut) -->
+    <DrawingImage x:Key="Icon_Cut">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="Transparent" Geometry="M 4,13 C 2.5,13 1.5,11.8 1.5,10.5 C 1.5,9.2 2.5,8 4,8 C 5.5,8 6.5,9.2 6.5,10.5 C 6.5,11.8 5.5,13 4,13 Z M 12,13 C 10.5,13 9.5,11.8 9.5,10.5 C 9.5,9.2 10.5,8 12,8 C 13.5,8 14.5,9.2 14.5,10.5 C 14.5,11.8 13.5,13 12,13 Z M 5,8.5 L 12,1.5 M 11,8.5 L 4,1.5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#404040" Thickness="1.5" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Copiar (Copy) -->
+    <DrawingImage x:Key="Icon_Copy">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Hoja trasera -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 5,1 L 14,1 L 14,11 L 5,11 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Hoja delantera -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 2,4 L 11,4 L 11,14 L 2,14 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0055EA" Geometry="M 4,7 L 9,7 M 4,10 L 9,10">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Pegar (Paste) -->
+    <DrawingImage x:Key="Icon_Paste">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Tabla del portapapeles -->
+                <GeometryDrawing Brush="#C68A4C" Geometry="M 2,3 L 13,3 L 13,15 L 2,15 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#8B5A2B" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Pinza metálica superior -->
+                <GeometryDrawing Brush="#D0D0D0" Geometry="M 5,1 L 10,1 L 10,4 L 5,4 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#606060" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Hoja blanca superpuesta -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 4,5 L 14,5 L 14,14 L 4,14 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0055EA" Geometry="M 6,8 L 12,8 M 6,11 L 11,11">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Buscar (Find) -->
+    <DrawingImage x:Key="Icon_Find">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Lente lupa -->
+                <GeometryDrawing Brush="#E0F2FE" Geometry="M 6.5,2 C 4,2 2,4 2,6.5 C 2,9 4,11 6.5,11 C 9,11 11,9 11,6.5 C 11,4 9,2 6.5,2 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1.5"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Mango lupa -->
+                <GeometryDrawing Brush="#404040" Geometry="M 9.5,9.5 L 14,14">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#404040" Thickness="2" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Buscar en Todo el Proyecto -->
+    <DrawingImage x:Key="Icon_FindInProject">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Hoja proyecto de fondo -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 1,1 L 9,1 L 9,9 L 1,9 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Lente lupa -->
+                <GeometryDrawing Brush="#E0F2FE" Geometry="M 9.5,5 C 7,5 5,7 5,9.5 C 5,12 7,14 9.5,14 C 12,14 14,12 14,9.5 C 14,7 12,5 9.5,5 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1.5"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Mango -->
+                <GeometryDrawing Brush="#404040" Geometry="M 12.5,12.5 L 15,15">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#404040" Thickness="2" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Buscar Referencias (Shift+F12) -->
+    <DrawingImage x:Key="Icon_FindReferences">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#E0F2FE" Geometry="M 6,1.5 C 3.5,1.5 1.5,3.5 1.5,6 C 1.5,8.5 3.5,10.5 6,10.5 C 8.5,10.5 10.5,8.5 10.5,6 C 10.5,3.5 8.5,1.5 6,1.5 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1.5"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#404040" Geometry="M 9,9 L 13,13">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#404040" Thickness="2" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Asterisco/Símbolo azul de referencia -->
+                <GeometryDrawing Brush="#D83B01" Geometry="M 13,3 L 13,7 M 11,5 L 15,5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#D83B01" Thickness="1.5"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Lista de Tareas (TODO Explorer) -->
+    <DrawingImage x:Key="Icon_TaskList">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Hoja de lista -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 2,1 L 14,1 L 14,15 L 2,15 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#606060" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Viñetas y líneas -->
+                <GeometryDrawing Brush="#107C41" Geometry="M 4,4 L 5.5,5.5 L 7.5,3.5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#107C41" Thickness="1.2"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#404040" Geometry="M 9,4.5 L 12,4.5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#404040" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#107C41" Geometry="M 4,8 L 5.5,9.5 L 7.5,7.5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#107C41" Thickness="1.2"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#404040" Geometry="M 9,8.5 L 12,8.5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#404040" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Comentar Bloque -->
+    <DrawingImage x:Key="Icon_CommentBlock">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Líneas de código -->
+                <GeometryDrawing Brush="#0055EA" Geometry="M 2,4 L 10,4 M 2,7 L 9,7 M 2,10 L 8,10">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1.5"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Comilla verde de comentario VB (') -->
+                <GeometryDrawing Brush="#107C41" Geometry="M 12,2 L 14,2 L 13,5 Z"/>
+                <GeometryDrawing Brush="#107C41" Geometry="M 12,7 L 14,7 L 13,10 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Descomentar Bloque -->
+    <DrawingImage x:Key="Icon_UncommentBlock">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Líneas de código -->
+                <GeometryDrawing Brush="#0055EA" Geometry="M 2,4 L 10,4 M 2,7 L 9,7 M 2,10 L 8,10">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1.5"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Símbolo de supresión rojo -->
+                <GeometryDrawing Brush="Transparent" Geometry="M 11,4 L 14,7 M 14,4 L 11,7">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#D83B01" Thickness="1.5"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Invertir Asignaciones A = B ⇄ B = A -->
+    <DrawingImage x:Key="Icon_SwitchAssignment">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Flecha superior hacia la derecha -->
+                <GeometryDrawing Brush="#0055EA" Geometry="M 2,5 L 12,5 M 9,2 L 13,5 L 9,8">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1.5" StartLineCap="Round" EndLineCap="Round" LineJoin="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Flecha inferior hacia la izquierda -->
+                <GeometryDrawing Brush="#D83B01" Geometry="M 14,11 L 4,11 M 7,8 L 3,11 L 7,14">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#D83B01" Thickness="1.5" StartLineCap="Round" EndLineCap="Round" LineJoin="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Alternar Resaltado de Línea Activa -->
+    <DrawingImage x:Key="Icon_HighlightLine">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Bombilla encendida / Resaltador amarillo -->
+                <GeometryDrawing Brush="#FFD700" Geometry="M 8,1 C 5.5,1 3.5,3 3.5,5.5 C 3.5,7 4.5,8.5 5.5,9.5 L 5.5,12 L 10.5,12 L 10.5,9.5 C 11.5,8.5 12.5,7 12.5,5.5 C 12.5,3 10.5,1 8,1 Z"/>
+                <GeometryDrawing Brush="#808080" Geometry="M 6,13 L 10,13 M 7,14.5 L 9,14.5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#808080" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Alternar Guías de Estructura de Bloques (Branch Lines) -->
+    <DrawingImage x:Key="Icon_BranchLines">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Líneas jerárquicas en árbol -->
+                <GeometryDrawing Brush="Transparent" Geometry="M 3,2 L 3,14 M 3,5 L 12,5 M 3,10 L 12,10">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#107C41" Thickness="1.5" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#107C41" Geometry="M 11,4 L 14,4 L 14,6 L 11,6 Z M 11,9 L 14,9 L 14,11 L 11,11 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Alternar Inlay Hints / Fin de Bloque -->
+    <DrawingImage x:Key="Icon_InlayHints">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Etiqueta / Tag de descripción -->
+                <GeometryDrawing Brush="#FFF3D4" Geometry="M 1,8 L 7,2 L 14,2 L 14,9 L 8,15 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#C28200" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#C28200" Geometry="M 11,4.5 C 11,4 11.4,3.5 12,3.5 C 12.6,3.5 13,4 13,4.5 C 13,5 12.6,5.5 12,5.5 C 11.4,5.5 11,5 11,4.5 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Ver Código (F7) -->
+    <DrawingImage x:Key="Icon_ViewCode">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Hoja de código con corchetes < / > -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 2,1 L 10,1 L 14,5 L 14,15 L 2,15 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#D0D0D0" Geometry="M 10,1 L 10,5 L 14,5 Z"/>
+                <!-- Signos < > -->
+                <GeometryDrawing Brush="Transparent" Geometry="M 6.5,8 L 4.5,10 L 6.5,12 M 9.5,8 L 11.5,10 L 9.5,12">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1.5" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Ver Objeto / Diseñador (Shift+F7) -->
+    <DrawingImage x:Key="Icon_ViewObject">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Ventana formulario clásica -->
+                <GeometryDrawing Brush="#ECE9D8" Geometry="M 1,2 L 15,2 L 15,14 L 1,14 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0A246A" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0A246A" Geometry="M 1,2 L 15,2 L 15,5 L 1,5 Z"/>
+                <!-- Botón interior simulado -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 4,8 L 12,8 L 12,11 L 4,11 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#808080" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Alternar Cuadrícula / Rejilla -->
+    <DrawingImage x:Key="Icon_Grid">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Matriz de puntos de cuadrícula -->
+                <GeometryDrawing Brush="#2B579A" Geometry="M 3,3 C 3,2.4 3.4,2 4,2 C 4.6,2 5,2.4 5,3 C 5,3.6 4.6,4 4,4 C 3.4,4 3,3.6 3,3 Z M 7,3 C 7,2.4 7.4,2 8,2 C 8.6,2 9,2.4 9,3 C 9,3.6 8.6,4 8,4 C 7.4,4 7,3.6 7,3 Z M 11,3 C 11,2.4 11.4,2 12,2 C 12.6,2 13,2.4 13,3 C 13,3.6 12.6,4 12,4 C 11.4,4 11,3.6 11,3 Z M 3,7 C 3,6.4 3.4,6 4,6 C 4.6,6 5,6.4 5,7 C 5,7.6 4.6,8 4,8 C 3.4,8 3,7.6 3,7 Z M 7,7 C 7,6.4 7.4,6 8,6 C 8.6,6 9,6.4 9,7 C 9,7.6 8.6,8 8,8 C 7.4,8 7,7.6 7,7 Z M 11,7 C 11,6.4 11.4,6 12,6 C 12.6,6 13,6.4 13,7 C 13,7.6 12.6,8 12,8 C 11.4,8 11,7.6 11,7 Z M 3,11 C 3,10.4 3.4,10 4,10 C 4.6,10 5,10.4 5,11 C 5,11.6 4.6,12 4,12 C 3.4,12 3,11.6 3,11 Z M 7,11 C 7,10.4 7.4,10 8,10 C 8.6,10 9,10.4 9,11 C 9,11.6 8.6,12 8,12 C 7.4,12 7,11.6 7,11 Z M 11,11 C 11,10.4 11.4,10 12,10 C 12.6,10 13,10.4 13,11 C 13,11.6 12.6,12 12,12 C 11.4,12 11,11.6 11,11 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Alternar Ajuste Magnético (Snap to Grid) -->
+    <DrawingImage x:Key="Icon_Snap">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Imán rojo/plateado clásico -->
+                <GeometryDrawing Brush="#D83B01" Geometry="M 2,2 L 6,2 L 6,8 C 6,9.1 6.9,10 8,10 C 9.1,10 10,9.1 10,8 L 10,2 L 14,2 L 14,8 C 14,11.3 11.3,14 8,14 C 4.7,14 2,11.3 2,8 Z"/>
+                <!-- Polos plateados -->
+                <GeometryDrawing Brush="#D0D0D0" Geometry="M 2,2 L 6,2 L 6,5 L 2,5 Z M 10,2 L 14,2 L 14,5 L 10,5 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Modo de Explorador de Proyectos (Avanzado / Estándar) -->
+    <DrawingImage x:Key="Icon_ExplorerMode">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFB900" Geometry="M 10,1 L 4,8 L 8,8 L 6,15 L 13,7 L 9,7 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Mayúsculas / Minúsculas (Aa) -->
+    <DrawingImage x:Key="Icon_CaseChange">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Letra A mayúscula -->
+                <GeometryDrawing Brush="#004578" Geometry="M 5,2 L 1.5,14 L 3.8,14 L 4.6,11 L 8.4,11 L 9.2,14 L 11.5,14 L 8,2 Z M 6.5,4.5 L 7.8,9 L 5.2,9 Z"/>
+                <!-- Letra a minúscula -->
+                <GeometryDrawing Brush="#0078D7" Geometry="M 14,8 C 12.5,8 11,8.8 11,10.5 C 11,12 12.2,13 13.5,13 C 14.5,13 15,12.3 15,12.3 L 15,14 L 16.5,14 L 16.5,9 C 16.5,8.2 15.5,8 14,8 Z M 14,11.5 C 13.2,11.5 12.5,11.2 12.5,10.5 C 12.5,9.8 13.2,9.5 14,9.5 C 14.8,9.5 15.2,9.8 15.2,10.5 C 15.2,11.2 14.8,11.5 14,11.5 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Alternar Marcador (Bookmark Toggle) -->
+    <DrawingImage x:Key="Icon_BookmarkToggle">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#0078D7" Geometry="M 3,2 L 13,2 L 13,15 L 8,11.5 L 3,15 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#004E8C" Thickness="1" LineJoin="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Siguiente Marcador (Bookmark Next) -->
+    <DrawingImage x:Key="Icon_BookmarkNext">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#0078D7" Geometry="M 2,1 L 10,1 L 10,13 L 6,10 L 2,13 Z"/>
+                <!-- Flecha abajo verde -->
+                <GeometryDrawing Brush="#107C41" Geometry="M 12,6 L 15,9 L 18,6 L 16,6 L 16,2 L 14,2 L 14,6 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Marcador Anterior (Bookmark Prev) -->
+    <DrawingImage x:Key="Icon_BookmarkPrev">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#0078D7" Geometry="M 2,3 L 10,3 L 10,15 L 6,12 L 2,15 Z"/>
+                <!-- Flecha arriba verde -->
+                <GeometryDrawing Brush="#107C41" Geometry="M 15,1 L 12,4 L 14,4 L 14,8 L 16,8 L 16,4 L 18,4 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Borrar Marcadores (Bookmark Clear) -->
+    <DrawingImage x:Key="Icon_BookmarkClear">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#0078D7" Geometry="M 2,2 L 10,2 L 10,14 L 6,11 L 2,14 Z"/>
+                <!-- Cruz roja ✕ -->
+                <GeometryDrawing Brush="Transparent" Geometry="M 11,4 L 16,9 M 16,4 L 11,9">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#D83B01" Thickness="1.8" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Asistente de Propiedades (Property Builder) -->
+    <DrawingImage x:Key="Icon_PropertyBuilder">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Llave inglesa clásica VS -->
+                <GeometryDrawing Brush="#5A6B7C" Geometry="M 9.5,1.5 C 8,1.5 6.8,2.5 6.4,3.8 L 1.5,8.7 C 0.8,9.4 0.8,10.6 1.5,11.3 L 3.7,13.5 C 4.4,14.2 5.6,14.2 6.3,13.5 L 11.2,8.6 C 12.5,8.2 13.5,7 13.5,5.5 C 13.5,4.7 13.2,4 12.7,3.5 L 10.5,5.7 L 9.3,4.5 L 11.5,2.3 C 11,1.8 10.3,1.5 9.5,1.5 Z"/>
+                <!-- Signo + verde -->
+                <GeometryDrawing Brush="#107C41" Geometry="M 13,10 L 15,10 L 15,12 L 17,12 L 17,14 L 15,14 L 15,16 L 13,16 L 13,14 L 11,14 L 11,12 L 13,12 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Asistente de Procedimientos (Procedure Builder) -->
+    <DrawingImage x:Key="Icon_ProcedureBuilder">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Cubo rosa magenta de método VS -->
+                <GeometryDrawing Brush="#B4009E" Geometry="M 3,4 L 7.5,1.5 L 12,4 L 12,10.5 L 7.5,13 L 3,10.5 Z"/>
+                <GeometryDrawing Brush="#E3008C" Geometry="M 7.5,1.5 L 12,4 L 7.5,6.5 L 3,4 Z"/>
+                <GeometryDrawing Brush="#8B006D" Geometry="M 7.5,6.5 L 12,4 L 12,10.5 L 7.5,13 Z"/>
+                <!-- Signo + verde -->
+                <GeometryDrawing Brush="#107C41" Geometry="M 12,9 L 14,9 L 14,11 L 16,11 L 16,13 L 14,13 L 14,15 L 12,15 L 12,13 L 10,13 L 10,11 L 12,11 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Insertar Snippet (AutoText / Snippet) -->
+    <DrawingImage x:Key="Icon_Snippet">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 2,1 L 10,1 L 14,5 L 14,15 L 2,15 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#D0D0D0" Geometry="M 10,1 L 10,5 L 14,5 Z"/>
+                <!-- Rectángulo de bloque de snippet celeste -->
+                <GeometryDrawing Brush="#D2E8F8" Geometry="M 4,7 L 12,7 L 12,12 L 4,12 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0078D7" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Historial del Portapapeles (Clipboard Ring) -->
+    <DrawingImage x:Key="Icon_ClipboardRing">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Portapapeles base -->
+                <GeometryDrawing Brush="#FFFDF0" Geometry="M 2,3 L 12,3 L 12,14 L 2,14 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#8C6B39" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#C8A060" Geometry="M 5,1.5 L 9,1.5 L 9,3.5 L 5,3.5 Z"/>
+                <!-- Flecha circular azul de historial -->
+                <GeometryDrawing Brush="Transparent" Geometry="M 13.5,8 A 4,4 0 1 1 12,5 L 10.5,5 M 10.5,2.5 L 10.5,5.5 L 13.5,5.5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0078D7" Thickness="1.5" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Formatear Documento (Format Document) -->
+    <DrawingImage x:Key="Icon_FormatDocument">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Hoja de código alineada -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 1,1 L 9,1 L 13,5 L 13,15 L 1,15 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0055EA" Geometry="M 3,5 L 8,5 M 3,8 L 10,8 M 5,11 L 10,11">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1.2"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Varita mágica / destello de formateo -->
+                <GeometryDrawing Brush="#FFB900" Geometry="M 14,1 L 15,3 L 17,4 L 15,5 L 14,7 L 13,5 L 11,4 L 13,3 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Ordenar Procedimientos (Sort Procedures) -->
+    <DrawingImage x:Key="Icon_SortProcedures">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Letra A arriba -->
+                <GeometryDrawing Brush="#004578" Geometry="M 4,2 L 2,7 L 3.5,7 L 4,5.5 L 6,5.5 L 6.5,7 L 8,7 Z M 5,3 L 5.7,4.5 L 4.3,4.5 Z"/>
+                <!-- Letra Z abajo -->
+                <GeometryDrawing Brush="#004578" Geometry="M 2.5,9.5 L 7.5,9.5 L 3.5,14 L 7.5,14 L 7.5,15 L 2,15 L 6,10.5 L 2.5,10.5 Z"/>
+                <!-- Flecha descendente azul -->
+                <GeometryDrawing Brush="#0078D7" Geometry="M 12,2 L 12,12 M 9,9 L 12,13 L 15,9">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0078D7" Thickness="1.6" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Comparar Diferencias / Diff (Show Diff) -->
+    <DrawingImage x:Key="Icon_ShowDiff">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Hoja izquierda azul -->
+                <GeometryDrawing Brush="#E6F2FA" Geometry="M 1,2 L 7,2 L 7,14 L 1,14 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0078D7" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Hoja derecha naranja -->
+                <GeometryDrawing Brush="#FFF4E6" Geometry="M 9,2 L 15,2 L 15,14 L 9,14 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#D83B01" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Flechas entre hojas -->
+                <GeometryDrawing Brush="#505050" Geometry="M 6,8 L 10,8">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#505050" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Estadísticas de Código (Code Statistics) -->
+    <DrawingImage x:Key="Icon_CodeStatistics">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Barras de métricas -->
+                <GeometryDrawing Brush="#0078D7" Geometry="M 2,9 L 5,9 L 5,14 L 2,14 Z"/>
+                <GeometryDrawing Brush="#107C41" Geometry="M 6,5 L 9,5 L 9,14 L 6,14 Z"/>
+                <GeometryDrawing Brush="#FFB900" Geometry="M 10,2 L 13,2 L 13,14 L 10,14 Z"/>
+                <GeometryDrawing Brush="#333333" Geometry="M 1,14 L 15,14">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#333333" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Manejo de Errores (Error Handling Engine) -->
+    <DrawingImage x:Key="Icon_ErrorHandler">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Escudo de seguridad azul/dorado -->
+                <GeometryDrawing Brush="#0078D7" Geometry="M 8,1.5 L 14,3.5 L 14,8 C 14,11.8 11.4,14 8,15 C 4.6,14 2,11.8 2,8 L 2,3.5 Z"/>
+                <GeometryDrawing Brush="#50E6FF" Geometry="M 8,2.8 L 13,4.5 L 13,8 C 13,11.2 10.8,13.1 8,14 Z"/>
+                <!-- Checkmark blanco -->
+                <GeometryDrawing Brush="Transparent" Geometry="M 5,8 L 7,10 L 11,6">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#FFFFFF" Thickness="1.6" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Subsistema de Trazas (Tracing Subsystem) -->
+    <DrawingImage x:Key="Icon_Tracing">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Ruta con puntos de trazabilidad / Footsteps -->
+                <GeometryDrawing Brush="#0078D7" Geometry="M 4,4 C 4,2.5 5.5,2.5 5.5,4 C 5.5,5.5 4,7 4,7 C 4,7 2.5,5.5 2.5,4 Z"/>
+                <GeometryDrawing Brush="#107C41" Geometry="M 11,8 C 11,6.5 12.5,6.5 12.5,8 C 12.5,9.5 11,11 11,11 C 11,11 9.5,9.5 9.5,8 Z"/>
+                <GeometryDrawing Brush="#FFB900" Geometry="M 6,12 C 6,10.5 7.5,10.5 7.5,12 C 7.5,13.5 6,15 6,15 C 6,15 4.5,13.5 4.5,12 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Orden de Tabulación (Tab Order) -->
+    <DrawingImage x:Key="Icon_TabOrder">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Cajas con 1, 2, 3 -->
+                <GeometryDrawing Brush="#F0F0F0" Geometry="M 1,2 L 6,2 L 6,7 L 1,7 Z M 9,2 L 14,2 L 14,7 L 9,7 Z M 5,9 L 10,9 L 10,14 L 5,14 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0078D7" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Dígito 1 -->
+                <GeometryDrawing Brush="#0078D7" Geometry="M 3.5,3 L 3.5,6"/>
+                <!-- Dígito 2 -->
+                <GeometryDrawing Brush="#0078D7" Geometry="M 10.5,3 L 12.5,3 L 10.5,6 L 12.5,6"/>
+                <!-- Flecha de transición -->
+                <GeometryDrawing Brush="#D83B01" Geometry="M 6.5,4.5 L 8.5,4.5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#D83B01" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Verificador de Teclas Rápidas (Hotkeys / Aceleradores) -->
+    <DrawingImage x:Key="Icon_Hotkeys">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Teclado clásico VS -->
+                <GeometryDrawing Brush="#F4F4F4" Geometry="M 1,4 L 15,4 L 15,13 L 1,13 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#555555" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Teclas superiores -->
+                <GeometryDrawing Brush="#707070" Geometry="M 3,6 L 5,6 M 7,6 L 9,6 M 11,6 L 13,6 M 3,8 L 5,8 M 7,8 L 9,8 M 11,8 L 13,8">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Barra espaciadora azul -->
+                <GeometryDrawing Brush="#0078D7" Geometry="M 5,10.5 L 11,10.5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0078D7" Thickness="1.5"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Analizador de Calidad de Código (Code Analyzer) -->
+    <DrawingImage x:Key="Icon_CodeAnalyzer">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Lupa de análisis -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 6.5,2 C 4,2 2,4 2,6.5 C 2,9 4,11 6.5,11 C 7.6,11 8.6,10.6 9.4,9.9 L 13.5,14 L 14.5,13 L 10.4,8.9 C 10.8,8.2 11,7.4 11,6.5 C 11,4 9,2 6.5,2 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0078D7" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Pulso o check de salud en el lente -->
+                <GeometryDrawing Brush="Transparent" Geometry="M 4,6.5 L 5.5,8 L 8.5,5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#107C41" Thickness="1.5" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- ==================== 3. ICONOS DE DOCUMENTOS / ARCHIVOS ================== -->
+
+    <!-- Formulario (.frm) -->
+    <DrawingImage x:Key="Icon_FileForm">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#ECE9D8" Geometry="M 1,2 L 15,2 L 15,14 L 1,14 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0A246A" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0A246A" Geometry="M 1,2 L 15,2 L 15,5 L 1,5 Z"/>
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 3,7 L 8,7 L 8,10 L 3,10 Z"/>
+                <GeometryDrawing Brush="#D0D0D0" Geometry="M 10,7 L 13,7 M 10,9 L 13,9 M 10,11 L 13,11">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#808080" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Módulo Estándar (.bas) -->
+    <DrawingImage x:Key="Icon_FileModule">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 2,1 L 10,1 L 14,5 L 14,15 L 2,15 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#D0D0D0" Geometry="M 10,1 L 10,5 L 14,5 Z"/>
+                <!-- Líneas de código verdes/azules -->
+                <GeometryDrawing Brush="#0055EA" Geometry="M 4,6 L 11,6 M 4,9 L 9,9 M 4,12 L 11,12">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1.2"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Módulo de Clase (.cls) -->
+    <DrawingImage x:Key="Icon_FileClass">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Cubo / Pieza de componente de clase azul -->
+                <GeometryDrawing Brush="#2B579A" Geometry="M 3,4 L 8,1.5 L 13,4 L 13,11 L 8,13.5 L 3,11 Z"/>
+                <GeometryDrawing Brush="#5B9BD5" Geometry="M 8,1.5 L 13,4 L 8,6.5 L 3,4 Z"/>
+                <GeometryDrawing Brush="#41719C" Geometry="M 8,6.5 L 13,4 L 13,11 L 8,13.5 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Control de Usuario (.ctl) -->
+    <DrawingImage x:Key="Icon_FileUserControl">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#F0F4F8" Geometry="M 1,2 L 15,2 L 15,14 L 1,14 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0078D7" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Sliders / Perillas de control -->
+                <GeometryDrawing Brush="#0078D7" Geometry="M 4,5 L 12,5 M 4,11 L 12,11">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0078D7" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#D83B01" Geometry="M 6,3.5 L 8,3.5 L 8,6.5 L 6,6.5 Z M 9,9.5 L 11,9.5 L 11,12.5 L 9,12.5 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Página de Propiedades (.pag) -->
+    <DrawingImage x:Key="Icon_FilePropertyPage">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Hoja con pestañas -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 1,4 L 5,1 L 15,1 L 15,15 L 1,15 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#E0E0E0" Geometry="M 1,4 L 15,4">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#0055EA" Geometry="M 4,7 L 12,7 M 4,10 L 10,10">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- Documento Genérico -->
+    <DrawingImage x:Key="Icon_FileGeneric">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 2,1 L 10,1 L 14,5 L 14,15 L 2,15 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#707070" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#D0D0D0" Geometry="M 10,1 L 10,5 L 14,5 Z"/>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+</ResourceDictionary>

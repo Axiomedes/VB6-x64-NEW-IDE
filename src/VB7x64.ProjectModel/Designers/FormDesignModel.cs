@@ -1,0 +1,120 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace VB7x64.ProjectModel.Designers;
+
+/// <summary>
+/// Modelo en memoria de la definición visual completa de un formulario VB6 (bloque Begin VB.Form ... End).
+/// </summary>
+public class FormDesignModel
+{
+    public const double TwipsPerPixel = 15.0;
+
+    public string VersionHeader { get; set; } = "VERSION 5.00";
+    public string RootType { get; set; } = "VB.Form";
+    public string Name { get; set; } = "Form1";
+    public string Caption { get; set; } = "Form1";
+
+    // Geometría en Twips
+    public int ClientLeft { get; set; } = 60;
+    public int ClientTop { get; set; } = 345;
+    public int ClientWidth { get; set; } = 4680;
+    public int ClientHeight { get; set; } = 3195;
+
+    public int? ScaleWidth { get; set; }
+    public int? ScaleHeight { get; set; }
+    public int? ScaleMode { get; set; } = 1; // 1 = Twip
+    public int? StartUpPosition { get; set; } = 3; // 3 = Windows Default
+    public int? BorderStyle { get; set; } = 2; // 2 = Sizable
+
+    public string? BackColorHex { get; set; } = "&H8000000F&"; // ButtonFace
+    public string? ForeColorHex { get; set; } = "&H80000012&"; // ButtonText
+    public FormFontDescription? Font { get; set; }
+
+    // Controles hijos de primer nivel
+    public List<FormDesignerControl> Children { get; set; } = new();
+
+    // Propiedades originales de la cabecera del formulario no mapeadas
+    public List<FormPropertyItem> CustomProperties { get; set; } = new();
+
+    // Atributos de módulo posteriores a la definición del formulario (Attribute VB_Name = ..., etc.)
+    public List<string> Attributes { get; set; } = new();
+
+    #region Conversión Twips ↔ Píxeles
+    public double ClientWidthPixels
+    {
+        get => Math.Max(50, ClientWidth / TwipsPerPixel);
+        set => ClientWidth = Math.Max(750, (int)Math.Round(value * TwipsPerPixel));
+    }
+
+    public double ClientHeightPixels
+    {
+        get => Math.Max(50, ClientHeight / TwipsPerPixel);
+        set => ClientHeight = Math.Max(750, (int)Math.Round(value * TwipsPerPixel));
+    }
+
+    public void SetClientSizePixels(double width, double height)
+    {
+        ClientWidthPixels = width;
+        ClientHeightPixels = height;
+    }
+    #endregion
+
+    /// <summary>
+    /// Retorna todos los controles del formulario de forma aplanada (incluyendo los anidados dentro de contenedores).
+    /// </summary>
+    public List<FormDesignerControl> GetAllControls()
+    {
+        var list = new List<FormDesignerControl>();
+        CollectControlsRecursively(Children, list);
+        return list;
+    }
+
+    private static void CollectControlsRecursively(IEnumerable<FormDesignerControl> controls, List<FormDesignerControl> accumulator)
+    {
+        foreach (var ctrl in controls)
+        {
+            accumulator.Add(ctrl);
+            if (ctrl.Children.Count > 0)
+            {
+                CollectControlsRecursively(ctrl.Children, accumulator);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Busca un control por su nombre en cualquier nivel de la jerarquía.
+    /// </summary>
+    public FormDesignerControl? FindControl(string name)
+    {
+        return GetAllControls().FirstOrDefault(c => string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Elimina un control de la jerarquía (sea hijo directo del formulario o de un contenedor).
+    /// </summary>
+    public bool RemoveControl(FormDesignerControl control)
+    {
+        if (control.ParentControl != null)
+        {
+            return control.ParentControl.Children.Remove(control);
+        }
+
+        return Children.Remove(control);
+    }
+
+    /// <summary>
+    /// Genera un nombre de control no repetido con prefijo estándar (ej. Command1, Command2).
+    /// </summary>
+    public string GenerateUniqueName(string prefix)
+    {
+        var allNames = new HashSet<string>(GetAllControls().Select(c => c.Name), StringComparer.OrdinalIgnoreCase);
+        int index = 1;
+        while (allNames.Contains($"{prefix}{index}"))
+        {
+            index++;
+        }
+        return $"{prefix}{index}";
+    }
+}

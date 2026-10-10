@@ -46,7 +46,7 @@
                     <CheckBox x:Name="ChkLineNumbers" Content="Mostrar números de línea" Margin="0,5,0,8" FontSize="12"/>
                     <CheckBox x:Name="ChkCreateBak" Content="Crear copia de respaldo (.bak) al guardar" Margin="0,0,0,8" FontSize="12"/>
                     <Separator Margin="0,6,0,10"/>
-                    <TextBlock Text="Funciones Avanzadas VB7:" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6" Foreground="#004488"/>
+                    <TextBlock Text="Funciones Avanzadas:" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6" Foreground="#004488"/>
                     <CheckBox x:Name="ChkCurrentLineHighlight" Content="Habilitar resaltado de línea activa" Margin="0,0,0,8" FontSize="12"/>
                     <CheckBox x:Name="ChkBranchLines" Content="Habilitar guías de estructura de bloques (Branch Lines)" Margin="0,0,0,8" FontSize="12"/>
                     <CheckBox x:Name="ChkEndOfLineDetails" Content="Habilitar detalles de fin de bloque (Inlay Hints)" Margin="0,0,0,8" FontSize="12"/>

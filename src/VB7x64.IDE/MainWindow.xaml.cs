@@ -9,11 +9,16 @@ using System.Windows.Media;
 using Microsoft.Win32;
 using ICSharpCode.AvalonEdit;
 using VB7x64.IDE.CodeBuilders;
+using VB7x64.IDE.Dialogs;
 using VB7x64.IDE.Editor;
 using VB7x64.IDE.Logging;
 using VB7x64.IDE.Settings;
+using VB7x64.ProjectModel.Analysis;
 using VB7x64.ProjectModel.CodeBuilders;
+using VB7x64.ProjectModel.Designers;
 using VB7x64.ProjectModel.Documents;
+using VB7x64.ProjectModel.ErrorHandling;
+using VB7x64.ProjectModel.Formatting;
 using VB7x64.ProjectModel.Navigation;
 using VB7x64.ProjectModel.Settings;
 using VB7x64.ProjectModel.Vbp;
@@ -935,20 +940,23 @@ public partial class MainWindow : Window
         if (TabRadioOutput?.IsChecked == true) ShowBottomTab("Output");
         else if (TabRadioReferences?.IsChecked == true) ShowBottomTab("References");
         else if (TabRadioTasks?.IsChecked == true) ShowBottomTab("Tasks");
+        else if (TabRadioAnalysis?.IsChecked == true) ShowBottomTab("Analysis");
     }
 
     public void ShowBottomTab(string tabName)
     {
-        if (ViewOutput == null || ViewReferences == null || ViewTasks == null) return;
-        if (TabRadioOutput == null || TabRadioReferences == null || TabRadioTasks == null) return;
+        if (ViewOutput == null || ViewReferences == null || ViewTasks == null || ViewAnalysis == null) return;
+        if (TabRadioOutput == null || TabRadioReferences == null || TabRadioTasks == null || TabRadioAnalysis == null) return;
 
         ViewOutput.Visibility = (tabName == "Output") ? Visibility.Visible : Visibility.Collapsed;
         ViewReferences.Visibility = (tabName == "References") ? Visibility.Visible : Visibility.Collapsed;
         ViewTasks.Visibility = (tabName == "Tasks") ? Visibility.Visible : Visibility.Collapsed;
+        ViewAnalysis.Visibility = (tabName == "Analysis") ? Visibility.Visible : Visibility.Collapsed;
 
         TabRadioOutput.IsChecked = (tabName == "Output");
         TabRadioReferences.IsChecked = (tabName == "References");
         TabRadioTasks.IsChecked = (tabName == "Tasks");
+        TabRadioAnalysis.IsChecked = (tabName == "Analysis");
 
         SetOutputPanelVisibility(true);
     }
@@ -1022,7 +1030,7 @@ public partial class MainWindow : Window
     }
     #endregion
 
-    #region Funciones Avanzadas VB7
+    #region Funciones Avanzadas
     private bool _isChordCtrlK;
 
     private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -1097,6 +1105,12 @@ public partial class MainWindow : Window
         if (_isChordCtrlK)
         {
             _isChordCtrlK = false;
+            if (e.Key == Key.D || e.Key == Key.F)
+            {
+                FormatActiveDocument();
+                e.Handled = true;
+                return;
+            }
             if (e.Key == Key.C)
             {
                 if (ActiveEditor != null)
@@ -1146,7 +1160,7 @@ public partial class MainWindow : Window
         else if (e.Key == Key.K && Keyboard.Modifiers == ModifierKeys.Control)
         {
             _isChordCtrlK = true;
-            SetStatusMessage("Ctrl+K presionado. Esperando segunda tecla (K: Marcador, N: Siguiente, P: Anterior, L: Limpiar, C: Comentar, U: Descomentar)...");
+            SetStatusMessage("Ctrl+K presionado. Esperando segunda tecla (D: Formatear, C: Comentar, U: Descomentar, K: Marcador, N: Siguiente, P: Anterior, L: Limpiar)...");
             e.Handled = true;
             return;
         }
@@ -1422,6 +1436,507 @@ public partial class MainWindow : Window
         ActiveEditor.Focus();
         SetStatusMessage($"{operationDesc} insertado exitosamente.");
     }
+
+    #region Fase 4: Formato, Ordenación, Diff y Estadísticas
+    private void MenuFormatDocument_Click(object sender, RoutedEventArgs e)
+    {
+        FormatActiveDocument();
+    }
+
+    private void MenuAlignDeclarations_Click(object sender, RoutedEventArgs e)
+    {
+        AlignDeclarationsInActiveDocument();
+    }
+
+    private void MenuSortProcedures_Click(object sender, RoutedEventArgs e)
+    {
+        SortProceduresInActiveDocument();
+    }
+
+    private void MenuShowDiff_Click(object sender, RoutedEventArgs e)
+    {
+        ShowFileDiffForActiveDocument();
+    }
+
+    private void MenuCodeStatistics_Click(object sender, RoutedEventArgs e)
+    {
+        ShowCodeStatistics();
+    }
+
+    public void FormatActiveDocument()
+    {
+        if (ActiveEditor == null || ActiveEditor.Document == null)
+        {
+            SetStatusMessage("No hay ningún documento activo para formatear.");
+            return;
+        }
+
+        string currentText = ActiveEditor.Text;
+        if (string.IsNullOrEmpty(currentText)) return;
+
+        var options = new CodeFormatterOptions
+        {
+            IndentSize = _settings.TabSize > 0 ? _settings.TabSize : 4,
+            UseTabs = false,
+            MaxConsecutiveBlankLines = 1,
+            EnsureBlankLineBetweenProcedures = true,
+            AlignDeclarations = false
+        };
+
+        string formatted = CodeFormatter.FormatCode(currentText, options);
+        if (!string.Equals(currentText, formatted, StringComparison.Ordinal))
+        {
+            int caretOffset = Math.Min(ActiveEditor.CaretOffset, formatted.Length);
+            ActiveEditor.Document.BeginUpdate();
+            try
+            {
+                ActiveEditor.Document.Text = formatted;
+            }
+            finally
+            {
+                ActiveEditor.Document.EndUpdate();
+            }
+            ActiveEditor.CaretOffset = caretOffset;
+            SetStatusMessage("Documento formateado correctamente.");
+        }
+        else
+        {
+            SetStatusMessage("El documento ya se encuentra correctamente formateado.");
+        }
+    }
+
+    public void AlignDeclarationsInActiveDocument()
+    {
+        if (ActiveEditor == null || ActiveEditor.Document == null)
+        {
+            SetStatusMessage("No hay ningún documento activo.");
+            return;
+        }
+
+        string currentText = ActiveEditor.Text;
+        if (string.IsNullOrEmpty(currentText)) return;
+
+        string aligned = CodeFormatter.AlignAsInDeclarations(currentText);
+        if (!string.Equals(currentText, aligned, StringComparison.Ordinal))
+        {
+            ActiveEditor.Document.BeginUpdate();
+            try
+            {
+                ActiveEditor.Document.Text = aligned;
+            }
+            finally
+            {
+                ActiveEditor.Document.EndUpdate();
+            }
+            SetStatusMessage("Declaraciones 'As' alineadas correctamente.");
+        }
+        else
+        {
+            SetStatusMessage("No se encontraron declaraciones contiguas para alinear.");
+        }
+    }
+
+    public void SortProceduresInActiveDocument()
+    {
+        if (ActiveEditor == null || ActiveEditor.Document == null)
+        {
+            MessageBox.Show(this, "Debes abrir un archivo de código para ordenar sus procedimientos.", "Ordenar Procedimientos", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        string currentText = ActiveEditor.Text;
+        if (string.IsNullOrEmpty(currentText)) return;
+
+        var dlg = new SortProceduresDialog(currentText)
+        {
+            Owner = this
+        };
+
+        if (dlg.ShowDialog() == true && !string.IsNullOrEmpty(dlg.ResultingCode))
+        {
+            if (!string.Equals(currentText, dlg.ResultingCode, StringComparison.Ordinal))
+            {
+                ActiveEditor.Document.BeginUpdate();
+                try
+                {
+                    ActiveEditor.Document.Text = dlg.ResultingCode;
+                }
+                finally
+                {
+                    ActiveEditor.Document.EndUpdate();
+                }
+                SetStatusMessage("Procedimientos del módulo reordenados exitosamente.");
+            }
+        }
+    }
+
+    public void ShowFileDiffForActiveDocument()
+    {
+        if (ActiveEditor == null || ActiveTab == null)
+        {
+            MessageBox.Show(this, "No hay ningún documento activo para comparar diferencias.", "Visual Diff", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        string filePath = ActiveTab.Document?.FilePath ?? string.Empty;
+        string editorText = ActiveEditor.Text;
+        string diskText = string.Empty;
+
+        if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+        {
+            try
+            {
+                var doc = SafeFileStorage.LoadDocument(filePath);
+                diskText = doc.Text;
+            }
+            catch
+            {
+                diskText = File.ReadAllText(filePath);
+            }
+        }
+
+        var dlg = new FileDiffDialog(filePath, diskText, editorText, onSaveAction: () =>
+        {
+            MenuSave_Click(this, new RoutedEventArgs());
+        })
+        {
+            Owner = this
+        };
+
+        dlg.ShowDialog();
+    }
+
+    public void ShowCodeStatistics()
+    {
+        ProjectStatisticsSummary summary;
+
+        if (_currentProjectGroup != null && _currentProjectGroup.Projects.Count > 0)
+        {
+            summary = new ProjectStatisticsSummary
+            {
+                ProjectName = $"Grupo: {_currentProjectGroup.Name}"
+            };
+            foreach (var prj in _currentProjectGroup.Projects)
+            {
+                var prjSummary = ProjectStatistics.AnalyzeProject(prj);
+                summary.Files.AddRange(prjSummary.Files);
+            }
+        }
+        else if (_currentProject != null)
+        {
+            summary = ProjectStatistics.AnalyzeProject(_currentProject);
+        }
+        else if (ActiveEditor != null)
+        {
+            string filePath = ActiveTab?.Document?.FilePath ?? "Documento Activo";
+            var fileStat = ProjectStatistics.AnalyzeText(ActiveEditor.Text, filePath);
+            summary = new ProjectStatisticsSummary
+            {
+                ProjectName = Path.GetFileName(filePath),
+                Files = new List<FileCodeStatistics> { fileStat }
+            };
+        }
+        else
+        {
+            MessageBox.Show(this, "No hay ningún proyecto ni documento abierto para calcular estadísticas.", "Estadísticas de Código", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var dlg = new CodeStatisticsDialog(summary)
+        {
+            Owner = this
+        };
+
+        dlg.ShowDialog();
+    }
+    #endregion
+
+    #region Fase 5: Manejo de Errores y Trazas (Tracing)
+    private void MenuErrorHandler_Click(object sender, RoutedEventArgs e)
+    {
+        OpenErrorHandlerDialog();
+    }
+
+    private void MenuTracing_Click(object sender, RoutedEventArgs e)
+    {
+        OpenTracingDialog();
+    }
+
+    private void MenuRemoveTraces_Click(object sender, RoutedEventArgs e)
+    {
+        RemoveAllTracesFromActiveDocument();
+    }
+
+    public void OpenErrorHandlerDialog()
+    {
+        if (ActiveEditor == null || ActiveTab == null)
+        {
+            MessageBox.Show(this, "Debes abrir un archivo de código para gestionar el manejo de errores.", "Manejo de Errores", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        string currentText = ActiveEditor.Text;
+        if (string.IsNullOrEmpty(currentText)) return;
+
+        string moduleName = Path.GetFileNameWithoutExtension(ActiveTab.Document?.FilePath ?? "") ?? "Module1";
+        int caretLine = ActiveEditor.TextArea.Caret.Line;
+
+        var dlg = new ErrorHandlerDialog(currentText, moduleName, caretLine)
+        {
+            Owner = this
+        };
+
+        if (dlg.ShowDialog() == true && !string.IsNullOrEmpty(dlg.ResultingCode))
+        {
+            if (!string.Equals(currentText, dlg.ResultingCode, StringComparison.Ordinal))
+            {
+                int caretOffset = Math.Min(ActiveEditor.CaretOffset, dlg.ResultingCode.Length);
+                ActiveEditor.Document.BeginUpdate();
+                try
+                {
+                    ActiveEditor.Document.Text = dlg.ResultingCode;
+                }
+                finally
+                {
+                    ActiveEditor.Document.EndUpdate();
+                }
+                ActiveEditor.CaretOffset = caretOffset;
+
+                string actionDesc = dlg.IsRemoval ? "retirado de" : "aplicado a";
+                SetStatusMessage($"Manejo de errores {actionDesc} {dlg.AffectedCount} procedimiento(s).");
+            }
+        }
+    }
+
+    public void OpenTracingDialog()
+    {
+        if (ActiveEditor == null || ActiveTab == null)
+        {
+            MessageBox.Show(this, "Debes abrir un archivo de código para inyectar o retirar trazas.", "Inyección de Trazas", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        string currentText = ActiveEditor.Text;
+        if (string.IsNullOrEmpty(currentText)) return;
+
+        string moduleName = Path.GetFileNameWithoutExtension(ActiveTab.Document?.FilePath ?? "") ?? "Module1";
+        int caretLine = ActiveEditor.TextArea.Caret.Line;
+
+        var dlg = new TracingDialog(currentText, moduleName, caretLine)
+        {
+            Owner = this
+        };
+
+        if (dlg.ShowDialog() == true && !string.IsNullOrEmpty(dlg.ResultingCode))
+        {
+            if (!string.Equals(currentText, dlg.ResultingCode, StringComparison.Ordinal))
+            {
+                int caretOffset = Math.Min(ActiveEditor.CaretOffset, dlg.ResultingCode.Length);
+                ActiveEditor.Document.BeginUpdate();
+                try
+                {
+                    ActiveEditor.Document.Text = dlg.ResultingCode;
+                }
+                finally
+                {
+                    ActiveEditor.Document.EndUpdate();
+                }
+                ActiveEditor.CaretOffset = caretOffset;
+
+                string actionDesc = dlg.IsRemoval ? "retiradas de" : "inyectadas en";
+                SetStatusMessage($"Trazas {actionDesc} {dlg.AffectedCount} procedimiento(s).");
+            }
+        }
+    }
+
+    public void RemoveAllTracesFromActiveDocument()
+    {
+        if (ActiveEditor == null || ActiveTab == null)
+        {
+            SetStatusMessage("No hay ningún documento activo.");
+            return;
+        }
+
+        string currentText = ActiveEditor.Text;
+        if (string.IsNullOrEmpty(currentText)) return;
+
+        string cleaned = TracingEngine.RemoveTracesFromModule(currentText, TracingOptions.DefaultTag, out int count);
+        if (!string.Equals(currentText, cleaned, StringComparison.Ordinal))
+        {
+            int caretOffset = Math.Min(ActiveEditor.CaretOffset, cleaned.Length);
+            ActiveEditor.Document.BeginUpdate();
+            try
+            {
+                ActiveEditor.Document.Text = cleaned;
+            }
+            finally
+            {
+                ActiveEditor.Document.EndUpdate();
+            }
+            ActiveEditor.CaretOffset = caretOffset;
+            SetStatusMessage($"Se retiraron todas las trazas de {count} procedimiento(s).");
+        }
+        else
+        {
+            SetStatusMessage("No se detectaron trazas inyectadas en el módulo activo.");
+        }
+    }
+    #endregion
+
+    #region Fase 6: Diseñadores y Analizador de Calidad
+    private void MenuTabOrder_Click(object sender, RoutedEventArgs e)
+    {
+        OpenTabOrderDialog();
+    }
+
+    public void OpenTabOrderDialog()
+    {
+        if (ActiveTab == null || ActiveTab.Document == null)
+        {
+            MessageBox.Show(this, "Abre un formulario (.frm, .ctl, .pag) para gestionar el orden de tabulación.", "Orden de Tabulación", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        string header = ActiveTab.Document.Header ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(header))
+        {
+            MessageBox.Show(this, "El archivo actual no posee una definición visual de formulario/controles o es un módulo estándar (.bas / .cls).", "Orden de Tabulación", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        string formName = Path.GetFileNameWithoutExtension(ActiveTab.Document.FilePath);
+        var dlg = new TabOrderDialog(header, formName)
+        {
+            Owner = this
+        };
+
+        if (dlg.ShowDialog() == true && !string.IsNullOrEmpty(dlg.ResultingHeader))
+        {
+            if (!string.Equals(header, dlg.ResultingHeader, StringComparison.Ordinal))
+            {
+                ActiveTab.Document.Header = dlg.ResultingHeader;
+                ActiveTab.Document.IsDirty = true;
+                ActiveTab.UpdateHeaderDisplay();
+                SetStatusMessage($"Orden de tabulación actualizado en '{formName}'.");
+            }
+        }
+    }
+
+    private void MenuHotkeys_Click(object sender, RoutedEventArgs e)
+    {
+        OpenHotkeyDialog();
+    }
+
+    public void OpenHotkeyDialog()
+    {
+        if (ActiveTab == null || ActiveTab.Document == null)
+        {
+            MessageBox.Show(this, "Abre un formulario (.frm, .ctl, .pag) para verificar las teclas rápidas de acceso.", "Teclas Rápidas (Hotkeys)", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        string header = ActiveTab.Document.Header ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(header))
+        {
+            MessageBox.Show(this, "El archivo actual no posee una definición visual de formulario/controles o es un módulo estándar (.bas / .cls).", "Teclas Rápidas (Hotkeys)", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        string formName = Path.GetFileNameWithoutExtension(ActiveTab.Document.FilePath);
+        var dlg = new HotkeyDialog(header, formName)
+        {
+            Owner = this
+        };
+
+        if (dlg.ShowDialog() == true && !string.IsNullOrEmpty(dlg.ResultingHeader))
+        {
+            if (!string.Equals(header, dlg.ResultingHeader, StringComparison.Ordinal))
+            {
+                ActiveTab.Document.Header = dlg.ResultingHeader;
+                ActiveTab.Document.IsDirty = true;
+                ActiveTab.UpdateHeaderDisplay();
+                SetStatusMessage($"Teclas rápidas actualizadas en '{formName}'.");
+            }
+        }
+    }
+
+    private void MenuRunAnalysis_Click(object sender, RoutedEventArgs e)
+    {
+        RunCodeAnalysis();
+    }
+
+    private void BtnRunAnalysis_Click(object sender, RoutedEventArgs e)
+    {
+        RunCodeAnalysis();
+    }
+
+    private void BtnClearAnalysis_Click(object sender, RoutedEventArgs e)
+    {
+        LstAnalysis.ItemsSource = null;
+        TxtAnalysisStatus.Text = "0 advertencias encontradas";
+        SetStatusMessage("Lista de análisis de calidad limpiada.");
+    }
+
+    public void RunCodeAnalysis()
+    {
+        var issues = new List<AnalysisIssue>();
+
+        if (_currentProject != null)
+        {
+            var projectFiles = GetSearchableFiles();
+            var visited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var file in projectFiles)
+            {
+                if (visited.Add(file))
+                {
+                    string? openText = GetOpenDocumentText(file);
+                    if (openText != null)
+                    {
+                        issues.AddRange(CodeAnalyzer.AnalyzeText(openText, file));
+                    }
+                    else
+                    {
+                        issues.AddRange(CodeAnalyzer.AnalyzeFile(file));
+                    }
+                }
+            }
+        }
+        else if (ActiveTab != null && ActiveEditor != null)
+        {
+            issues.AddRange(CodeAnalyzer.AnalyzeText(ActiveEditor.Text, ActiveTab.Document.FilePath));
+        }
+        else
+        {
+            MessageBox.Show(this, "No hay ningún proyecto ni archivo abierto para analizar.", "Analizador de Código", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var sortedIssues = issues.OrderBy(i => i.Severity).ThenBy(i => i.FileName).ThenBy(i => i.LineNumber).ToList();
+        LstAnalysis.ItemsSource = sortedIssues;
+        TxtAnalysisStatus.Text = $"{sortedIssues.Count} advertencia(s) / sugerencia(s) encontradas";
+        ShowBottomTab("Analysis");
+        SetStatusMessage($"Análisis de calidad completado: {sortedIssues.Count} observación(es).");
+    }
+
+    private void LstAnalysis_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (LstAnalysis.SelectedItem is AnalysisIssue issue)
+        {
+            RecordCurrentNavigation();
+            var tab = OpenFile(issue.FilePath);
+            if (tab != null && issue.LineNumber > 0 && issue.LineNumber <= tab.Editor.Document.LineCount)
+            {
+                var lineObj = tab.Editor.Document.GetLineByNumber(issue.LineNumber);
+                tab.Editor.CaretOffset = lineObj.Offset;
+                tab.Editor.ScrollToLine(issue.LineNumber);
+                tab.Editor.Focus();
+                SetStatusMessage($"Navegando a advertencia: {issue.RuleId} en {Path.GetFileName(issue.FilePath)} (Línea {issue.LineNumber})");
+            }
+        }
+    }
+    #endregion
+
     #region Navegación e Historial (Alt+← / Alt+→)
     private void MenuNavBackward_Click(object sender, RoutedEventArgs e)
     {

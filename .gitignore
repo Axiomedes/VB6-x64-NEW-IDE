@@ -22,6 +22,9 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+[Tt]est[Rr]esults/
+*.tmp
+*.bak
 
 # OS files
 Thumbs.db

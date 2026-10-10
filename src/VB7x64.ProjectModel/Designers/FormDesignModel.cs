@@ -16,6 +16,17 @@ public class FormDesignModel
     public string Name { get; set; } = "Form1";
     public string Caption { get; set; } = "Form1";
 
+    public bool IsUserControl =>
+        RootType.Equals("VB.UserControl", StringComparison.OrdinalIgnoreCase) ||
+        RootType.Equals("UserControl", StringComparison.OrdinalIgnoreCase) ||
+        RootType.EndsWith(".UserControl", StringComparison.OrdinalIgnoreCase);
+
+    public bool IsPropertyPage =>
+        RootType.Equals("VB.PropertyPage", StringComparison.OrdinalIgnoreCase) ||
+        RootType.Equals("PropertyPage", StringComparison.OrdinalIgnoreCase);
+
+    public bool HasTitleBar => !IsUserControl && !IsPropertyPage;
+
     // Geometría en Twips
     public int ClientLeft { get; set; } = 60;
     public int ClientTop { get; set; } = 345;

@@ -164,4 +164,96 @@ public class FormDesignerVisualTests
         Assert.Equal("Command1", clonedChild.Name);
         Assert.Equal("Click Me", clonedChild.Caption);
     }
+
+    [Fact]
+    public void FormDesignModel_UserControl_DifferentiatesFromFormAndHidesTitleBar()
+    {
+        var formModel = new FormDesignModel { RootType = "VB.Form", Name = "Form1" };
+        Assert.False(formModel.IsUserControl);
+        Assert.True(formModel.HasTitleBar);
+
+        var ucModel = new FormDesignModel { RootType = "VB.UserControl", Name = "UserControl1" };
+        Assert.True(ucModel.IsUserControl);
+        Assert.False(ucModel.HasTitleBar);
+
+        var propPageModel = new FormDesignModel { RootType = "VB.PropertyPage", Name = "PropertyPage1" };
+        Assert.True(propPageModel.IsPropertyPage);
+        Assert.False(propPageModel.HasTitleBar);
+    }
+
+    [Fact]
+    public void FormDesignerControl_IsNonResizable_CorrectForTimerAndControls()
+    {
+        var timer = new FormDesignerControl { TypeName = "VB.Timer", Name = "Timer1" };
+        Assert.True(timer.IsTimer);
+        Assert.True(timer.IsNonResizable);
+
+        var btn = new FormDesignerControl { TypeName = "VB.CommandButton", Name = "Command1" };
+        Assert.False(btn.IsTimer);
+        Assert.False(btn.IsNonResizable);
+    }
+
+    [Fact]
+    public void FormDesigner_ContainerHierarchy_CoordinatesAndAbsolutePositions()
+    {
+        var frame = new FormDesignerControl
+        {
+            TypeName = "VB.Frame",
+            Name = "Frame1",
+            Left = 1500, // 100 px
+            Top = 3000   // 200 px
+        };
+
+        var btn = new FormDesignerControl
+        {
+            TypeName = "VB.CommandButton",
+            Name = "Command1",
+            Left = 450, // 30 px
+            Top = 600,  // 40 px
+            ParentControl = frame
+        };
+        frame.Children.Add(btn);
+
+        Assert.True(frame.IsContainer);
+        Assert.False(btn.IsContainer);
+        Assert.Equal(100.0, frame.LeftPixels);
+        Assert.Equal(200.0, frame.TopPixels);
+        Assert.Equal(30.0, btn.LeftPixels);
+        Assert.Equal(40.0, btn.TopPixels);
+
+        // Posiciones absolutas proyectadas respecto al formulario
+        Assert.Equal(130.0, btn.AbsoluteLeftPixels);
+        Assert.Equal(240.0, btn.AbsoluteTopPixels);
+    }
+
+    [Fact]
+    public void FormDesignParser_ParseControlSnippet_And_SerializeControls_RoundTrip()
+    {
+        var originalBtn = new FormDesignerControl
+        {
+            TypeName = "VB.CommandButton",
+            Name = "Command1",
+            Caption = "Copied Button",
+            Left = 1200,
+            Top = 600,
+            Width = 1500,
+            Height = 450
+        };
+
+        string serialized = FormDesignSerializer.SerializeControls(new[] { originalBtn });
+        Assert.Contains("Begin VB.CommandButton Command1", serialized);
+        Assert.Contains("Caption         =   \"Copied Button\"", serialized);
+
+        var parsedList = FormDesignParser.ParseControlSnippet(serialized);
+        Assert.Single(parsedList);
+
+        var parsedBtn = parsedList[0];
+        Assert.Equal("VB.CommandButton", parsedBtn.TypeName);
+        Assert.Equal("Command1", parsedBtn.Name);
+        Assert.Equal("Copied Button", parsedBtn.Caption);
+        Assert.Equal(1200, parsedBtn.Left);
+        Assert.Equal(600, parsedBtn.Top);
+        Assert.Equal(1500, parsedBtn.Width);
+        Assert.Equal(450, parsedBtn.Height);
+    }
 }

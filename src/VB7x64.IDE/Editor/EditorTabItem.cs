@@ -36,8 +36,8 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
     public bool IsDesignerActive { get; private set; }
     public event Action<bool>? ViewModeChanged;
 
-    private RadioButton? _radioCodeView;
-    private RadioButton? _radioDesignView;
+    private Button? _btnToggleView;
+    private Border _navPanel = null!;
 
     public event Action<int, int>? CaretPositionChanged;
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -97,8 +97,10 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         InitializeHeader();
         SetupContextMenu();
 
-        // Inicializar Diseñador Visual si el documento es un formulario VB6
-        if (document.HasHeader || document.FilePath.EndsWith(".frm", StringComparison.OrdinalIgnoreCase))
+        // Inicializar Diseñador Visual si el documento es un formulario o UserControl VB6
+        if (document.HasHeader ||
+            document.FilePath.EndsWith(".frm", StringComparison.OrdinalIgnoreCase) ||
+            document.FilePath.EndsWith(".ctl", StringComparison.OrdinalIgnoreCase))
         {
             InitializeVisualDesigner();
         }
@@ -113,63 +115,40 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         };
         _cmbProcedures.SelectionChanged += CmbProcedures_SelectionChanged;
 
-        var navPanel = new Border
+        _navPanel = new Border
         {
             Background = new SolidColorBrush(Color.FromRgb(248, 248, 248)),
             BorderBrush = new SolidColorBrush(Color.FromRgb(225, 225, 225)),
             BorderThickness = new Thickness(0, 0, 0, 1),
-            Padding = new Thickness(6, 3, 6, 3)
+            Padding = new Thickness(4, 2, 4, 2),
+            Height = 26
         };
 
         var dockPanel = new DockPanel();
-        var lblDoc = new TextBlock
-        {
-            Text = $"📄 {document.DisplayName}",
-            VerticalAlignment = VerticalAlignment.Center,
-            FontSize = 11.5,
-            Foreground = new SolidColorBrush(Color.FromRgb(80, 80, 80))
-        };
-        DockPanel.SetDock(lblDoc, Dock.Left);
-        dockPanel.Children.Add(lblDoc);
 
         if (DesignSurface != null)
         {
-            var modePanel = new StackPanel
-            {
-                Orientation = Orientation.Horizontal,
-                VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(14, 0, 0, 0)
-            };
-
-            _radioCodeView = new RadioButton
-            {
-                Content = "📜 Código (F7)",
-                IsChecked = false,
-                FontSize = 11,
-                Margin = new Thickness(0, 0, 8, 0),
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            _radioCodeView.Checked += (_, _) => SwitchToCodeView();
-
-            _radioDesignView = new RadioButton
+            _btnToggleView = new Button
             {
                 Content = "🗔 Diseñador (Shift+F7)",
-                IsChecked = true,
+                ToolTip = "Cambiar a la vista del Diseñador Visual",
                 FontSize = 11,
-                VerticalAlignment = VerticalAlignment.Center
+                Padding = new Thickness(8, 1, 8, 1),
+                Margin = new Thickness(2, 0, 8, 0),
+                VerticalAlignment = VerticalAlignment.Center,
+                Cursor = Cursors.Hand
             };
-            _radioDesignView.Checked += (_, _) => SwitchToDesignerView();
+            _btnToggleView.Click += (_, _) => SwitchToDesignerView();
 
-            modePanel.Children.Add(_radioCodeView);
-            modePanel.Children.Add(_radioDesignView);
-
-            DockPanel.SetDock(modePanel, Dock.Left);
-            dockPanel.Children.Add(modePanel);
+            DockPanel.SetDock(_btnToggleView, Dock.Left);
+            dockPanel.Children.Add(_btnToggleView);
         }
 
         _cmbProcedures.HorizontalAlignment = HorizontalAlignment.Right;
+        _cmbProcedures.VerticalAlignment = VerticalAlignment.Center;
+        _cmbProcedures.Height = 22;
         dockPanel.Children.Add(_cmbProcedures);
-        navPanel.Child = dockPanel;
+        _navPanel.Child = dockPanel;
 
         var contentGrid = new Grid();
         contentGrid.Children.Add(Editor);
@@ -177,6 +156,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         {
             contentGrid.Children.Add(DesignSurface);
             Editor.Visibility = Visibility.Collapsed;
+            _navPanel.Visibility = Visibility.Collapsed;
             DesignSurface.Visibility = Visibility.Visible;
             IsDesignerActive = true;
         }
@@ -185,9 +165,9 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         rootGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
-        Grid.SetRow(navPanel, 0);
+        Grid.SetRow(_navPanel, 0);
         Grid.SetRow(contentGrid, 1);
-        rootGrid.Children.Add(navPanel);
+        rootGrid.Children.Add(_navPanel);
         rootGrid.Children.Add(contentGrid);
 
         Content = rootGrid;
@@ -662,12 +642,22 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             string headerText = Document.Header ?? string.Empty;
             if (string.IsNullOrWhiteSpace(headerText))
             {
-                headerText = $"VERSION 5.00\r\nBegin VB.Form {TitleWithoutExtension}\r\n   Caption = \"{TitleWithoutExtension}\"\r\n   ClientHeight = 3195\r\n   ClientLeft = 60\r\n   ClientTop = 345\r\n   ClientWidth = 4680\r\nEnd\r\n";
+                bool isCtl = Document.FilePath.EndsWith(".ctl", StringComparison.OrdinalIgnoreCase);
+                if (isCtl)
+                {
+                    headerText = $"VERSION 5.00\r\nBegin VB.UserControl {TitleWithoutExtension}\r\n   ClientHeight = 3600\r\n   ClientLeft = 0\r\n   ClientTop = 0\r\n   ClientWidth = 4800\r\n   ScaleHeight = 3600\r\n   ScaleWidth = 4800\r\nEnd\r\n";
+                }
+                else
+                {
+                    headerText = $"VERSION 5.00\r\nBegin VB.Form {TitleWithoutExtension}\r\n   Caption = \"{TitleWithoutExtension}\"\r\n   ClientHeight = 3195\r\n   ClientLeft = 60\r\n   ClientTop = 345\r\n   ClientWidth = 4680\r\nEnd\r\n";
+                }
             }
 
             DesignModel = FormDesignParser.Parse(headerText);
             DesignSurface = new FormDesignSurface();
             DesignSurface.LoadModel(DesignModel);
+
+            DesignSurface.RequestCodeView += () => SwitchToCodeView();
 
             DesignSurface.ModelModified += () =>
             {
@@ -698,8 +688,8 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             DesignSurface.Visibility = Visibility.Collapsed;
         }
         Editor.Visibility = Visibility.Visible;
+        _navPanel.Visibility = Visibility.Visible;
         IsDesignerActive = false;
-        if (_radioCodeView != null) _radioCodeView.IsChecked = true;
         ViewModeChanged?.Invoke(false);
         Editor.Focus();
     }
@@ -708,9 +698,9 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
     {
         if (DesignSurface == null) return;
         Editor.Visibility = Visibility.Collapsed;
+        _navPanel.Visibility = Visibility.Collapsed;
         DesignSurface.Visibility = Visibility.Visible;
         IsDesignerActive = true;
-        if (_radioDesignView != null) _radioDesignView.IsChecked = true;
         ViewModeChanged?.Invoke(true);
         DesignSurface.Focus();
     }

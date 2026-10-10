@@ -28,6 +28,7 @@ public partial class FormDesignSurface : UserControl
     public event Action<FormDesignerControl>? ControlDeleted;
     public event Action? ToolCreationFinished;
     public event Action? ModelModified;
+    public event Action? RequestCodeView;
 
     // Herramienta activa para creación desde la Toolbox
     public string? ActiveCreationTool { get; set; }
@@ -75,6 +76,11 @@ public partial class FormDesignSurface : UserControl
         UpdateResizeThumbs();
     }
 
+    private void BtnSwitchToCode_Click(object sender, RoutedEventArgs e)
+    {
+        RequestCodeView?.Invoke();
+    }
+
     /// <summary>
     /// Carga y visualiza el modelo de diseño del formulario.
     /// </summary>
@@ -84,7 +90,23 @@ public partial class FormDesignSurface : UserControl
         ClearSelection();
 
         TxtFormCaption.Text = string.IsNullOrEmpty(model.Caption) ? model.Name : model.Caption;
-        TxtFormTitle.Text = $"Diseñador: {model.Name}";
+        TxtFormTitle.Text = model.IsUserControl ? $"Diseñador UserControl: {model.Name}" : $"Diseñador: {model.Name}";
+
+        // Diferenciar entre Formulario estándar y UserControl (sin barra de título de ventana)
+        if (!model.HasTitleBar)
+        {
+            TitleBarRow.Height = new GridLength(0);
+            BorderTitleBar.Visibility = Visibility.Collapsed;
+            FormWindowBorder.BorderThickness = new Thickness(1);
+            FormWindowBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(128, 128, 128));
+        }
+        else
+        {
+            TitleBarRow.Height = new GridLength(26);
+            BorderTitleBar.Visibility = Visibility.Visible;
+            FormWindowBorder.BorderThickness = new Thickness(3);
+            FormWindowBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(10, 36, 106));
+        }
 
         // Configurar dimensiones del área cliente
         GridCanvas.Width = model.ClientWidthPixels;
@@ -143,6 +165,13 @@ public partial class FormDesignSurface : UserControl
         visual.MouseLeftButtonDown += (s, e) =>
         {
             GridCanvas.Focus();
+
+            // Si hay una herramienta de creación activa en la Toolbox (distinta del puntero), permitir dibujar en este control/contenedor
+            if (!string.IsNullOrEmpty(ActiveCreationTool) && ActiveCreationTool != ControlToolboxRegistry.PointerTool)
+            {
+                GridCanvas_MouseLeftButtonDown(GridCanvas, e);
+                return;
+            }
 
             if (e.ClickCount == 2)
             {
@@ -436,8 +465,45 @@ public partial class FormDesignSurface : UserControl
 
             if (CurrentModel != null && !string.IsNullOrEmpty(ActiveCreationTool))
             {
-                var newCtrl = ControlToolboxRegistry.CreateControl(ActiveCreationTool, CurrentModel, leftTwips, topTwips, widthTwips, heightTwips);
-                CurrentModel.Children.Add(newCtrl);
+                var targetContainer = FindContainerAt(_creationStartPoint);
+                FormDesignerControl newCtrl;
+
+                if (targetContainer != null)
+                {
+                    Point innerOrigin = GetContainerInnerOrigin(targetContainer);
+                    double relLeft = Math.Max(0, left - innerOrigin.X);
+                    double relTop = Math.Max(0, top - innerOrigin.Y);
+
+                    if (GridCanvas.SnapToGrid)
+                    {
+                        relLeft = GridCanvas.SnapValue(relLeft);
+                        relTop = GridCanvas.SnapValue(relTop);
+                    }
+
+                    int leftTw = (int)Math.Round(relLeft * FormDesignerControl.TwipsPerPixel);
+                    int topTw = (int)Math.Round(relTop * FormDesignerControl.TwipsPerPixel);
+
+                    newCtrl = ControlToolboxRegistry.CreateControl(ActiveCreationTool, CurrentModel, leftTw, topTw, widthTwips, heightTwips);
+                    newCtrl.ParentControl = targetContainer;
+                    if (newCtrl.IsNonResizable)
+                    {
+                        newCtrl.Width = 480;
+                        newCtrl.Height = 480;
+                    }
+                    targetContainer.Children.Add(newCtrl);
+                }
+                else
+                {
+                    newCtrl = ControlToolboxRegistry.CreateControl(ActiveCreationTool, CurrentModel, leftTwips, topTwips, widthTwips, heightTwips);
+                    newCtrl.ParentControl = null;
+                    if (newCtrl.IsNonResizable)
+                    {
+                        newCtrl.Width = 480;
+                        newCtrl.Height = 480;
+                    }
+                    CurrentModel.Children.Add(newCtrl);
+                }
+
                 RefreshCanvas();
                 SelectSingleControl(newCtrl);
                 ControlAdded?.Invoke(newCtrl);
@@ -488,14 +554,249 @@ public partial class FormDesignSurface : UserControl
     }
     #endregion
 
-    #region Manejo de Teclado (Flechas para Mover/Redimensionar, Supr, Ctrl+A, Esc)
+    #region Detección de Contenedores (Frame, PictureBox) y Operaciones de Portapapeles
+    private FormDesignerControl? FindContainerAt(Point canvasPoint)
+    {
+        if (CurrentModel == null) return null;
+
+        FormDesignerControl? bestContainer = null;
+        int bestDepth = -1;
+
+        void SearchInList(IEnumerable<FormDesignerControl> controls, int depth)
+        {
+            foreach (var ctrl in controls)
+            {
+                if (ctrl.IsContainer && _visualMap.TryGetValue(ctrl, out var vis))
+                {
+                    try
+                    {
+                        Point origin = vis.TranslatePoint(new Point(0, 0), GridCanvas);
+                        var bounds = new Rect(origin.X, origin.Y, Math.Max(10, ctrl.WidthPixels), Math.Max(10, ctrl.HeightPixels));
+                        if (bounds.Contains(canvasPoint))
+                        {
+                            if (depth > bestDepth)
+                            {
+                                bestDepth = depth;
+                                bestContainer = ctrl;
+                            }
+                        }
+                    }
+                    catch { }
+                }
+
+                if (ctrl.Children.Count > 0)
+                {
+                    SearchInList(ctrl.Children, depth + 1);
+                }
+            }
+        }
+
+        SearchInList(CurrentModel.Children, 0);
+        return bestContainer;
+    }
+
+    private Point GetContainerInnerOrigin(FormDesignerControl container)
+    {
+        Point origin = new Point(container.LeftPixels, container.TopPixels);
+        if (_visualMap.TryGetValue(container, out var containerVis))
+        {
+            Canvas? innerCanvas = null;
+            if (containerVis is GroupBox gb && gb.Content is Canvas c1)
+            {
+                innerCanvas = c1;
+            }
+            else if (containerVis is Border b && b.Child is Canvas c2)
+            {
+                innerCanvas = c2;
+            }
+
+            if (innerCanvas != null)
+            {
+                try
+                {
+                    origin = innerCanvas.TranslatePoint(new Point(0, 0), GridCanvas);
+                }
+                catch
+                {
+                    try { origin = containerVis.TranslatePoint(new Point(0, 0), GridCanvas); } catch { }
+                }
+            }
+            else
+            {
+                try { origin = containerVis.TranslatePoint(new Point(0, 0), GridCanvas); } catch { }
+            }
+        }
+        return origin;
+    }
+
+    public void CopySelectedControls()
+    {
+        if (_selectedControls.Count == 0) return;
+        try
+        {
+            string serialized = FormDesignSerializer.SerializeControls(_selectedControls);
+            Clipboard.SetText(serialized);
+            TxtDesignerStatus.Text = $"{_selectedControls.Count} control(es) copiado(s) al portapapeles.";
+        }
+        catch (Exception ex)
+        {
+            TxtDesignerStatus.Text = $"Error al copiar: {ex.Message}";
+        }
+    }
+
+    public void CutSelectedControls()
+    {
+        if (_selectedControls.Count == 0 || CurrentModel == null) return;
+        try
+        {
+            CopySelectedControls();
+            var controlsToDelete = _selectedControls.ToList();
+            foreach (var ctrl in controlsToDelete)
+            {
+                CurrentModel.RemoveControl(ctrl);
+                ControlDeleted?.Invoke(ctrl);
+            }
+            ClearSelection();
+            RefreshCanvas();
+            ModelModified?.Invoke();
+            TxtDesignerStatus.Text = $"{controlsToDelete.Count} control(es) cortado(s).";
+        }
+        catch (Exception ex)
+        {
+            TxtDesignerStatus.Text = $"Error al cortar: {ex.Message}";
+        }
+    }
+
+    public void PasteControls()
+    {
+        if (CurrentModel == null) return;
+        try
+        {
+            if (!Clipboard.ContainsText()) return;
+            string text = Clipboard.GetText();
+            var parsedList = FormDesignParser.ParseControlSnippet(text);
+            if (parsedList.Count == 0) return;
+
+            // Determinar si hay un contenedor seleccionado para pegar dentro de él
+            FormDesignerControl? targetContainer = null;
+            if (_selectedControls.Count == 1 && _primarySelectedControl != null)
+            {
+                if (_primarySelectedControl.IsContainer)
+                {
+                    targetContainer = _primarySelectedControl;
+                }
+                else if (_primarySelectedControl.ParentControl != null)
+                {
+                    targetContainer = _primarySelectedControl.ParentControl;
+                }
+            }
+
+            _selectedControls.Clear();
+            foreach (var ctrl in parsedList)
+            {
+                // Desplazamiento sutil para no superponer exactamente
+                ctrl.Left += 120; // 8 px
+                ctrl.Top += 120;
+
+                // Generar nombre único
+                string basePrefix = System.Text.RegularExpressions.Regex.Replace(ctrl.Name, @"\d+$", "");
+                if (string.IsNullOrWhiteSpace(basePrefix)) basePrefix = ctrl.DisplayType;
+                ctrl.Name = CurrentModel.GenerateUniqueName(basePrefix);
+
+                if (ctrl.IsNonResizable)
+                {
+                    ctrl.Width = 480;
+                    ctrl.Height = 480;
+                }
+
+                if (targetContainer != null)
+                {
+                    ctrl.ParentControl = targetContainer;
+                    targetContainer.Children.Add(ctrl);
+                }
+                else
+                {
+                    ctrl.ParentControl = null;
+                    CurrentModel.Children.Add(ctrl);
+                }
+
+                _selectedControls.Add(ctrl);
+                ControlAdded?.Invoke(ctrl);
+            }
+
+            _primarySelectedControl = parsedList.LastOrDefault();
+            RefreshCanvas();
+            UpdateSelectionFrame();
+            NotifySelectionChanged();
+            ModelModified?.Invoke();
+            TxtDesignerStatus.Text = $"{parsedList.Count} control(es) pegado(s).";
+        }
+        catch (Exception ex)
+        {
+            TxtDesignerStatus.Text = $"Error al pegar: {ex.Message}";
+        }
+    }
+
+    public void DuplicateSelectedControls()
+    {
+        if (_selectedControls.Count == 0 || CurrentModel == null) return;
+        CopySelectedControls();
+        PasteControls();
+    }
+    #endregion
+
+    #region Manejo de Teclado (Flechas para Mover/Redimensionar, Supr, Ctrl+C/X/V/D, Ctrl+A, Esc)
     private void GridCanvas_KeyDown(object sender, KeyEventArgs e)
     {
-        if (CurrentModel == null || _selectedControls.Count == 0) return;
+        if (CurrentModel == null) return;
 
         double step = GridCanvas.SnapToGrid ? GridCanvas.GridSize : 1.0;
         bool isShift = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
         bool isCtrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+
+        if (e.Key == Key.V && isCtrl)
+        {
+            PasteControls();
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.A && isCtrl)
+        {
+            SelectAllControls();
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.Escape)
+        {
+            ClearSelection();
+            e.Handled = true;
+            return;
+        }
+
+        if (_selectedControls.Count == 0) return;
+
+        if (e.Key == Key.C && isCtrl)
+        {
+            CopySelectedControls();
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.X && isCtrl)
+        {
+            CutSelectedControls();
+            e.Handled = true;
+            return;
+        }
+
+        if (e.Key == Key.D && isCtrl)
+        {
+            DuplicateSelectedControls();
+            e.Handled = true;
+            return;
+        }
 
         if (e.Key == Key.Delete)
         {
@@ -591,8 +892,10 @@ public partial class FormDesignSurface : UserControl
 
     private void UpdateResizeThumbs()
     {
-        double formW = GridCanvas.Width + (WindowBorderThickness * 2);
-        double formH = GridCanvas.Height + TitleBarHeight + (WindowBorderThickness * 2);
+        double titleH = (CurrentModel?.HasTitleBar == false) ? 0.0 : TitleBarHeight;
+        double borderThick = (CurrentModel?.HasTitleBar == false) ? 1.0 : WindowBorderThickness;
+        double formW = GridCanvas.Width + (borderThick * 2);
+        double formH = GridCanvas.Height + titleH + (borderThick * 2);
 
         Canvas.SetLeft(ThumbResizeCorner, formW);
         Canvas.SetTop(ThumbResizeCorner, formH);
@@ -704,8 +1007,15 @@ public partial class FormDesignSurface : UserControl
         int defW = info?.DefaultWidthTwips ?? 1200;
         int defH = info?.DefaultHeightTwips ?? 400;
 
-        int leftTwips = Math.Max(0, (CurrentModel.ClientWidth - defW) / 2);
-        int topTwips = Math.Max(0, (CurrentModel.ClientHeight - defH) / 2);
+        FormDesignerControl? targetContainer = (_selectedControls.Count == 1 && _primarySelectedControl?.IsContainer == true)
+            ? _primarySelectedControl
+            : null;
+
+        int containerW = targetContainer?.Width ?? CurrentModel.ClientWidth;
+        int containerH = targetContainer?.Height ?? CurrentModel.ClientHeight;
+
+        int leftTwips = Math.Max(0, (containerW - defW) / 2);
+        int topTwips = Math.Max(0, (containerH - defH) / 2);
 
         if (GridCanvas.SnapToGrid)
         {
@@ -716,7 +1026,23 @@ public partial class FormDesignSurface : UserControl
         }
 
         var newCtrl = ControlToolboxRegistry.CreateControl(typeName, CurrentModel, leftTwips, topTwips, defW, defH);
-        CurrentModel.Children.Add(newCtrl);
+        if (newCtrl.IsNonResizable)
+        {
+            newCtrl.Width = 480;
+            newCtrl.Height = 480;
+        }
+
+        if (targetContainer != null)
+        {
+            newCtrl.ParentControl = targetContainer;
+            targetContainer.Children.Add(newCtrl);
+        }
+        else
+        {
+            newCtrl.ParentControl = null;
+            CurrentModel.Children.Add(newCtrl);
+        }
+
         RefreshCanvas();
         SelectSingleControl(newCtrl);
         ControlAdded?.Invoke(newCtrl);

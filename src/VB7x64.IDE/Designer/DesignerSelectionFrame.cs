@@ -207,6 +207,17 @@ public class DesignerSelectionFrame : Canvas
         // 8. Middle-Left
         SetLeft(_thumbW, -HalfHandle);
         SetTop(_thumbW, (h / 2.0) - HalfHandle);
+
+        // Controles de tamaño fijo en diseño (ej. Timer) no muestran tiradores de redimensión
+        var thumbsVis = (BoundControl.IsNonResizable) ? Visibility.Collapsed : Visibility.Visible;
+        _thumbNW.Visibility = thumbsVis;
+        _thumbN.Visibility = thumbsVis;
+        _thumbNE.Visibility = thumbsVis;
+        _thumbE.Visibility = thumbsVis;
+        _thumbSE.Visibility = thumbsVis;
+        _thumbS.Visibility = thumbsVis;
+        _thumbSW.Visibility = thumbsVis;
+        _thumbW.Visibility = thumbsVis;
     }
 
     private double Snap(double value) => SnapFunction?.Invoke(value) ?? value;

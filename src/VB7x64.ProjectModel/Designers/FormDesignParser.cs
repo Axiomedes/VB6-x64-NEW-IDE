@@ -33,6 +33,30 @@ public static class FormDesignParser
         RegexOptions.Compiled);
 
     /// <summary>
+    /// Parsea un fragmento de controles (por ejemplo pegados desde el portapapeles) y retorna la lista de controles.
+    /// </summary>
+    public static List<FormDesignerControl> ParseControlSnippet(string snippetText)
+    {
+        if (string.IsNullOrWhiteSpace(snippetText)) return new List<FormDesignerControl>();
+
+        string trimmed = snippetText.TrimStart();
+        string wrappedText;
+        if (trimmed.StartsWith("VERSION ", StringComparison.OrdinalIgnoreCase) ||
+            trimmed.StartsWith("Begin VB.Form", StringComparison.OrdinalIgnoreCase) ||
+            trimmed.StartsWith("Begin VB.UserControl", StringComparison.OrdinalIgnoreCase))
+        {
+            wrappedText = snippetText;
+        }
+        else
+        {
+            wrappedText = $"VERSION 5.00\r\nBegin VB.Form DummyHost\r\n{snippetText}\r\nEnd\r\n";
+        }
+
+        var model = Parse(wrappedText);
+        return model.Children;
+    }
+
+    /// <summary>
     /// Parsea el texto de la cabecera visual de un formulario VB6 y retorna el modelo de diseño.
     /// </summary>
     public static FormDesignModel Parse(string headerText)

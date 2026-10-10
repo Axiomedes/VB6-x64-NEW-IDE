@@ -84,6 +84,36 @@ public class FormDesignerControl
         TopPixels = top;
     }
 
+    public double AbsoluteLeftPixels
+    {
+        get
+        {
+            double l = LeftPixels;
+            var p = ParentControl;
+            while (p != null)
+            {
+                l += p.LeftPixels;
+                p = p.ParentControl;
+            }
+            return l;
+        }
+    }
+
+    public double AbsoluteTopPixels
+    {
+        get
+        {
+            double t = TopPixels;
+            var p = ParentControl;
+            while (p != null)
+            {
+                t += p.TopPixels;
+                p = p.ParentControl;
+            }
+            return t;
+        }
+    }
+
     public void SetSizePixels(double width, double height)
     {
         WidthPixels = width;
@@ -107,6 +137,11 @@ public class FormDesignerControl
 
     public bool IsTimer =>
         TypeName.Equals("VB.Timer", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Indica si el control tiene un tamaño fijo en diseño y no puede redimensionarse (ej: Timer).
+    /// </summary>
+    public bool IsNonResizable => IsTimer;
     #endregion
 
     /// <summary>

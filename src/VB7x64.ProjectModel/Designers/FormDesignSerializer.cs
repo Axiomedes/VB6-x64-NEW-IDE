@@ -77,6 +77,31 @@ public static class FormDesignSerializer
         return sb.ToString();
     }
 
+    /// <summary>
+    /// Serializa un único control a sintaxis VB6.
+    /// </summary>
+    public static string SerializeControl(FormDesignerControl ctrl, int indentLevel = 0)
+    {
+        if (ctrl == null) return string.Empty;
+        var sb = new StringBuilder();
+        SerializeControl(sb, ctrl, indentLevel);
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Serializa una lista de controles (por ejemplo para el portapapeles).
+    /// </summary>
+    public static string SerializeControls(IEnumerable<FormDesignerControl> controls)
+    {
+        if (controls == null) return string.Empty;
+        var sb = new StringBuilder();
+        foreach (var ctrl in controls)
+        {
+            SerializeControl(sb, ctrl, 0);
+        }
+        return sb.ToString();
+    }
+
     private static void SerializeFormProperties(StringBuilder sb, FormDesignModel model, int indentLevel)
     {
         string indent = new string(' ', indentLevel * 3);

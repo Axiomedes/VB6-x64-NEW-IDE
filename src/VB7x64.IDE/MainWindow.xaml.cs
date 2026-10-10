@@ -1283,6 +1283,12 @@ public partial class MainWindow : Window
 
     private void MenuCut_Click(object sender, RoutedEventArgs e)
     {
+        if (ActiveTab?.IsDesignerActive == true && ActiveTab.DesignSurface != null)
+        {
+            ActiveTab.DesignSurface.CutSelectedControls();
+            return;
+        }
+
         if (ActiveEditor != null)
         {
             string sel = ActiveEditor.SelectedText;
@@ -1296,6 +1302,12 @@ public partial class MainWindow : Window
 
     private void MenuCopy_Click(object sender, RoutedEventArgs e)
     {
+        if (ActiveTab?.IsDesignerActive == true && ActiveTab.DesignSurface != null)
+        {
+            ActiveTab.DesignSurface.CopySelectedControls();
+            return;
+        }
+
         if (ActiveEditor != null)
         {
             string sel = ActiveEditor.SelectedText;
@@ -1309,6 +1321,12 @@ public partial class MainWindow : Window
 
     private void MenuPaste_Click(object sender, RoutedEventArgs e)
     {
+        if (ActiveTab?.IsDesignerActive == true && ActiveTab.DesignSurface != null)
+        {
+            ActiveTab.DesignSurface.PasteControls();
+            return;
+        }
+
         ActiveEditor?.Paste();
     }
 

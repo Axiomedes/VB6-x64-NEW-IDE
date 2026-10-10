@@ -350,7 +350,7 @@
                 <!-- Área Central de Pestañas / Documentos -->
                 <Border Grid.Column="2" Background="#ECECEC">
                     <Grid>
-                        <TabControl x:Name="DocumentsTabControl" BorderThickness="0" Background="#FFFFFF">
+                        <TabControl x:Name="DocumentsTabControl" BorderThickness="0" Background="#FFFFFF" Padding="0">
                             <TabControl.ItemContainerStyle>
                                 <Style TargetType="TabItem">
                                     <Setter Property="MinHeight" Value="28"/>

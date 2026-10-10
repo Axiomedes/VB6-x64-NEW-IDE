@@ -17,9 +17,18 @@
         <Border Grid.Row="0" Background="#F1F3F5" BorderBrush="#D0D4D9" BorderThickness="0,0,0,1" Padding="6,3">
             <DockPanel LastChildFill="True">
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Botón para alternar a vista de código -->
+                    <Button x:Name="BtnSwitchToCode" ToolTip="Ver Código de este componente (F7)" 
+                            Padding="6,2" Margin="0,0,6,0" FontSize="11" Click="BtnSwitchToCode_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📜" Margin="0,0,4,0" FontSize="11"/>
+                            <TextBlock Text="Código"/>
+                        </StackPanel>
+                    </Button>
+
                     <!-- Alternar visualización de cuadrícula -->
                     <ToggleButton x:Name="BtnToggleGrid" IsChecked="True" ToolTip="Mostrar u ocultar cuadrícula de puntos" 
-                                  Padding="6,2" Margin="0,0,4,0" FontSize="11" Click="BtnToggleGrid_Click">
+                            Padding="6,2" Margin="0,0,4,0" FontSize="11" Click="BtnToggleGrid_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="▦" Margin="0,0,4,0" FontSize="11"/>
                             <TextBlock Text="Rejilla"/>
@@ -71,12 +80,12 @@
                     </Border.Effect>
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="26"/> <!-- Barra de título -->
+                            <RowDefinition x:Name="TitleBarRow" Height="26"/> <!-- Barra de título -->
                             <RowDefinition Height="Auto"/> <!-- Área de cliente del formulario -->
                         </Grid.RowDefinitions>
 
                         <!-- 1. Barra de título de la ventana clásica de VB6 -->
-                        <Border Grid.Row="0" Background="#0A246A" Padding="4,2,2,2">
+                        <Border x:Name="BorderTitleBar" Grid.Row="0" Background="#0A246A" Padding="4,2,2,2">
                             <DockPanel LastChildFill="True">
                                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
                                     <Border Width="16" Height="14" Background="#D4D0C8" BorderBrush="#808080" BorderThickness="1" Margin="0,0,2,0">

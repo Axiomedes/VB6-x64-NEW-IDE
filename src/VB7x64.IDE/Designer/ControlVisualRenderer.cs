@@ -41,8 +41,18 @@ public static class ControlVisualRenderer
             _ => CreateGenericControl(control)
         };
 
-        visual.Width = control.WidthPixels;
-        visual.Height = control.HeightPixels;
+        if (control.IsNonResizable)
+        {
+            visual.Width = 32;
+            visual.Height = 32;
+            control.Width = 480;
+            control.Height = 480;
+        }
+        else
+        {
+            visual.Width = control.WidthPixels;
+            visual.Height = control.HeightPixels;
+        }
         visual.Tag = control;
 
         Canvas.SetLeft(visual, control.LeftPixels);
@@ -391,8 +401,8 @@ public static class ControlVisualRenderer
     {
         var border = new Border
         {
-            Width = 28,
-            Height = 28,
+            Width = 32,
+            Height = 32,
             Background = new SolidColorBrush(Color.FromRgb(255, 255, 230)),
             BorderBrush = new SolidColorBrush(Color.FromRgb(160, 160, 160)),
             BorderThickness = new Thickness(1),

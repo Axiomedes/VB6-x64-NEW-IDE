@@ -139,7 +139,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             _radioCodeView = new RadioButton
             {
                 Content = "📜 Código (F7)",
-                IsChecked = true,
+                IsChecked = false,
                 FontSize = 11,
                 Margin = new Thickness(0, 0, 8, 0),
                 VerticalAlignment = VerticalAlignment.Center
@@ -149,6 +149,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             _radioDesignView = new RadioButton
             {
                 Content = "🗔 Diseñador (Shift+F7)",
+                IsChecked = true,
                 FontSize = 11,
                 VerticalAlignment = VerticalAlignment.Center
             };
@@ -170,7 +171,9 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         if (DesignSurface != null)
         {
             contentGrid.Children.Add(DesignSurface);
-            DesignSurface.Visibility = Visibility.Collapsed;
+            Editor.Visibility = Visibility.Collapsed;
+            DesignSurface.Visibility = Visibility.Visible;
+            IsDesignerActive = true;
         }
 
         var rootGrid = new Grid();

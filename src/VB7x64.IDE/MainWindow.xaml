@@ -60,7 +60,9 @@
         <!-- 1. Menú Superior -->
         <Menu Grid.Row="0" Background="#F5F5F5" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Padding="2">
             <MenuItem Header="_Archivo">
-                <MenuItem Header="_Nuevo Proyecto..." IsEnabled="False"/>
+                <MenuItem x:Name="MenuNewProject" Header="_Nuevo Proyecto..." InputGestureText="Ctrl+Shift+N" Click="MenuNewProject_Click"/>
+                <MenuItem x:Name="MenuNewForm" Header="_Nuevo Formulario..." InputGestureText="Ctrl+N" Click="MenuNewForm_Click"/>
+                <Separator/>
                 <MenuItem Header="_Abrir Proyecto o Grupo..." InputGestureText="Ctrl+O" Click="MenuOpenProject_Click"/>
                 <MenuItem Header="Abrir _Archivo..." Click="MenuOpenFile_Click"/>
                 <Separator/>
@@ -107,6 +109,11 @@
                 <MenuItem x:Name="MenuToggleStatusBar" Header="_Barra de Estado" IsCheckable="True" IsChecked="True" Click="MenuToggleStatusBar_Click"/>
                 <Separator/>
                 <MenuItem Header="Abrir Carpeta de _Logs" Click="MenuOpenLogsFolder_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Proyecto">
+                <MenuItem Header="_Agregar Formulario..." InputGestureText="Ctrl+N" Click="MenuNewForm_Click"/>
+                <MenuItem Header="Agregar _Módulo..." Click="MenuAddModule_Click"/>
+                <MenuItem Header="Agregar Módulo de _Clase..." Click="MenuAddClass_Click"/>
             </MenuItem>
             <MenuItem Header="_Funciones Avanzadas">
                 <MenuItem x:Name="MenuToggleLineHighlight" Header="Resaltar _Línea Activa" IsCheckable="True" IsChecked="True" Click="MenuToggleLineHighlight_Click"/>
@@ -160,6 +167,13 @@
         <!-- 2. Barra de Herramientas Inicial -->
         <ToolBarTray Grid.Row="1" Background="#F0F0F0">
             <ToolBar Band="0" BandIndex="0">
+                <Button ToolTip="Nuevo Proyecto (Ctrl+Shift+N)" Click="MenuNewProject_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="✨" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button ToolTip="Nuevo Formulario (Ctrl+N)" Click="MenuNewForm_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="🗔" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Separator/>
                 <Button ToolTip="Abrir Proyecto o Grupo (Ctrl+O)" Click="MenuOpenProject_Click" Width="28" Height="24" Padding="0">
                     <TextBlock Text="📂" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>

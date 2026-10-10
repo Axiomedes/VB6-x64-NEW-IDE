@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -821,6 +822,303 @@ public partial class MainWindow : Window
     #endregion
 
     #region Menu File Actions
+    private void MenuNewProject_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var saveDlg = new SaveFileDialog
+            {
+                Title = "Crear Nuevo Proyecto VB6 (EXE Estándar)",
+                Filter = "Proyecto Visual Basic (*.vbp)|*.vbp",
+                FileName = "Proyecto1.vbp",
+                DefaultExt = ".vbp"
+            };
+
+            if (saveDlg.ShowDialog() != true) return;
+
+            string vbpPath = saveDlg.FileName;
+            string projectDir = Path.GetDirectoryName(vbpPath) ?? AppDomain.CurrentDomain.BaseDirectory;
+            string projectName = Path.GetFileNameWithoutExtension(vbpPath);
+            string form1Path = Path.Combine(projectDir, "Form1.frm");
+
+            // 1. Crear Form1.frm estándar de VB6
+            string formContent =
+                "VERSION 5.00\r\n" +
+                "Begin VB.Form Form1 \r\n" +
+                "   Caption         =   \"Form1\"\r\n" +
+                "   ClientHeight    =   4500\r\n" +
+                "   ClientLeft      =   60\r\n" +
+                "   ClientTop       =   450\r\n" +
+                "   ClientWidth     =   6800\r\n" +
+                "   LinkTopic       =   \"Form1\"\r\n" +
+                "   ScaleHeight     =   4500\r\n" +
+                "   ScaleWidth      =   6800\r\n" +
+                "   StartUpPosition =   3  'Windows Default\r\n" +
+                "End\r\n" +
+                "Attribute VB_Name = \"Form1\"\r\n" +
+                "Attribute VB_GlobalNameSpace = False\r\n" +
+                "Attribute VB_Creatable = False\r\n" +
+                "Attribute VB_PredeclaredId = True\r\n" +
+                "Attribute VB_Exposed = False\r\n" +
+                "\r\n" +
+                "Private Sub Form_Load()\r\n" +
+                "    \r\n" +
+                "End Sub\r\n";
+
+            File.WriteAllText(form1Path, formContent, Encoding.GetEncoding(1252));
+
+            // 2. Crear Proyecto.vbp estándar de VB6
+            string vbpContent =
+                "Type=Exe\r\n" +
+                "Form=Form1.frm\r\n" +
+                "Startup=\"Form1\"\r\n" +
+                $"Name=\"{projectName}\"\r\n" +
+                $"Title=\"{projectName}\"\r\n" +
+                $"ExeName32=\"{projectName}.exe\"\r\n" +
+                "Command32=\"\"\r\n" +
+                "CompatibleMode=\"0\"\r\n" +
+                "MajorVer=1\r\n" +
+                "MinorVer=0\r\n" +
+                "RevisionVer=0\r\n" +
+                "AutoIncrementVer=0\r\n" +
+                "ServerSupportFiles=0\r\n" +
+                "CompilationType=0\r\n" +
+                "OptimizationType=0\r\n" +
+                "FavorPentiumPro(tm)=0\r\n" +
+                "CodeViewDebugInfo=0\r\n" +
+                "NoAliasing=0\r\n" +
+                "BoundsCheck=0\r\n" +
+                "OverflowCheck=0\r\n" +
+                "FlPointCheck=0\r\n" +
+                "FDIVCheck=0\r\n" +
+                "UnroundedFP=0\r\n" +
+                "StartMode=0\r\n" +
+                "Unattended=0\r\n" +
+                "Retained=0\r\n" +
+                "ThreadPerObject=0\r\n" +
+                "MaxNumberOfThreads=1\r\n";
+
+            File.WriteAllText(vbpPath, vbpContent, Encoding.GetEncoding(1252));
+
+            // 3. Cargar el proyecto y abrir Form1.frm
+            LoadProject(vbpPath);
+            OpenFile(form1Path);
+            SetStatusMessage($"Nuevo proyecto creado: {projectName} ({vbpPath})");
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error("Error al crear nuevo proyecto", ex);
+            MessageBox.Show($"Error al crear el nuevo proyecto:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void MenuNewForm_Click(object? sender, RoutedEventArgs? e)
+    {
+        try
+        {
+            if (_currentProject != null)
+            {
+                int idx = 1;
+                string formName = $"Form{idx}";
+                while (_currentProject.Forms.Any(f => string.Equals(Path.GetFileNameWithoutExtension(f.AbsolutePath), formName, StringComparison.OrdinalIgnoreCase)) ||
+                       File.Exists(Path.Combine(_currentProject.ProjectDirectory, $"{formName}.frm")))
+                {
+                    idx++;
+                    formName = $"Form{idx}";
+                }
+
+                string formPath = Path.Combine(_currentProject.ProjectDirectory, $"{formName}.frm");
+                string formContent =
+                    "VERSION 5.00\r\n" +
+                    $"Begin VB.Form {formName} \r\n" +
+                    $"   Caption         =   \"{formName}\"\r\n" +
+                    "   ClientHeight    =   4500\r\n" +
+                    "   ClientLeft      =   60\r\n" +
+                    "   ClientTop       =   450\r\n" +
+                    "   ClientWidth     =   6800\r\n" +
+                    $"   LinkTopic       =   \"{formName}\"\r\n" +
+                    "   ScaleHeight     =   4500\r\n" +
+                    "   ScaleWidth      =   6800\r\n" +
+                    "   StartUpPosition =   3  'Windows Default\r\n" +
+                    "End\r\n" +
+                    $"Attribute VB_Name = \"{formName}\"\r\n" +
+                    "Attribute VB_GlobalNameSpace = False\r\n" +
+                    "Attribute VB_Creatable = False\r\n" +
+                    "Attribute VB_PredeclaredId = True\r\n" +
+                    "Attribute VB_Exposed = False\r\n" +
+                    "\r\n" +
+                    "Private Sub Form_Load()\r\n" +
+                    "    \r\n" +
+                    "End Sub\r\n";
+
+                File.WriteAllText(formPath, formContent, Encoding.GetEncoding(1252));
+
+                string vbpText = File.ReadAllText(_currentProject.ProjectFilePath, Encoding.GetEncoding(1252));
+                string newEntry = $"Form={formName}.frm\r\n";
+                int lastFormIdx = vbpText.LastIndexOf("Form=", StringComparison.OrdinalIgnoreCase);
+                if (lastFormIdx >= 0)
+                {
+                    int endOfLine = vbpText.IndexOf("\r\n", lastFormIdx);
+                    if (endOfLine >= 0)
+                        vbpText = vbpText.Insert(endOfLine + 2, newEntry);
+                    else
+                        vbpText += "\r\n" + newEntry;
+                }
+                else
+                {
+                    vbpText = newEntry + vbpText;
+                }
+                File.WriteAllText(_currentProject.ProjectFilePath, vbpText, Encoding.GetEncoding(1252));
+
+                LoadProject(_currentProject.ProjectFilePath);
+                OpenFile(formPath);
+                SetStatusMessage($"Formulario '{formName}.frm' agregado al proyecto.");
+            }
+            else
+            {
+                var saveDlg = new SaveFileDialog
+                {
+                    Title = "Guardar Nuevo Formulario",
+                    Filter = "Formulario de Visual Basic (*.frm)|*.frm",
+                    FileName = "Form1.frm",
+                    DefaultExt = ".frm"
+                };
+
+                if (saveDlg.ShowDialog() != true) return;
+
+                string formPath = saveDlg.FileName;
+                string formName = Path.GetFileNameWithoutExtension(formPath);
+                string formContent =
+                    "VERSION 5.00\r\n" +
+                    $"Begin VB.Form {formName} \r\n" +
+                    $"   Caption         =   \"{formName}\"\r\n" +
+                    "   ClientHeight    =   4500\r\n" +
+                    "   ClientLeft      =   60\r\n" +
+                    "   ClientTop       =   450\r\n" +
+                    "   ClientWidth     =   6800\r\n" +
+                    $"   LinkTopic       =   \"{formName}\"\r\n" +
+                    "   ScaleHeight     =   4500\r\n" +
+                    "   ScaleWidth      =   6800\r\n" +
+                    "   StartUpPosition =   3  'Windows Default\r\n" +
+                    "End\r\n" +
+                    $"Attribute VB_Name = \"{formName}\"\r\n" +
+                    "Attribute VB_GlobalNameSpace = False\r\n" +
+                    "Attribute VB_Creatable = False\r\n" +
+                    "Attribute VB_PredeclaredId = True\r\n" +
+                    "Attribute VB_Exposed = False\r\n" +
+                    "\r\n" +
+                    "Private Sub Form_Load()\r\n" +
+                    "    \r\n" +
+                    "End Sub\r\n";
+
+                File.WriteAllText(formPath, formContent, Encoding.GetEncoding(1252));
+                OpenFile(formPath);
+                SetStatusMessage($"Nuevo formulario creado: {formName}.frm");
+            }
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error("Error al agregar nuevo formulario", ex);
+            MessageBox.Show($"Error al crear el formulario:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void MenuAddModule_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (_currentProject == null)
+            {
+                MessageBox.Show("Debes tener un proyecto abierto para agregar un módulo.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            int idx = 1;
+            string modName = $"Module{idx}";
+            while (_currentProject.Modules.Any(m => string.Equals(Path.GetFileNameWithoutExtension(m.AbsolutePath), modName, StringComparison.OrdinalIgnoreCase)) ||
+                   File.Exists(Path.Combine(_currentProject.ProjectDirectory, $"{modName}.bas")))
+            {
+                idx++;
+                modName = $"Module{idx}";
+            }
+
+            string modPath = Path.Combine(_currentProject.ProjectDirectory, $"{modName}.bas");
+            string modContent =
+                $"Attribute VB_Name = \"{modName}\"\r\n" +
+                "Option Explicit\r\n\r\n";
+
+            File.WriteAllText(modPath, modContent, Encoding.GetEncoding(1252));
+
+            string vbpText = File.ReadAllText(_currentProject.ProjectFilePath, Encoding.GetEncoding(1252));
+            string newEntry = $"Module={modName}; {modName}.bas\r\n";
+            vbpText += "\r\n" + newEntry;
+            File.WriteAllText(_currentProject.ProjectFilePath, vbpText, Encoding.GetEncoding(1252));
+
+            LoadProject(_currentProject.ProjectFilePath);
+            OpenFile(modPath);
+            SetStatusMessage($"Módulo '{modName}.bas' agregado al proyecto.");
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error("Error al agregar módulo", ex);
+            MessageBox.Show($"Error al crear el módulo:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void MenuAddClass_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (_currentProject == null)
+            {
+                MessageBox.Show("Debes tener un proyecto abierto para agregar un módulo de clase.", "Información", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            int idx = 1;
+            string clsName = $"Class{idx}";
+            while (_currentProject.Classes.Any(c => string.Equals(Path.GetFileNameWithoutExtension(c.AbsolutePath), clsName, StringComparison.OrdinalIgnoreCase)) ||
+                   File.Exists(Path.Combine(_currentProject.ProjectDirectory, $"{clsName}.cls")))
+            {
+                idx++;
+                clsName = $"Class{idx}";
+            }
+
+            string clsPath = Path.Combine(_currentProject.ProjectDirectory, $"{clsName}.cls");
+            string clsContent =
+                "VERSION 1.0 CLASS\r\n" +
+                "BEGIN\r\n" +
+                "  MultiUse = -1  'True\r\n" +
+                "  Persistable = 0  'NotPersistable\r\n" +
+                "  DataBindingBehavior = 0  'vbNone\r\n" +
+                "  DataSourceBehavior  = 0  'vbNone\r\n" +
+                "  MTSTransactionMode  = 0  'NotAnMTSObject\r\n" +
+                "END\r\n" +
+                $"Attribute VB_Name = \"{clsName}\"\r\n" +
+                "Attribute VB_GlobalNameSpace = False\r\n" +
+                "Attribute VB_Creatable = True\r\n" +
+                "Attribute VB_PredeclaredId = False\r\n" +
+                "Attribute VB_Exposed = False\r\n" +
+                "Option Explicit\r\n\r\n";
+
+            File.WriteAllText(clsPath, clsContent, Encoding.GetEncoding(1252));
+
+            string vbpText = File.ReadAllText(_currentProject.ProjectFilePath, Encoding.GetEncoding(1252));
+            string newEntry = $"Class={clsName}; {clsName}.cls\r\n";
+            vbpText += "\r\n" + newEntry;
+            File.WriteAllText(_currentProject.ProjectFilePath, vbpText, Encoding.GetEncoding(1252));
+
+            LoadProject(_currentProject.ProjectFilePath);
+            OpenFile(clsPath);
+            SetStatusMessage($"Clase '{clsName}.cls' agregada al proyecto.");
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error("Error al agregar clase", ex);
+            MessageBox.Show($"Error al crear la clase:\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
     private void MenuOpenProject_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new OpenFileDialog
@@ -1197,6 +1495,21 @@ public partial class MainWindow : Window
 
     private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        // Ctrl+Shift+N: Nuevo Proyecto / Ctrl+N: Nuevo Formulario
+        if (e.Key == Key.N && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {
+                MenuNewProject_Click(this, new RoutedEventArgs());
+            }
+            else
+            {
+                MenuNewForm_Click(this, new RoutedEventArgs());
+            }
+            e.Handled = true;
+            return;
+        }
+
         // F7: Ver Código / Shift+F7: Ver Diseñador (Flujo Dual VB6)
         if (e.Key == Key.F7)
         {

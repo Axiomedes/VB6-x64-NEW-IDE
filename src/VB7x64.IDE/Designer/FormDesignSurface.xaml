@@ -60,14 +60,15 @@
         <!-- Área de trabajo con desplazamiento -->
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="#5A5D62">
             <Grid Margin="24">
-                <!-- Ventana visual del Formulario -->
                 <Border x:Name="FormWindowBorder" 
                         Background="#ECE9D8" 
                         BorderBrush="#0A246A" 
                         BorderThickness="3" 
                         HorizontalAlignment="Left" 
-                        VerticalAlignment="Top" 
-                        Effect="{DynamicResource {x:Static SystemColors.WindowFrameBrushKey}}">
+                        VerticalAlignment="Top">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="8" ShadowDepth="3" Direction="315" Opacity="0.4"/>
+                    </Border.Effect>
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="26"/> <!-- Barra de título -->

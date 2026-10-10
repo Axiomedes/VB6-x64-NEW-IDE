@@ -6,9 +6,12 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using ICSharpCode.AvalonEdit;
+using VB7x64.IDE.Designer;
 using VB7x64.IDE.SyntaxHighlighting;
 using VB7x64.ProjectModel.CodeBuilders;
+using VB7x64.ProjectModel.Designers;
 using VB7x64.ProjectModel.Documents;
+using VB7x64.IDE.Logging;
 using VB7x64.ProjectModel.Navigation;
 using VB7x64.ProjectModel.Settings;
 
@@ -23,6 +26,15 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
     public EndOfLineDetailsRenderer EndOfLineDetailsRenderer { get; }
     public BookmarkMargin BookmarkMargin { get; }
     private readonly ComboBox _cmbProcedures;
+
+    // Soporte para Diseñador Visual Dual (Código F7 / Diseñador Shift+F7)
+    public FormDesignSurface? DesignSurface { get; private set; }
+    public FormDesignModel? DesignModel { get; private set; }
+    public bool IsDesignerActive { get; private set; }
+    public event Action<bool>? ViewModeChanged;
+
+    private RadioButton? _radioCodeView;
+    private RadioButton? _radioDesignView;
 
     public event Action<int, int>? CaretPositionChanged;
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -80,10 +92,16 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         InitializeHeader();
         SetupContextMenu();
 
+        // Inicializar Diseñador Visual si el documento es un formulario VB6
+        if (document.HasHeader || document.FilePath.EndsWith(".frm", StringComparison.OrdinalIgnoreCase))
+        {
+            InitializeVisualDesigner();
+        }
+
         // Barra superior de navegación de procedimientos
         _cmbProcedures = new ComboBox
         {
-            MinWidth = 260,
+            MinWidth = 240,
             FontSize = 11.5,
             DisplayMemberPath = "DisplayText",
             ToolTip = "Saltar a procedimiento (Sub, Function, Property)"
@@ -109,18 +127,60 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         DockPanel.SetDock(lblDoc, Dock.Left);
         dockPanel.Children.Add(lblDoc);
 
+        if (DesignSurface != null)
+        {
+            var modePanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(14, 0, 0, 0)
+            };
+
+            _radioCodeView = new RadioButton
+            {
+                Content = "📜 Código (F7)",
+                IsChecked = true,
+                FontSize = 11,
+                Margin = new Thickness(0, 0, 8, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            _radioCodeView.Checked += (_, _) => SwitchToCodeView();
+
+            _radioDesignView = new RadioButton
+            {
+                Content = "🗔 Diseñador (Shift+F7)",
+                FontSize = 11,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            _radioDesignView.Checked += (_, _) => SwitchToDesignerView();
+
+            modePanel.Children.Add(_radioCodeView);
+            modePanel.Children.Add(_radioDesignView);
+
+            DockPanel.SetDock(modePanel, Dock.Left);
+            dockPanel.Children.Add(modePanel);
+        }
+
         _cmbProcedures.HorizontalAlignment = HorizontalAlignment.Right;
         dockPanel.Children.Add(_cmbProcedures);
         navPanel.Child = dockPanel;
+
+        var contentGrid = new Grid();
+        contentGrid.Children.Add(Editor);
+        if (DesignSurface != null)
+        {
+            contentGrid.Children.Add(DesignSurface);
+            DesignSurface.Visibility = Visibility.Collapsed;
+        }
 
         var rootGrid = new Grid();
         rootGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
         rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
         Grid.SetRow(navPanel, 0);
-        Grid.SetRow(Editor, 1);
+        Grid.SetRow(contentGrid, 1);
         rootGrid.Children.Add(navPanel);
-        rootGrid.Children.Add(Editor);
+        rootGrid.Children.Add(contentGrid);
 
         Content = rootGrid;
         DataContext = this;
@@ -584,6 +644,116 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         EndOfLineDetailsRenderer.IsEnabled = enabled;
         Editor.TextArea?.TextView?.InvalidateLayer(ICSharpCode.AvalonEdit.Rendering.KnownLayer.Background);
     }
+
+    #region Soporte para Diseñador Visual Dual (F7 / Shift+F7)
+    private void InitializeVisualDesigner()
+    {
+        try
+        {
+            string headerText = Document.Header ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(headerText))
+            {
+                headerText = $"VERSION 5.00\r\nBegin VB.Form {TitleWithoutExtension}\r\n   Caption = \"{TitleWithoutExtension}\"\r\n   ClientHeight = 3195\r\n   ClientLeft = 60\r\n   ClientTop = 345\r\n   ClientWidth = 4680\r\nEnd\r\n";
+            }
+
+            DesignModel = FormDesignParser.Parse(headerText);
+            DesignSurface = new FormDesignSurface();
+            DesignSurface.LoadModel(DesignModel);
+
+            DesignSurface.ModelModified += () =>
+            {
+                if (DesignModel != null)
+                {
+                    Document.Header = FormDesignSerializer.Serialize(DesignModel);
+                    Document.IsDirty = true;
+                    OnPropertyChanged(nameof(HeaderText));
+                }
+            };
+
+            DesignSurface.ControlDoubleClicked += ctrl =>
+            {
+                NavigateToControlEvent(ctrl);
+            };
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Warn($"No se pudo inicializar el Diseñador Visual para {Document.DisplayName}: {ex.Message}");
+        }
+    }
+
+    public void SwitchToCodeView()
+    {
+        if (DesignSurface != null && DesignModel != null)
+        {
+            Document.Header = FormDesignSerializer.Serialize(DesignModel);
+            DesignSurface.Visibility = Visibility.Collapsed;
+        }
+        Editor.Visibility = Visibility.Visible;
+        IsDesignerActive = false;
+        if (_radioCodeView != null) _radioCodeView.IsChecked = true;
+        ViewModeChanged?.Invoke(false);
+        Editor.Focus();
+    }
+
+    public void SwitchToDesignerView()
+    {
+        if (DesignSurface == null) return;
+        Editor.Visibility = Visibility.Collapsed;
+        DesignSurface.Visibility = Visibility.Visible;
+        IsDesignerActive = true;
+        if (_radioDesignView != null) _radioDesignView.IsChecked = true;
+        ViewModeChanged?.Invoke(true);
+        DesignSurface.Focus();
+    }
+
+    private void NavigateToControlEvent(FormDesignerControl ctrl)
+    {
+        SwitchToCodeView();
+
+        string eventName = GetDefaultEventName(ctrl.TypeName);
+        string procName = $"{ctrl.Name}_{eventName}";
+        string pattern = $"Sub {procName}";
+
+        int targetLine = -1;
+        var lines = Editor.Text.Split('\n');
+        for (int i = 0; i < lines.Length; i++)
+        {
+            if (lines[i].Contains(pattern, StringComparison.OrdinalIgnoreCase))
+            {
+                targetLine = i + 1;
+                break;
+            }
+        }
+
+        if (targetLine != -1)
+        {
+            var lineObj = Editor.Document.GetLineByNumber(targetLine);
+            Editor.CaretOffset = lineObj.Offset;
+            Editor.ScrollToLine(targetLine);
+        }
+        else
+        {
+            string codeSnippet = $"\r\nPrivate Sub {procName}()\r\n    \r\nEnd Sub\r\n";
+            int offset = Editor.Document.TextLength;
+            Editor.Document.Insert(offset, codeSnippet);
+            Editor.CaretOffset = offset + $"\r\nPrivate Sub {procName}()\r\n    ".Length;
+            Editor.ScrollToLine(Editor.Document.LineCount);
+        }
+    }
+
+    private static string GetDefaultEventName(string typeName)
+    {
+        if (typeName.EndsWith("CommandButton", StringComparison.OrdinalIgnoreCase)) return "Click";
+        if (typeName.EndsWith("TextBox", StringComparison.OrdinalIgnoreCase)) return "Change";
+        if (typeName.EndsWith("Timer", StringComparison.OrdinalIgnoreCase)) return "Timer";
+        if (typeName.EndsWith("Form", StringComparison.OrdinalIgnoreCase)) return "Load";
+        if (typeName.EndsWith("CheckBox", StringComparison.OrdinalIgnoreCase)) return "Click";
+        if (typeName.EndsWith("OptionButton", StringComparison.OrdinalIgnoreCase)) return "Click";
+        if (typeName.EndsWith("ListBox", StringComparison.OrdinalIgnoreCase)) return "Click";
+        if (typeName.EndsWith("ComboBox", StringComparison.OrdinalIgnoreCase)) return "Click";
+        return "Click";
+    }
+    #endregion
 
     protected void OnPropertyChanged(string propertyName)
     {

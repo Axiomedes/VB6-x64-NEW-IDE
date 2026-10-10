@@ -52,6 +52,25 @@ public static class VbColorHelper
     }
 
     /// <summary>
+    /// Sobrecarga conveniente para obtener un SolidColorBrush a partir de una cadena hexadecimal de VB6.
+    /// </summary>
+    public static SolidColorBrush ToBrush(string? vbColorStr)
+    {
+        return ToBrush(vbColorStr, DefaultControlBrush);
+    }
+
+    /// <summary>
+    /// Obtiene un SolidColorBrush para previsualización en listas y grillas de propiedades.
+    /// </summary>
+    public static SolidColorBrush GetBrushFromHex(string? vbColorStr, VbRgbColor? fallback = null)
+    {
+        var fb = fallback != null 
+            ? new SolidColorBrush(Color.FromRgb(fallback.R, fallback.G, fallback.B)) 
+            : DefaultControlBrush;
+        return ToBrush(vbColorStr, fb);
+    }
+
+    /// <summary>
     /// Convierte un Color de WPF a la representación hexadecimal canónica de VB6 (&H00BBGGRR&).
     /// </summary>
     public static string ToVbColorHex(Color color)

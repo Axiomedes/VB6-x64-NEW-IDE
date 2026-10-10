@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:designer="clr-namespace:VB7x64.IDE.Designer"
         mc:Ignorable="d"
         Title="VB7-x64 IDE - Entorno de Desarrollo VB6 Clásico"
         Height="720" Width="1100"
@@ -92,8 +93,12 @@
             <MenuItem Header="_Ver">
                 <MenuItem Header="Navegar hacia a_trás" InputGestureText="Alt+←" Click="MenuNavBackward_Click"/>
                 <MenuItem Header="Navegar hacia a_delante" InputGestureText="Alt+→" Click="MenuNavForward_Click"/>
+                <MenuItem x:Name="MenuViewCode" Header="_Código" InputGestureText="F7" Click="BtnViewCode_Click"/>
+                <MenuItem x:Name="MenuViewObject" Header="_Objeto" InputGestureText="Shift+F7" Click="BtnViewObject_Click"/>
                 <Separator/>
+                <MenuItem x:Name="MenuToggleToolbox" Header="_Caja de Herramientas" IsCheckable="True" IsChecked="True" InputGestureText="Ctrl+Alt+X" Click="MenuToggleToolbox_Click"/>
                 <MenuItem x:Name="MenuToggleProjectExplorer" Header="_Explorador de Proyectos" IsCheckable="True" IsChecked="True" Click="MenuToggleProjectExplorer_Click"/>
+                <MenuItem x:Name="MenuToggleProperties" Header="Ventana de _Propiedades" IsCheckable="True" IsChecked="True" InputGestureText="F4" Click="MenuToggleProperties_Click"/>
                 <MenuItem x:Name="MenuExplorerMode" Header="Modo de Explorador: _Avanzado" IsCheckable="True" IsChecked="True" Click="MenuExplorerMode_Click"/>
                 <Separator/>
                 <MenuItem x:Name="MenuToggleOutput" Header="Panel de _Salida / Logs" IsCheckable="True" IsChecked="False" Click="MenuToggleOutput_Click"/>
@@ -307,55 +312,28 @@
                 <RowDefinition x:Name="RowOutput" Height="140"/>
             </Grid.RowDefinitions>
 
-            <!-- Área Superior: Explorer + Editor -->
+            <!-- Área Superior: Toolbox + Editor + (Explorer & Properties) -->
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition x:Name="ColProjectExplorer" Width="260" MinWidth="150" MaxWidth="500"/>
-                    <ColumnDefinition Width="4"/>
+                    <!-- Columna 0: Caja de Herramientas (Toolbox de VB6) -->
+                    <ColumnDefinition x:Name="ColToolbox" Width="135" MinWidth="32" MaxWidth="280"/>
+                    <!-- Columna 1: Splitter Izquierdo -->
+                    <ColumnDefinition x:Name="ColToolboxSplitter" Width="4"/>
+                    <!-- Columna 2: Área Central de Documentos / Editor / Diseñador -->
                     <ColumnDefinition Width="*"/>
+                    <!-- Columna 3: Splitter Derecho -->
+                    <ColumnDefinition x:Name="ColRightSplitter" Width="4"/>
+                    <!-- Columna 4: Panel Lateral Derecho (Explorador arriba, Propiedades abajo) -->
+                    <ColumnDefinition x:Name="ColProjectExplorer" Width="280" MinWidth="180" MaxWidth="600"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Panel de Explorador de Proyectos -->
-                <Border Grid.Column="0" Background="#FFFFFF" BorderBrush="#D0D0D0" BorderThickness="0,0,1,0">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        
-                        <Border Grid.Row="0" Background="#E8EEF5" BorderBrush="#C5D3E8" BorderThickness="0,0,0,1" Padding="6,4">
-                            <DockPanel LastChildFill="True">
-                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                                    <Button x:Name="BtnToggleExplorerMode" ToolTip="Alternar Modo de Explorador (Estándar / Avanzado)" Width="22" Height="22" Padding="0" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="BtnToggleExplorerMode_Click">
-                                        <TextBlock x:Name="TxtExplorerModeIcon" Text="⚡" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Button>
-                                </StackPanel>
-                                <TextBlock Text="Explorador de Proyectos" FontWeight="SemiBold" FontSize="12" Foreground="#102A45" VerticalAlignment="Center"/>
-                            </DockPanel>
-                        </Border>
-
-                        <Border Grid.Row="1" Background="#F4F7FA" BorderBrush="#DCE4EC" BorderThickness="0,0,0,1" Padding="4,3">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="🔍" FontSize="11" Foreground="#888888" VerticalAlignment="Center" Margin="2,0,4,0"/>
-                                <TextBox x:Name="TxtProjectSearch" Grid.Column="1" Height="22" FontSize="11.5" VerticalContentAlignment="Center" BorderThickness="1" BorderBrush="#C0CAD4" Padding="3,1" ToolTip="Buscar archivos, módulos o procedimientos en tiempo real" TextChanged="TxtProjectSearch_TextChanged"/>
-                                <Button x:Name="BtnClearSearch" Grid.Column="2" Content="✕" Width="18" Height="20" Margin="2,0,0,0" FontSize="10" Background="Transparent" BorderThickness="0" Cursor="Hand" ToolTip="Limpiar búsqueda" Click="BtnClearSearch_Click" Visibility="Collapsed"/>
-                            </Grid>
-                        </Border>
-
-                        <TreeView x:Name="ProjectTreeView" Grid.Row="2" BorderThickness="0" Padding="4" MouseDoubleClick="ProjectTreeView_MouseDoubleClick">
-                            <TreeViewItem Header="Ningún proyecto abierto" IsSelected="True" Foreground="#777777" FontStyle="Italic"/>
-                        </TreeView>
-                    </Grid>
+                <!-- Panel de Caja de Herramientas (Toolbox) -->
+                <Border Grid.Column="0" Background="#F5F5F7" BorderBrush="#D0D0D0" BorderThickness="0,0,1,0">
+                    <designer:ToolboxPanel x:Name="MainToolboxPanel"/>
                 </Border>
 
-                <!-- Splitter para redimensionar el panel lateral -->
-                <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="#E0E0E0" Cursor="SizeWE"/>
+                <!-- Splitter de Caja de Herramientas -->
+                <GridSplitter x:Name="SplitterToolbox" Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="#E0E0E0" Cursor="SizeWE"/>
 
                 <!-- Área Central de Pestañas / Documentos -->
                 <Border Grid.Column="2" Background="#ECECEC">
@@ -406,6 +384,72 @@
                                 </StackPanel>
                             </StackPanel>
                         </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Splitter del Panel Derecho -->
+                <GridSplitter x:Name="SplitterRight" Grid.Column="3" Width="4" HorizontalAlignment="Stretch" Background="#E0E0E0" Cursor="SizeWE"/>
+
+                <!-- Panel Lateral Derecho (Explorador arriba + Propiedades abajo) -->
+                <Border Grid.Column="4" Background="#FFFFFF" BorderBrush="#D0D0D0" BorderThickness="1,0,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <!-- Fila 0: Explorador de Proyectos -->
+                            <RowDefinition x:Name="RowProjectExplorer" Height="*"/>
+                            <!-- Fila 1: Splitter horizontal -->
+                            <RowDefinition x:Name="RowPropertiesSplitter" Height="4"/>
+                            <!-- Fila 2: Ventana de Propiedades -->
+                            <RowDefinition x:Name="RowProperties" Height="320" MinHeight="100"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Explorador de Proyectos en Fila 0 -->
+                        <Grid Grid.Row="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <Border Grid.Row="0" Background="#E8EEF5" BorderBrush="#C5D3E8" BorderThickness="0,0,0,1" Padding="6,4">
+                                <DockPanel LastChildFill="True">
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button x:Name="BtnViewCode" ToolTip="Ver Código (F7)" Width="22" Height="22" Margin="0,0,2,0" Padding="0" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="BtnViewCode_Click">
+                                            <TextBlock Text="📜" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Button>
+                                        <Button x:Name="BtnViewObject" ToolTip="Ver Objeto / Diseñador (Shift+F7)" Width="22" Height="22" Margin="0,0,4,0" Padding="0" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="BtnViewObject_Click">
+                                            <TextBlock Text="🗔" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Button>
+                                        <Button x:Name="BtnToggleExplorerMode" ToolTip="Alternar Modo de Explorador (Estándar / Avanzado)" Width="22" Height="22" Padding="0" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="BtnToggleExplorerMode_Click">
+                                            <TextBlock x:Name="TxtExplorerModeIcon" Text="⚡" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Button>
+                                    </StackPanel>
+                                    <TextBlock Text="Explorador de Proyectos" FontWeight="SemiBold" FontSize="12" Foreground="#102A45" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </Border>
+
+                            <Border Grid.Row="1" Background="#F4F7FA" BorderBrush="#DCE4EC" BorderThickness="0,0,0,1" Padding="4,3">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="🔍" FontSize="11" Foreground="#888888" VerticalAlignment="Center" Margin="2,0,4,0"/>
+                                    <TextBox x:Name="TxtProjectSearch" Grid.Column="1" Height="22" FontSize="11.5" VerticalContentAlignment="Center" BorderThickness="1" BorderBrush="#C0CAD4" Padding="3,1" ToolTip="Buscar archivos, módulos o procedimientos en tiempo real" TextChanged="TxtProjectSearch_TextChanged"/>
+                                    <Button x:Name="BtnClearSearch" Grid.Column="2" Content="✕" Width="18" Height="20" Margin="2,0,0,0" FontSize="10" Background="Transparent" BorderThickness="0" Cursor="Hand" ToolTip="Limpiar búsqueda" Click="BtnClearSearch_Click" Visibility="Collapsed"/>
+                                </Grid>
+                            </Border>
+
+                            <TreeView x:Name="ProjectTreeView" Grid.Row="2" BorderThickness="0" Padding="4" MouseDoubleClick="ProjectTreeView_MouseDoubleClick">
+                                <TreeViewItem Header="Ningún proyecto abierto" IsSelected="True" Foreground="#777777" FontStyle="Italic"/>
+                            </TreeView>
+                        </Grid>
+
+                        <!-- Splitter Horizontal entre Explorador y Propiedades -->
+                        <GridSplitter Grid.Row="1" Height="4" HorizontalAlignment="Stretch" Background="#E0E0E0" Cursor="SizeNS"/>
+
+                        <!-- Ventana de Propiedades en Fila 2 -->
+                        <designer:PropertyGridPanel x:Name="MainPropertyGridPanel" Grid.Row="2"/>
                     </Grid>
                 </Border>
             </Grid>

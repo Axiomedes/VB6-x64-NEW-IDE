@@ -47,8 +47,12 @@ public class AppSettings
     public double WindowTop { get; set; } = 100;
     public bool IsMaximized { get; set; } = false;
 
-    public double ProjectExplorerWidth { get; set; } = 260.0;
+    public double ProjectExplorerWidth { get; set; } = 280.0;
     public bool ShowProjectExplorer { get; set; } = true;
+    public bool ShowToolbox { get; set; } = true;
+    public double ToolboxWidth { get; set; } = 135.0;
+    public bool ShowProperties { get; set; } = true;
+    public double PropertiesHeight { get; set; } = 320.0;
     public bool ShowOutputPanel { get; set; } = false;
     public double OutputPanelHeight { get; set; } = 140.0;
 

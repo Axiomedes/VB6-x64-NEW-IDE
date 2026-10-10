@@ -24,7 +24,15 @@ public partial class FormDesignSurface : UserControl
     public event Action<FormDesignerControl>? ControlSelected;
     public event Action<List<FormDesignerControl>>? SelectionChanged;
     public event Action<FormDesignerControl>? ControlDoubleClicked;
+    public event Action<FormDesignerControl>? ControlAdded;
+    public event Action<FormDesignerControl>? ControlDeleted;
+    public event Action? ToolCreationFinished;
     public event Action? ModelModified;
+
+    // Herramienta activa para creación desde la Toolbox
+    public string? ActiveCreationTool { get; set; }
+    private bool _isCreatingControl;
+    private Point _creationStartPoint;
 
     // Colección de controles seleccionados actualmente
     private readonly HashSet<FormDesignerControl> _selectedControls = new();
@@ -273,6 +281,24 @@ public partial class FormDesignSurface : UserControl
     {
         GridCanvas.Focus();
 
+        // 1. Si hay una herramienta activa de Toolbox, iniciar creación de control
+        if (!string.IsNullOrEmpty(ActiveCreationTool) && ActiveCreationTool != ControlToolboxRegistry.PointerTool)
+        {
+            ClearSelection();
+            _isCreatingControl = true;
+            _creationStartPoint = e.GetPosition(GridCanvas);
+
+            Canvas.SetLeft(MarqueeRectangle, _creationStartPoint.X);
+            Canvas.SetTop(MarqueeRectangle, _creationStartPoint.Y);
+            MarqueeRectangle.Width = 0;
+            MarqueeRectangle.Height = 0;
+            MarqueeRectangle.Visibility = Visibility.Visible;
+
+            GridCanvas.CaptureMouse();
+            e.Handled = true;
+            return;
+        }
+
         // Clic en espacio vacío: deseleccionar o iniciar selección por área
         bool isShiftOrCtrl = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift) ||
                              Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
@@ -298,6 +324,31 @@ public partial class FormDesignSurface : UserControl
     private void GridCanvas_MouseMove(object sender, MouseEventArgs e)
     {
         Point curPoint = e.GetPosition(GridCanvas);
+
+        // 0. Creación interactiva de control desde Toolbox
+        if (_isCreatingControl)
+        {
+            double x = Math.Min(_creationStartPoint.X, curPoint.X);
+            double y = Math.Min(_creationStartPoint.Y, curPoint.Y);
+            double w = Math.Abs(curPoint.X - _creationStartPoint.X);
+            double h = Math.Abs(curPoint.Y - _creationStartPoint.Y);
+
+            Canvas.SetLeft(MarqueeRectangle, x);
+            Canvas.SetTop(MarqueeRectangle, y);
+            MarqueeRectangle.Width = w;
+            MarqueeRectangle.Height = h;
+            return;
+        }
+
+        // Si hay una herramienta activa, cursor en cruz
+        if (!string.IsNullOrEmpty(ActiveCreationTool) && ActiveCreationTool != ControlToolboxRegistry.PointerTool)
+        {
+            GridCanvas.Cursor = Cursors.Cross;
+        }
+        else
+        {
+            GridCanvas.Cursor = Cursors.Arrow;
+        }
 
         // 1. Arrastre de controles seleccionados
         if (_isDraggingControls && _selectedControls.Count > 0)
@@ -357,6 +408,49 @@ public partial class FormDesignSurface : UserControl
 
     private void GridCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
+        // 0. Finalizar creación de control desde Toolbox
+        if (_isCreatingControl)
+        {
+            _isCreatingControl = false;
+            MarqueeRectangle.Visibility = Visibility.Collapsed;
+            GridCanvas.ReleaseMouseCapture();
+
+            Point endPoint = e.GetPosition(GridCanvas);
+            double rawW = Math.Abs(endPoint.X - _creationStartPoint.X);
+            double rawH = Math.Abs(endPoint.Y - _creationStartPoint.Y);
+            double left = Math.Min(_creationStartPoint.X, endPoint.X);
+            double top = Math.Min(_creationStartPoint.Y, endPoint.Y);
+
+            if (GridCanvas.SnapToGrid)
+            {
+                left = GridCanvas.SnapValue(left);
+                top = GridCanvas.SnapValue(top);
+                rawW = GridCanvas.SnapValue(rawW);
+                rawH = GridCanvas.SnapValue(rawH);
+            }
+
+            int leftTwips = (int)Math.Round(left * FormDesignerControl.TwipsPerPixel);
+            int topTwips = (int)Math.Round(top * FormDesignerControl.TwipsPerPixel);
+            int? widthTwips = (rawW > 15) ? (int)Math.Round(rawW * FormDesignerControl.TwipsPerPixel) : null;
+            int? heightTwips = (rawH > 15) ? (int)Math.Round(rawH * FormDesignerControl.TwipsPerPixel) : null;
+
+            if (CurrentModel != null && !string.IsNullOrEmpty(ActiveCreationTool))
+            {
+                var newCtrl = ControlToolboxRegistry.CreateControl(ActiveCreationTool, CurrentModel, leftTwips, topTwips, widthTwips, heightTwips);
+                CurrentModel.Children.Add(newCtrl);
+                RefreshCanvas();
+                SelectSingleControl(newCtrl);
+                ControlAdded?.Invoke(newCtrl);
+                ModelModified?.Invoke();
+            }
+
+            ActiveCreationTool = null;
+            GridCanvas.Cursor = Cursors.Arrow;
+            ToolCreationFinished?.Invoke();
+            e.Handled = true;
+            return;
+        }
+
         if (_isDraggingControls)
         {
             _isDraggingControls = false;
@@ -410,6 +504,7 @@ public partial class FormDesignSurface : UserControl
             foreach (var ctrl in controlsToDelete)
             {
                 CurrentModel.RemoveControl(ctrl);
+                ControlDeleted?.Invoke(ctrl);
             }
 
             ClearSelection();
@@ -594,6 +689,77 @@ public partial class FormDesignSurface : UserControl
             3 => 16.0,
             _ => 8.0
         };
+    }
+    #endregion
+
+    #region Métodos de Integración con Toolbox y Property Grid
+    /// <summary>
+    /// Crea e inserta un control centrado en el formulario.
+    /// </summary>
+    public FormDesignerControl? CreateControlInCenter(string typeName)
+    {
+        if (CurrentModel == null) return null;
+
+        var info = ControlToolboxRegistry.Find(typeName);
+        int defW = info?.DefaultWidthTwips ?? 1200;
+        int defH = info?.DefaultHeightTwips ?? 400;
+
+        int leftTwips = Math.Max(0, (CurrentModel.ClientWidth - defW) / 2);
+        int topTwips = Math.Max(0, (CurrentModel.ClientHeight - defH) / 2);
+
+        if (GridCanvas.SnapToGrid)
+        {
+            double leftPx = GridCanvas.SnapValue(leftTwips / FormDesignerControl.TwipsPerPixel);
+            double topPx = GridCanvas.SnapValue(topTwips / FormDesignerControl.TwipsPerPixel);
+            leftTwips = (int)Math.Round(leftPx * FormDesignerControl.TwipsPerPixel);
+            topTwips = (int)Math.Round(topPx * FormDesignerControl.TwipsPerPixel);
+        }
+
+        var newCtrl = ControlToolboxRegistry.CreateControl(typeName, CurrentModel, leftTwips, topTwips, defW, defH);
+        CurrentModel.Children.Add(newCtrl);
+        RefreshCanvas();
+        SelectSingleControl(newCtrl);
+        ControlAdded?.Invoke(newCtrl);
+        ModelModified?.Invoke();
+        return newCtrl;
+    }
+
+    /// <summary>
+    /// Selecciona programáticamente un control o deselecciona si es nulo.
+    /// </summary>
+    public void SelectControl(FormDesignerControl? control)
+    {
+        if (control == null)
+        {
+            ClearSelection();
+        }
+        else
+        {
+            SelectSingleControl(control);
+        }
+    }
+
+    /// <summary>
+    /// Actualiza la representación visual de todos los controles y del formulario tras cambios en la Ventana de Propiedades.
+    /// </summary>
+    public void RefreshVisuals()
+    {
+        if (CurrentModel == null) return;
+
+        TxtFormCaption.Text = string.IsNullOrEmpty(CurrentModel.Caption) ? CurrentModel.Name : CurrentModel.Caption;
+        TxtFormTitle.Text = $"Diseñador: {CurrentModel.Name}";
+
+        GridCanvas.Width = CurrentModel.ClientWidthPixels;
+        GridCanvas.Height = CurrentModel.ClientHeightPixels;
+
+        FormClientArea.Background = VbColorHelper.ToBrush(
+            CurrentModel.BackColorHex,
+            new SolidColorBrush(Color.FromRgb(240, 240, 240))
+        );
+
+        UpdateDimensionText();
+        UpdateResizeThumbs();
+        RefreshCanvas();
     }
     #endregion
 }

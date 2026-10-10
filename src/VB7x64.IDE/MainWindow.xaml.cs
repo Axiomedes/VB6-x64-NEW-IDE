@@ -71,12 +71,22 @@ public partial class MainWindow : Window
         if (_settings.WindowTop >= 0) Top = _settings.WindowTop;
         if (_settings.IsMaximized) WindowState = WindowState.Maximized;
 
-        // Restaurar estado de paneles
+        // Restaurar estado de paneles clásicos VB6
+        MenuToggleToolbox.IsChecked = _settings.ShowToolbox;
+        ColToolbox.Width = _settings.ShowToolbox ? new GridLength(_settings.ToolboxWidth) : new GridLength(0);
+
         MenuToggleProjectExplorer.IsChecked = _settings.ShowProjectExplorer;
         ColProjectExplorer.Width = _settings.ShowProjectExplorer ? new GridLength(_settings.ProjectExplorerWidth) : new GridLength(0);
 
+        MenuToggleProperties.IsChecked = _settings.ShowProperties;
+        RowProperties.Height = _settings.ShowProperties ? new GridLength(_settings.PropertiesHeight) : new GridLength(0);
+        RowPropertiesSplitter.Height = _settings.ShowProperties ? new GridLength(4) : new GridLength(0);
+
         MenuToggleOutput.IsChecked = _settings.ShowOutputPanel;
         SetOutputPanelVisibility(_settings.ShowOutputPanel);
+
+        // Inicializar integración de paneles de diseño visual
+        InitializeDesignerPanels();
 
         // Restaurar estado de Funciones Avanzadas VB7
         MenuToggleLineHighlight.IsChecked = _settings.EnableCurrentLineHighlight;
@@ -137,10 +147,22 @@ public partial class MainWindow : Window
             _settings.WindowTop = Top;
         }
 
+        _settings.ShowToolbox = MenuToggleToolbox.IsChecked;
+        if (ColToolbox.Width.Value > 30)
+        {
+            _settings.ToolboxWidth = ColToolbox.Width.Value;
+        }
+
         _settings.ShowProjectExplorer = MenuToggleProjectExplorer.IsChecked;
         if (ColProjectExplorer.Width.Value > 50)
         {
             _settings.ProjectExplorerWidth = ColProjectExplorer.Width.Value;
+        }
+
+        _settings.ShowProperties = MenuToggleProperties.IsChecked;
+        if (RowProperties.Height.Value > 50)
+        {
+            _settings.PropertiesHeight = RowProperties.Height.Value;
         }
 
         _settings.ShowOutputPanel = MenuToggleOutput.IsChecked;
@@ -191,6 +213,7 @@ public partial class MainWindow : Window
     private void DocumentsTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         UpdateStatusFromActiveTab();
+        SyncDesignerPanelsWithActiveTab();
     }
 
     private void UpdateStatusFromActiveTab()
@@ -212,6 +235,99 @@ public partial class MainWindow : Window
             SetLineCol(1, 1);
             SetEncodingInfo("Windows-1252 (ANSI)", "CRLF");
             SetStatusMessage("Listo");
+        }
+    }
+
+    private void InitializeDesignerPanels()
+    {
+        // Enlazar eventos de Toolbox global al diseñador activo
+        MainToolboxPanel.ToolSelected += typeName =>
+        {
+            if (ActiveTab?.DesignSurface != null && ActiveTab.IsDesignerActive)
+            {
+                ActiveTab.DesignSurface.ActiveCreationTool = typeName;
+            }
+        };
+
+        MainToolboxPanel.ToolDoubleClicked += typeName =>
+        {
+            if (ActiveTab?.DesignSurface != null && ActiveTab.IsDesignerActive)
+            {
+                ActiveTab.DesignSurface.CreateControlInCenter(typeName);
+            }
+        };
+
+        // Enlazar eventos de PropertyGrid global
+        MainPropertyGridPanel.ObjectSelected += ctrl =>
+        {
+            if (ActiveTab?.DesignSurface != null && ActiveTab.IsDesignerActive)
+            {
+                ActiveTab.DesignSurface.SelectControl(ctrl);
+            }
+        };
+
+        MainPropertyGridPanel.ModelChanged += () =>
+        {
+            if (ActiveTab?.DesignSurface != null && ActiveTab.DesignModel != null)
+            {
+                ActiveTab.Document.Header = FormDesignSerializer.Serialize(ActiveTab.DesignModel);
+                ActiveTab.Document.IsDirty = true;
+                ActiveTab.DesignSurface.RefreshVisuals();
+            }
+        };
+    }
+
+    private void SyncDesignerPanelsWithActiveTab()
+    {
+        if (ActiveTab?.DesignSurface != null && ActiveTab.DesignModel != null)
+        {
+            var surface = ActiveTab.DesignSurface;
+            var model = ActiveTab.DesignModel;
+
+            MainPropertyGridPanel.BindModel(model, surface.SelectedControl);
+
+            // Suscribir eventos del diseñador de esta pestaña
+            surface.SelectionChanged += selList =>
+            {
+                if (ActiveTab?.DesignSurface == surface)
+                {
+                    if (selList.Count == 0)
+                        MainPropertyGridPanel.SelectForm();
+                    else
+                        MainPropertyGridPanel.SelectControl(selList.LastOrDefault());
+                }
+            };
+
+            surface.ControlAdded += ctrl =>
+            {
+                if (ActiveTab?.DesignSurface == surface)
+                {
+                    MainPropertyGridPanel.RefreshObjectList();
+                    MainPropertyGridPanel.SelectControl(ctrl);
+                }
+            };
+
+            surface.ControlDeleted += ctrl =>
+            {
+                if (ActiveTab?.DesignSurface == surface)
+                {
+                    MainPropertyGridPanel.RefreshObjectList();
+                    MainPropertyGridPanel.SelectForm();
+                }
+            };
+
+            surface.ModelModified += () =>
+            {
+                if (ActiveTab?.DesignSurface == surface)
+                {
+                    MainPropertyGridPanel.RefreshCurrentProperties();
+                }
+            };
+
+            surface.ToolCreationFinished += () =>
+            {
+                MainToolboxPanel.ResetToPointer();
+            };
         }
     }
 
@@ -260,6 +376,11 @@ public partial class MainWindow : Window
                 {
                     SetLineCol(line, col);
                 }
+            };
+
+            tabItem.ViewModeChanged += isDesigner =>
+            {
+                SyncDesignerPanelsWithActiveTab();
             };
 
             DocumentsTabControl.Items.Add(tabItem);
@@ -907,9 +1028,50 @@ public partial class MainWindow : Window
     #endregion
 
     #region Menu View Actions
+    private void BtnViewCode_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveTab != null && ActiveTab.DesignSurface != null)
+        {
+            ActiveTab.SwitchToCodeView();
+            return;
+        }
+
+        if (ProjectTreeView.SelectedItem is TreeViewItem selItem && selItem.Tag is ProjectItem item)
+        {
+            var tab = OpenFile(item.AbsolutePath);
+            tab?.SwitchToCodeView();
+        }
+    }
+
+    private void BtnViewObject_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveTab != null && ActiveTab.DesignSurface != null)
+        {
+            ActiveTab.SwitchToDesignerView();
+            return;
+        }
+
+        if (ProjectTreeView.SelectedItem is TreeViewItem selItem && selItem.Tag is ProjectItem item)
+        {
+            var tab = OpenFile(item.AbsolutePath);
+            tab?.SwitchToDesignerView();
+        }
+    }
+
+    private void MenuToggleToolbox_Click(object sender, RoutedEventArgs e)
+    {
+        ColToolbox.Width = MenuToggleToolbox.IsChecked ? new GridLength(_settings.ToolboxWidth) : new GridLength(0);
+    }
+
     private void MenuToggleProjectExplorer_Click(object sender, RoutedEventArgs e)
     {
         ColProjectExplorer.Width = MenuToggleProjectExplorer.IsChecked ? new GridLength(_settings.ProjectExplorerWidth) : new GridLength(0);
+    }
+
+    private void MenuToggleProperties_Click(object sender, RoutedEventArgs e)
+    {
+        RowProperties.Height = MenuToggleProperties.IsChecked ? new GridLength(_settings.PropertiesHeight) : new GridLength(0);
+        RowPropertiesSplitter.Height = MenuToggleProperties.IsChecked ? new GridLength(4) : new GridLength(0);
     }
 
     private void MenuToggleStatusBar_Click(object sender, RoutedEventArgs e)
@@ -1035,6 +1197,47 @@ public partial class MainWindow : Window
 
     private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        // F7: Ver Código / Shift+F7: Ver Diseñador (Flujo Dual VB6)
+        if (e.Key == Key.F7)
+        {
+            if (ActiveTab?.DesignSurface != null)
+            {
+                if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                {
+                    ActiveTab.SwitchToDesignerView();
+                }
+                else
+                {
+                    ActiveTab.SwitchToCodeView();
+                }
+                e.Handled = true;
+                return;
+            }
+        }
+
+        // F4: Mostrar / Enfocar Ventana de Propiedades
+        if (e.Key == Key.F4 && Keyboard.Modifiers == ModifierKeys.None)
+        {
+            if (RowProperties.Height.Value <= 30)
+            {
+                RowProperties.Height = new GridLength(_settings.PropertiesHeight);
+                RowPropertiesSplitter.Height = new GridLength(4);
+                MenuToggleProperties.IsChecked = true;
+            }
+            MainPropertyGridPanel.Focus();
+            e.Handled = true;
+            return;
+        }
+
+        // Ctrl+Alt+X: Alternar Caja de Herramientas (Toolbox)
+        if (e.Key == Key.X && (Keyboard.Modifiers & (ModifierKeys.Control | ModifierKeys.Alt)) == (ModifierKeys.Control | ModifierKeys.Alt))
+        {
+            MenuToggleToolbox.IsChecked = !MenuToggleToolbox.IsChecked;
+            ColToolbox.Width = MenuToggleToolbox.IsChecked ? new GridLength(_settings.ToolboxWidth) : new GridLength(0);
+            e.Handled = true;
+            return;
+        }
+
         // 0. Navegación Atrás / Adelante: Alt+Left o Ctrl+- / Alt+Right o Ctrl+Shift+-
         if ((e.Key == Key.Left && Keyboard.Modifiers == ModifierKeys.Alt) ||
             (e.Key == Key.OemMinus && Keyboard.Modifiers == ModifierKeys.Control))

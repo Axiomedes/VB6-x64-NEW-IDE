@@ -1552,19 +1552,27 @@ public partial class MainWindow : Window
             return;
         }
 
-        var editorWnd = new VB7x64.IDE.Designer.MenuEditor.MenuEditorWindow(ActiveTab.DesignModel)
+        try
         {
-            Owner = this
-        };
+            var editorWnd = new VB7x64.IDE.Designer.MenuEditor.MenuEditorWindow(ActiveTab.DesignModel)
+            {
+                Owner = this
+            };
 
-        if (editorWnd.ShowDialog() == true)
+            if (editorWnd.ShowDialog() == true)
+            {
+                // El modelo fue actualizado con la nueva jerarquía de menús
+                ActiveTab.Document.Header = FormDesignSerializer.Serialize(ActiveTab.DesignModel);
+                ActiveTab.Document.IsDirty = true;
+                ActiveTab.DesignSurface?.RefreshVisuals();
+                MainPropertyGridPanel.RefreshObjectList();
+                SetStatusMessage("Estructura de menús actualizada.");
+            }
+        }
+        catch (Exception ex)
         {
-            // El modelo fue actualizado con la nueva jerarquía de menús
-            ActiveTab.Document.Header = FormDesignSerializer.Serialize(ActiveTab.DesignModel);
-            ActiveTab.Document.IsDirty = true;
-            ActiveTab.DesignSurface?.RefreshVisuals();
-            MainPropertyGridPanel.RefreshObjectList();
-            SetStatusMessage("Estructura de menús actualizada.");
+            AppLogger.Error("Error al abrir el Editor de Menús", ex);
+            MessageBox.Show($"Ocurrió un error al abrir el Editor de Menús:\n\n{ex.Message}", "Editor de Menús", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 

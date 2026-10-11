@@ -60,7 +60,7 @@
             <StackPanel Grid.Column="6">
                 <TextBlock Text="NegotiatePosition:" Margin="0,0,0,3"/>
                 <ComboBox x:Name="CmbNegotiatePosition" Height="24" SelectionChanged="CmbNegotiatePosition_SelectionChanged">
-                    <ComboBoxItem Content="0 - None" IsSelected="True"/>
+                    <ComboBoxItem Content="0 - None"/>
                     <ComboBoxItem Content="1 - Left"/>
                     <ComboBoxItem Content="2 - Middle"/>
                     <ComboBoxItem Content="3 - Right"/>
@@ -71,8 +71,8 @@
         <!-- 2: Checkboxes -->
         <WrapPanel Grid.Row="2" Margin="0,0,0,10" VerticalAlignment="Center">
             <CheckBox x:Name="ChkChecked" Content="Activo (&amp;Checked)" Margin="0,0,16,0" Checked="ChkProperty_Changed" Unchecked="ChkProperty_Changed"/>
-            <CheckBox x:Name="ChkEnabled" Content="Habilitado (&amp;Enabled)" IsChecked="True" Margin="0,0,16,0" Checked="ChkProperty_Changed" Unchecked="ChkProperty_Changed"/>
-            <CheckBox x:Name="ChkVisible" Content="Visible" IsChecked="True" Margin="0,0,16,0" Checked="ChkProperty_Changed" Unchecked="ChkProperty_Changed"/>
+            <CheckBox x:Name="ChkEnabled" Content="Habilitado (&amp;Enabled)" Margin="0,0,16,0" Checked="ChkProperty_Changed" Unchecked="ChkProperty_Changed"/>
+            <CheckBox x:Name="ChkVisible" Content="Visible" Margin="0,0,16,0" Checked="ChkProperty_Changed" Unchecked="ChkProperty_Changed"/>
             <CheckBox x:Name="ChkWindowList" Content="&amp;WindowList" Margin="0,0,16,0" Checked="ChkProperty_Changed" Unchecked="ChkProperty_Changed"/>
         </WrapPanel>
 

@@ -151,10 +151,11 @@ public partial class MenuEditorWindow : Window
 
     private readonly FormDesignModel _model;
     private readonly ObservableCollection<MenuItemViewModel> _items = new();
-    private bool _isUpdatingUI;
+    private bool _isUpdatingUI = true;
 
     public MenuEditorWindow(FormDesignModel model)
     {
+        _isUpdatingUI = true;
         InitializeComponent();
         _model = model;
 
@@ -189,10 +190,13 @@ public partial class MenuEditorWindow : Window
             LstMenuItems.SelectedIndex = 0;
         }
 
+        _isUpdatingUI = false;
+        UpdateFormFieldsFromSelection();
+
         Loaded += (_, _) => TxtCaption.Focus();
     }
 
-    private MenuItemViewModel? SelectedItem => LstMenuItems.SelectedItem as MenuItemViewModel;
+    private MenuItemViewModel? SelectedItem => LstMenuItems?.SelectedItem as MenuItemViewModel;
 
     private void LstMenuItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {

@@ -163,5 +163,6 @@ dotnet run --project src/VB7x64.IDE
 | **M4: Editor de Menús (<kbd>Ctrl+E</kbd>)** | ✅ Completado | Editor jerárquico de menús, indentación por puntos `....`, atajos de teclado y sincronización `.frm`. |
 | **M5: IntelliSense y Carga de OCX en Diseño** | ✅ Completado | List Members, Parameter Info, Complete Word, lector COM TypeLib nativo x64, diálogo Componentes (<kbd>Ctrl+T</kbd>). |
 | **M6: Ejecución en Caliente (Hot-Run / <kbd>F5</kbd>)** | ✅ Completado | Motor de ejecución en memoria sin compilar a disco, ventana en vivo interactiva (`LiveFormWindow`), breakpoints (<kbd>F9</kbd>), paso a paso (<kbd>F8</kbd>), Ventana Inmediata (<kbd>Ctrl+G</kbd>, `?` / `Print`) y `Debug.Print` en tiempo real. |
-| **M7: Compilación Nativa x32 (MSVBVM60.DLL)** | ⏳ **Próximo** | Emisor nativo de ejecutables PE32 (x86) independientes con cabeceras VB6 clásicas y enlace directo al runtime del sistema `msvbvm60.dll` (Opción B). |
-| **M8: Generación y Compilación Nativa x64** | ⏳ **Planificado** | Compilador / emisor nativo a ejecutables y librerías de 64 bits para arquitectura Windows x64 moderna. |
+| **M7: Compilación Nativa x32 (MSVBVM60.DLL)** | ⏳ **En Curso** | Emisor nativo de ejecutables PE32 (x86) independientes con cabeceras VB6 clásicas y enlace directo al runtime del sistema `msvbvm60.dll` (Opción B). |
+| **M8: UserControls en Diseño y Ejecución** | ⏳ **Planificado** | Renderizado de controles `.ctl`, aparición en Toolbox del proyecto, composición visual dentro de formularios y ejecución interactiva en caliente. |
+| **M9: Generación y Compilación Nativa x64** | ⏳ **Planificado** | Compilador / emisor nativo a ejecutables y librerías de 64 bits para arquitectura Windows x64 moderna. |

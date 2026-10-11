@@ -73,7 +73,9 @@ public partial class ToolboxPanel : UserControl, INotifyPropertyChanged
         LoadTools();
     }
 
-    private void LoadTools()
+    public void ReloadTools() => LoadTools();
+
+    public void LoadTools()
     {
         Tools.Clear();
         foreach (var tool in ControlToolboxRegistry.GetAllTools())

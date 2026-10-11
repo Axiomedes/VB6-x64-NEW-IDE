@@ -1,16 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using VB7x64.ProjectModel.ActiveX;
 
 namespace VB7x64.ProjectModel.IntelliSense;
 
 /// <summary>
 /// Catálogo exhaustivo de miembros (propiedades, métodos y eventos) para los controles
-/// intrínsecos de Visual Basic 6.0 y el Formulario (Form).
+/// intrínsecos de Visual Basic 6.0, el Formulario (Form) y controles ActiveX / OCX cargados dinámicamente.
 /// </summary>
 public static class VbControlMemberCatalog
 {
     private static readonly Dictionary<string, List<VbSymbolItem>> _controlMembers = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly Dictionary<string, List<VbSymbolItem>> _dynamicControlMembers = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly List<OcxLibraryInfo> _registeredOcxLibraries = [];
     private static readonly List<VbSymbolItem> _formMembers = [];
 
     static VbControlMemberCatalog()
@@ -35,7 +38,7 @@ public static class VbControlMemberCatalog
     }
 
     /// <summary>
-    /// Retorna la lista de miembros de un control según su tipo (e.g. "CommandButton", "VB.CommandButton", "TextBox", "Form").
+    /// Retorna la lista de miembros de un control según su tipo (e.g. "CommandButton", "VB.CommandButton", "TextBox", "Form", "axJColCombo").
     /// </summary>
     public static IReadOnlyList<VbSymbolItem> GetMembersForControl(string typeName)
     {
@@ -50,6 +53,27 @@ public static class VbControlMemberCatalog
             return list;
         }
 
+        // Buscar en controles dinámicos registrados (OCX)
+        if (_dynamicControlMembers.TryGetValue(normalized, out var dynList))
+        {
+            return dynList;
+        }
+
+        // Si viene calificado ej. "AxJControls.axJColCombo", buscar por la parte no calificada
+        int dot = normalized.LastIndexOf('.');
+        if (dot >= 0 && dot < normalized.Length - 1)
+        {
+            string shortName = normalized[(dot + 1)..];
+            if (_controlMembers.TryGetValue(shortName, out var shortList))
+            {
+                return shortList;
+            }
+            if (_dynamicControlMembers.TryGetValue(shortName, out var shortDynList))
+            {
+                return shortDynList;
+            }
+        }
+
         return Array.Empty<VbSymbolItem>();
     }
 
@@ -57,6 +81,133 @@ public static class VbControlMemberCatalog
     /// Retorna los miembros del Formulario (Form / Me).
     /// </summary>
     public static IReadOnlyList<VbSymbolItem> GetFormMembers() => _formMembers;
+
+    /// <summary>
+    /// Registra en el catálogo de IntelliSense una biblioteca OCX completa con todos sus controles, métodos y propiedades.
+    /// </summary>
+    public static void RegisterOcxLibrary(OcxLibraryInfo lib)
+    {
+        ArgumentNullException.ThrowIfNull(lib);
+
+        // Si ya estaba registrada, desregistrar primero para refrescar
+        UnregisterOcxLibrary(lib.LibraryName);
+
+        _registeredOcxLibraries.Add(lib);
+
+        foreach (var ctrl in lib.Controls)
+        {
+            var symbols = new List<VbSymbolItem>();
+
+            // Propiedades y métodos del control
+            foreach (var m in ctrl.Members)
+            {
+                symbols.Add(new VbSymbolItem
+                {
+                    Name = m.Name,
+                    Kind = m.Kind,
+                    ReturnType = m.ReturnType,
+                    Description = !string.IsNullOrEmpty(m.Description) ? m.Description : $"{m.Kind} {m.Name} de {ctrl.Name}",
+                    Parameters = m.Parameters.Select(p => new VbParameterInfo
+                    {
+                        Name = p.Name,
+                        Type = p.Type,
+                        IsOptional = p.IsOptional,
+                        DefaultValue = p.DefaultValue,
+                        Description = p.Description ?? string.Empty
+                    }).ToList()
+                });
+            }
+
+            // Eventos del control
+            foreach (var ev in ctrl.Events)
+            {
+                symbols.Add(new VbSymbolItem
+                {
+                    Name = ev.Name,
+                    Kind = VbSymbolKind.Event,
+                    ReturnType = "Void",
+                    Description = !string.IsNullOrEmpty(ev.Description) ? ev.Description : $"Evento {ev.Name} de {ctrl.Name}",
+                    Parameters = ev.Parameters.Select(p => new VbParameterInfo
+                    {
+                        Name = p.Name,
+                        Type = p.Type,
+                        IsOptional = p.IsOptional,
+                        DefaultValue = p.DefaultValue,
+                        Description = p.Description ?? string.Empty
+                    }).ToList()
+                });
+            }
+
+            // Registrar por nombre simple (ej. "axJColCombo")
+            _dynamicControlMembers[ctrl.Name] = symbols;
+
+            // Registrar por nombre calificado si tiene biblioteca (ej. "AxJControls.axJColCombo")
+            if (!string.IsNullOrEmpty(lib.LibraryName))
+            {
+                _dynamicControlMembers[$"{lib.LibraryName}.{ctrl.Name}"] = symbols;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Elimina el registro de una biblioteca OCX previamente cargada.
+    /// </summary>
+    public static void UnregisterOcxLibrary(string libraryNameOrPath)
+    {
+        if (string.IsNullOrWhiteSpace(libraryNameOrPath)) return;
+
+        var matching = _registeredOcxLibraries.Where(l =>
+            string.Equals(l.LibraryName, libraryNameOrPath, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(l.FilePath, libraryNameOrPath, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(l.Guid, libraryNameOrPath, StringComparison.OrdinalIgnoreCase)
+        ).ToList();
+
+        foreach (var lib in matching)
+        {
+            _registeredOcxLibraries.Remove(lib);
+            foreach (var ctrl in lib.Controls)
+            {
+                _dynamicControlMembers.Remove(ctrl.Name);
+                if (!string.IsNullOrEmpty(lib.LibraryName))
+                {
+                    _dynamicControlMembers.Remove($"{lib.LibraryName}.{ctrl.Name}");
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Retorna la lista de bibliotecas OCX registradas dinámicamente.
+    /// </summary>
+    public static IReadOnlyList<OcxLibraryInfo> GetRegisteredOcxLibraries() => _registeredOcxLibraries;
+
+    /// <summary>
+    /// Limpia todos los controles dinámicos registrados.
+    /// </summary>
+    public static void ClearDynamicRegistrations()
+    {
+        _dynamicControlMembers.Clear();
+        _registeredOcxLibraries.Clear();
+    }
+
+    /// <summary>
+    /// Verifica si un tipo de control está registrado en el catálogo (intrínseco o dinámico).
+    /// </summary>
+    public static bool IsControlRegistered(string typeName)
+    {
+        string norm = NormalizeTypeName(typeName);
+        if (_controlMembers.ContainsKey(norm) || _dynamicControlMembers.ContainsKey(norm))
+        {
+            return true;
+        }
+        int dot = norm.LastIndexOf('.');
+        if (dot >= 0 && dot < norm.Length - 1)
+        {
+            string shortName = norm[(dot + 1)..];
+            return _controlMembers.ContainsKey(shortName) || _dynamicControlMembers.ContainsKey(shortName);
+        }
+        return false;
+    }
 
     /// <summary>
     /// Busca un miembro específico en un tipo de control.

@@ -241,6 +241,70 @@ public static class ControlToolboxRegistry
     }
 
     /// <summary>
+    /// Registra una herramienta personalizada en la caja de herramientas.
+    /// </summary>
+    public static void RegisterCustomTool(ToolboxItemInfo tool)
+    {
+        if (tool == null) return;
+        var existing = _tools.FirstOrDefault(t => string.Equals(t.TypeName, tool.TypeName, StringComparison.OrdinalIgnoreCase));
+        if (existing != null)
+        {
+            _tools.Remove(existing);
+        }
+        _tools.Add(tool);
+    }
+
+    /// <summary>
+    /// Elimina herramientas que cumplan con la condición dada.
+    /// </summary>
+    public static void UnregisterCustomTools(Func<ToolboxItemInfo, bool> predicate)
+    {
+        _tools.RemoveAll(t => predicate(t));
+    }
+
+    /// <summary>
+    /// Registra en la caja de herramientas todos los controles visuales expuestos por una biblioteca OCX.
+    /// </summary>
+    public static void RegisterOcxTools(VB7x64.ProjectModel.ActiveX.OcxLibraryInfo lib)
+    {
+        if (lib == null) return;
+
+        foreach (var ctrl in lib.Controls.Where(c => c.IsControl))
+        {
+            string typeName = !string.IsNullOrEmpty(lib.LibraryName) ? $"{lib.LibraryName}.{ctrl.Name}" : ctrl.Name;
+            string prefix = ctrl.Name;
+            if (prefix.StartsWith("ax", StringComparison.OrdinalIgnoreCase))
+            {
+                prefix = prefix[2..];
+            }
+
+            var tool = new ToolboxItemInfo(
+                TypeName: typeName,
+                DisplayName: ctrl.Name,
+                DefaultPrefix: prefix,
+                Glyph: "🧩",
+                ToolTip: $"{ctrl.Name} ({(!string.IsNullOrEmpty(ctrl.Description) ? ctrl.Description : lib.LibraryName)})",
+                DefaultWidthTwips: 1500,
+                DefaultHeightTwips: 600,
+                IsContainer: false,
+                HasCaption: ctrl.Members.Any(m => m.Name.Equals("Caption", StringComparison.OrdinalIgnoreCase)),
+                HasText: ctrl.Members.Any(m => m.Name.Equals("Text", StringComparison.OrdinalIgnoreCase))
+            );
+
+            RegisterCustomTool(tool);
+        }
+    }
+
+    /// <summary>
+    /// Elimina de la caja de herramientas todos los controles pertenecientes a una biblioteca OCX.
+    /// </summary>
+    public static void UnregisterOcxTools(string libraryName)
+    {
+        if (string.IsNullOrWhiteSpace(libraryName)) return;
+        UnregisterCustomTools(t => t.TypeName.StartsWith($"{libraryName}.", StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
     /// Instancia un nuevo control con nombre autogenerado único, dimensiones estándar y textos por defecto.
     /// </summary>
     public static FormDesignerControl CreateControl(
@@ -263,9 +327,15 @@ public static class ControlToolboxRegistry
         if (w <= 0 && !string.Equals(typeName, "VB.Line", StringComparison.OrdinalIgnoreCase)) w = 300;
         if (h <= 0 && !string.Equals(typeName, "VB.Line", StringComparison.OrdinalIgnoreCase)) h = 300;
 
+        string finalTypeName = typeName;
+        if (!finalTypeName.StartsWith("VB.", StringComparison.OrdinalIgnoreCase) && !finalTypeName.Contains('.'))
+        {
+            finalTypeName = $"VB.{finalTypeName}";
+        }
+
         var control = new FormDesignerControl
         {
-            TypeName = typeName.StartsWith("VB.", StringComparison.OrdinalIgnoreCase) ? typeName : $"VB.{typeName}",
+            TypeName = finalTypeName,
             Name = uniqueName,
             Left = Math.Max(0, leftTwips),
             Top = Math.Max(0, topTwips),

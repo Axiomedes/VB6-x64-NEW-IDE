@@ -14,12 +14,14 @@ using VB7x64.IDE.Dialogs;
 using VB7x64.IDE.Editor;
 using VB7x64.IDE.Logging;
 using VB7x64.IDE.Settings;
+using VB7x64.ProjectModel.ActiveX;
 using VB7x64.ProjectModel.Analysis;
 using VB7x64.ProjectModel.CodeBuilders;
 using VB7x64.ProjectModel.Designers;
 using VB7x64.ProjectModel.Documents;
 using VB7x64.ProjectModel.ErrorHandling;
 using VB7x64.ProjectModel.Formatting;
+using VB7x64.ProjectModel.IntelliSense;
 using VB7x64.ProjectModel.Navigation;
 using VB7x64.ProjectModel.Settings;
 using VB7x64.ProjectModel.Vbp;
@@ -502,6 +504,11 @@ public partial class MainWindow : Window
             _currentProjectGroup = group;
             _currentProject = group.StartupProject ?? group.Projects.FirstOrDefault();
 
+            foreach (var p in group.Projects)
+            {
+                LoadProjectActiveXComponents(p);
+            }
+
             RefreshProjectTree();
             SetStatusMessage($"Grupo de proyectos '{group.Name}' cargado con {group.Projects.Count} proyectos.");
             Title = $"VB7-x64 IDE - [Grupo] {group.Name} ({Path.GetFileName(group.GroupFilePath)})";
@@ -525,6 +532,8 @@ public partial class MainWindow : Window
             var project = VbpParser.Parse(vbpFilePath);
             _currentProject = project;
             _currentProjectGroup = null;
+
+            LoadProjectActiveXComponents(project);
 
             RefreshProjectTree();
             SetStatusMessage($"Proyecto '{project.Name}' cargado exitosamente.");
@@ -1167,6 +1176,120 @@ public partial class MainWindow : Window
         }
     }
 
+    private void MenuComponents_Click(object sender, RoutedEventArgs e)
+    {
+        ShowComponentsDialog();
+    }
+
+    private void ShowComponentsDialog()
+    {
+        var dlg = new Dialogs.ComponentsWindow(_currentProject)
+        {
+            Owner = this
+        };
+
+        if (dlg.ShowDialog() == true)
+        {
+            // Procesar bibliotecas seleccionadas
+            foreach (var lib in dlg.SelectedLibraries)
+            {
+                // 1. Registrar en el catálogo de IntelliSense
+                VbControlMemberCatalog.RegisterOcxLibrary(lib);
+
+                // 2. Registrar en la caja de herramientas
+                ControlToolboxRegistry.RegisterOcxTools(lib);
+
+                // 3. Agregar al proyecto actual si está abierto
+                if (_currentProject != null)
+                {
+                    string relPath = !string.IsNullOrEmpty(_currentProject.ProjectDirectory) && lib.FilePath.StartsWith(_currentProject.ProjectDirectory, StringComparison.OrdinalIgnoreCase)
+                        ? Path.GetRelativePath(_currentProject.ProjectDirectory, lib.FilePath)
+                        : Path.GetFileName(lib.FilePath);
+
+                    _currentProject.AddActiveXControl(lib, relPath);
+
+                    // Persistir en el archivo .vbp en disco si existe
+                    try
+                    {
+                        if (File.Exists(_currentProject.ProjectFilePath))
+                        {
+                            string vbpContent = File.ReadAllText(_currentProject.ProjectFilePath, Encoding.GetEncoding(1252));
+                            string guidFormatted = lib.Guid.StartsWith('{') ? lib.Guid : "{" + lib.Guid + "}";
+                            string objLine = $"Object={guidFormatted}#{lib.MajorVersion}.{lib.MinorVersion}#0; {Path.GetFileName(lib.FilePath)}";
+
+                            if (!vbpContent.Contains(guidFormatted, StringComparison.OrdinalIgnoreCase))
+                            {
+                                int firstForm = vbpContent.IndexOf("Form=", StringComparison.OrdinalIgnoreCase);
+                                if (firstForm >= 0)
+                                {
+                                    vbpContent = vbpContent.Insert(firstForm, objLine + "\r\n");
+                                }
+                                else
+                                {
+                                    vbpContent += "\r\n" + objLine;
+                                }
+                                File.WriteAllText(_currentProject.ProjectFilePath, vbpContent, Encoding.GetEncoding(1252));
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        AppLogger.Warn($"No se pudo persistir la línea Object= en el archivo VBP: {ex.Message}");
+                    }
+                }
+            }
+
+            // Procesar bibliotecas deseleccionadas
+            foreach (var lib in dlg.DeselectedLibraries)
+            {
+                VbControlMemberCatalog.UnregisterOcxLibrary(lib.LibraryName);
+                ControlToolboxRegistry.UnregisterOcxTools(lib.LibraryName);
+            }
+
+            // Refrescar caja de herramientas
+            MainToolboxPanel.ReloadTools();
+
+            int addedCount = dlg.SelectedLibraries.Count;
+            int totalTools = dlg.SelectedLibraries.Sum(l => l.Controls.Count(c => c.IsControl));
+            SetStatusMessage($"Componentes actualizados: {addedCount} bibliotecas activas ({totalTools} controles disponibles en Toolbox e IntelliSense).");
+        }
+    }
+
+    private void LoadProjectActiveXComponents(VB6Project project)
+    {
+        if (project == null) return;
+
+        int loadedCount = 0;
+        foreach (var item in project.ActiveXControls)
+        {
+            string? resolvedPath = OcxTypeLibReader.ResolveOcxPath(item.RelativePath, project.ProjectDirectory);
+            if (string.IsNullOrEmpty(resolvedPath) && !string.IsNullOrEmpty(item.AbsolutePath) && File.Exists(item.AbsolutePath))
+            {
+                resolvedPath = item.AbsolutePath;
+            }
+
+            if (!string.IsNullOrEmpty(resolvedPath) && File.Exists(resolvedPath))
+            {
+                if (OcxTypeLibReader.TryReadTypeLib(resolvedPath, out var lib, out _))
+                {
+                    VbControlMemberCatalog.RegisterOcxLibrary(lib!);
+                    ControlToolboxRegistry.RegisterOcxTools(lib!);
+                    if (!project.LoadedOcxLibraries.Contains(lib!))
+                    {
+                        project.LoadedOcxLibraries.Add(lib!);
+                    }
+                    loadedCount++;
+                }
+            }
+        }
+
+        if (loadedCount > 0)
+        {
+            MainToolboxPanel.ReloadTools();
+            AppLogger.Info($"Se cargaron {loadedCount} componentes ActiveX del proyecto '{project.Name}'.");
+        }
+    }
+
     private void MenuOpenProject_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new OpenFileDialog
@@ -1733,6 +1856,14 @@ public partial class MainWindow : Window
         {
             MenuToggleToolbox.IsChecked = !MenuToggleToolbox.IsChecked;
             ColToolbox.Width = MenuToggleToolbox.IsChecked ? new GridLength(_settings.ToolboxWidth) : new GridLength(0);
+            e.Handled = true;
+            return;
+        }
+
+        // Ctrl+T: Componentes ActiveX / OCX
+        if (e.Key == Key.T && Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            ShowComponentsDialog();
             e.Handled = true;
             return;
         }

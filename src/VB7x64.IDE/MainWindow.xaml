@@ -112,6 +112,8 @@
                 <MenuItem Header="_Agregar Formulario..." InputGestureText="Ctrl+N" Click="MenuNewForm_Click"/>
                 <MenuItem Header="Agregar _Módulo..." Click="MenuAddModule_Click"/>
                 <MenuItem Header="Agregar Módulo de _Clase..." Click="MenuAddClass_Click"/>
+                <Separator/>
+                <MenuItem Header="_Componentes..." InputGestureText="Ctrl+T" Click="MenuComponents_Click"/>
             </MenuItem>
             <MenuItem Header="_Funciones Avanzadas">
                 <MenuItem x:Name="MenuToggleLineHighlight" Header="Resaltar _Línea Activa" IsCheckable="True" IsChecked="True" Click="MenuToggleLineHighlight_Click"/>

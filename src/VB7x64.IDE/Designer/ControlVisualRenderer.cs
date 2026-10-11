@@ -21,24 +21,34 @@ public static class ControlVisualRenderer
     /// </summary>
     public static FrameworkElement CreateVisual(FormDesignerControl control, Action<FormDesignerControl, FrameworkElement>? onChildCreated = null)
     {
-        FrameworkElement visual = control.TypeName.ToUpperInvariant() switch
+        string normType = control.TypeName.ToUpperInvariant();
+        if (normType.StartsWith("VB.", StringComparison.OrdinalIgnoreCase))
         {
-            "VB.COMMANDBUTTON" => CreateCommandButton(control),
-            "VB.TEXTBOX" => CreateTextBox(control),
-            "VB.LABEL" => CreateLabel(control),
-            "VB.CHECKBOX" => CreateCheckBox(control),
-            "VB.OPTIONBUTTON" => CreateOptionButton(control),
-            "VB.FRAME" => CreateFrame(control, onChildCreated),
-            "VB.LISTBOX" => CreateListBox(control),
-            "VB.COMBOBOX" => CreateComboBox(control),
-            "VB.PICTUREBOX" => CreatePictureBox(control, onChildCreated),
-            "VB.IMAGE" => CreateImage(control),
-            "VB.TIMER" => CreateTimer(control),
-            "VB.HSCROLLBAR" => CreateHScrollBar(control),
-            "VB.VSCROLLBAR" => CreateVScrollBar(control),
-            "VB.SHAPE" => CreateShape(control),
-            "VB.LINE" => CreateLine(control),
-            _ => CreateGenericControl(control)
+            normType = normType[3..];
+        }
+
+        FrameworkElement visual = normType switch
+        {
+            "COMMANDBUTTON" => CreateCommandButton(control),
+            "TEXTBOX" => CreateTextBox(control),
+            "LABEL" => CreateLabel(control),
+            "CHECKBOX" => CreateCheckBox(control),
+            "OPTIONBUTTON" => CreateOptionButton(control),
+            "FRAME" => CreateFrame(control, onChildCreated),
+            "LISTBOX" => CreateListBox(control),
+            "COMBOBOX" => CreateComboBox(control),
+            "PICTUREBOX" => CreatePictureBox(control, onChildCreated),
+            "IMAGE" => CreateImage(control),
+            "TIMER" => CreateTimer(control),
+            "HSCROLLBAR" => CreateHScrollBar(control),
+            "VSCROLLBAR" => CreateVScrollBar(control),
+            "SHAPE" => CreateShape(control),
+            "LINE" => CreateLine(control),
+            _ => normType.Contains("COMBO")
+                ? CreateComboBox(control)
+                : normType.Contains("LIST")
+                    ? CreateListBox(control)
+                    : CreateGenericControl(control)
         };
 
         if (control.IsNonResizable)
@@ -523,7 +533,7 @@ public static class ControlVisualRenderer
     {
         var border = new Border
         {
-            Background = new SolidColorBrush(Color.FromRgb(245, 245, 245)),
+            Background = VbColorHelper.ToBrush(ctrl.BackColorHex, new SolidColorBrush(Color.FromRgb(245, 245, 245))),
             BorderBrush = new SolidColorBrush(Color.FromRgb(160, 160, 160)),
             BorderThickness = new Thickness(1),
             Padding = new Thickness(4)
@@ -532,17 +542,19 @@ public static class ControlVisualRenderer
         var sp = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
         sp.Children.Add(new TextBlock
         {
-            Text = $"⚙ {ctrl.DisplayType}",
+            Text = $"🧩 {ctrl.DisplayType}",
             FontSize = 10,
             FontWeight = FontWeights.SemiBold,
             Foreground = Brushes.DarkSlateGray,
             HorizontalAlignment = HorizontalAlignment.Center
         });
+
+        string label = !string.IsNullOrEmpty(ctrl.Caption) ? ctrl.Caption : ctrl.Name;
         sp.Children.Add(new TextBlock
         {
-            Text = ctrl.Name,
+            Text = label,
             FontSize = 9.5,
-            Foreground = Brushes.Gray,
+            Foreground = Brushes.DimGray,
             HorizontalAlignment = HorizontalAlignment.Center
         });
 

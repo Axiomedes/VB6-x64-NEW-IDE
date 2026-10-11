@@ -463,7 +463,18 @@ public static class IntelliSenseContextDetector
             else
             {
                 var ctrl = formModel?.FindControl(targetExpr);
-                if (ctrl != null) typeName = ctrl.TypeName;
+                if (ctrl != null)
+                {
+                    typeName = ctrl.TypeName;
+                }
+                else
+                {
+                    var declaredType = FindVariableType(documentText, targetExpr);
+                    if (!string.IsNullOrEmpty(declaredType))
+                    {
+                        typeName = declaredType;
+                    }
+                }
             }
 
             symbol = VbControlMemberCatalog.FindMember(typeName, callName);

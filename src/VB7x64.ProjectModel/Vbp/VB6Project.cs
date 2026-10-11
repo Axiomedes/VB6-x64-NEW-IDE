@@ -20,6 +20,48 @@ public class VB6Project
     public List<string> RawLines { get; } = [];
     public Dictionary<string, string> Settings { get; } = new(StringComparer.OrdinalIgnoreCase);
 
+    public int MajorVer
+    {
+        get => int.TryParse(Settings.TryGetValue("MajorVer", out var v) ? v : "1", out var n) ? n : 1;
+        set => Settings["MajorVer"] = value.ToString();
+    }
+
+    public int MinorVer
+    {
+        get => int.TryParse(Settings.TryGetValue("MinorVer", out var v) ? v : "0", out var n) ? n : 0;
+        set => Settings["MinorVer"] = value.ToString();
+    }
+
+    public int RevisionVer
+    {
+        get => int.TryParse(Settings.TryGetValue("RevisionVer", out var v) ? v : "0", out var n) ? n : 0;
+        set => Settings["RevisionVer"] = value.ToString();
+    }
+
+    public bool AutoIncrementVer
+    {
+        get => Settings.TryGetValue("AutoIncrementVer", out var v) && (v == "1" || string.Equals(v, "true", StringComparison.OrdinalIgnoreCase));
+        set => Settings["AutoIncrementVer"] = value ? "1" : "0";
+    }
+
+    public string CompanyName
+    {
+        get => Settings.TryGetValue("CompanyName", out var v) ? v : string.Empty;
+        set => Settings["CompanyName"] = value;
+    }
+
+    public string FileDescription
+    {
+        get => Settings.TryGetValue("FileDescription", out var v) ? v : Title;
+        set => Settings["FileDescription"] = value;
+    }
+
+    public string LegalCopyright
+    {
+        get => Settings.TryGetValue("LegalCopyright", out var v) ? v : string.Empty;
+        set => Settings["LegalCopyright"] = value;
+    }
+
     public IEnumerable<ProjectItem> Forms => Items.FindAll(i => i.Type == ProjectItemType.Form);
     public IEnumerable<ProjectItem> Modules => Items.FindAll(i => i.Type == ProjectItemType.Module);
     public IEnumerable<ProjectItem> Classes => Items.FindAll(i => i.Type == ProjectItemType.Class);

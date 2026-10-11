@@ -69,6 +69,12 @@
                 <MenuItem x:Name="MenuCloseDoc" Header="_Cerrar documento" InputGestureText="Ctrl+W" Click="MenuCloseDoc_Click"/>
                 <MenuItem x:Name="MenuCloseAll" Header="Cerrar _todo (Proyecto y Documentos)" InputGestureText="Ctrl+Shift+W" Click="MenuCloseAll_Click"/>
                 <Separator/>
+                <MenuItem x:Name="MenuMakeExe" Header="Generar _Ejecutable..." InputGestureText="Ctrl+Shift+B" Click="MenuMakeExe_Click">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource Icon_MakeExe}" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
                 <MenuItem Header="_Salir" InputGestureText="Alt+F4" Click="MenuExit_Click"/>
             </MenuItem>
             <MenuItem Header="_Edición">
@@ -258,6 +264,10 @@
                 <Separator/>
                 <Button x:Name="BtnToolbarMenuEditor" ToolTip="Editor de Menús (Ctrl+E)" Click="MenuMenuEditor_Click" Width="28" Height="24" Padding="0">
                     <Image Source="{StaticResource Icon_MenuEditor}" Width="16" Height="16"/>
+                </Button>
+                <Separator/>
+                <Button x:Name="BtnToolbarMakeExe" ToolTip="Generar Ejecutable PE32 Nativo (Ctrl+Shift+B)" Click="MenuMakeExe_Click" Width="28" Height="24" Padding="0">
+                    <Image Source="{StaticResource Icon_MakeExe}" Width="16" Height="16"/>
                 </Button>
                 <Separator/>
                 <Button x:Name="BtnToolbarRunStart" ToolTip="Iniciar Ejecución en Caliente (F5)" Click="MenuRunStart_Click" Width="28" Height="24" Padding="0">

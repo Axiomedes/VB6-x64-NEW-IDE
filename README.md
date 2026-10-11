@@ -3,7 +3,7 @@
 [![Build & Test](https://img.shields.io/badge/.NET-10.0%20LTS-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20x64-0078D6?logo=windows)](https://microsoft.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSES.md)
-[![Tests](https://img.shields.io/badge/Tests-154%20Passing-success.svg)](tests/VB7x64.Tests)
+[![Tests](https://img.shields.io/badge/Tests-158%20Passing-success.svg)](tests/VB7x64.Tests)
 
 Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado en **Microsoft Visual Basic 6.0**, diseñado para abrir, explorar, editar, diseñar y refactorizar proyectos clásicos de VB6 (`.vbp`, `.vbg`, `.bas`, `.cls`, `.frm`, `.ctl`, `.pag`) de forma nativa en sistemas de 64 bits, con total seguridad y sin corromper sus formatos ni recursos binarios.
 
@@ -101,6 +101,17 @@ Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado 
   * Paso a paso por instrucciones (<kbd>F8</kbd>) y por procedimientos (<kbd>Shift+F8</kbd>).
   * Gestión de Puntos de Interrupción (<kbd>F9</kbd> / <kbd>Ctrl+Shift+F9</kbd>).
 
+### 10. Compilación Nativa x32 con Runtime MSVBVM60.DLL (<kbd>Ctrl+Shift+B</kbd>)
+* **Emisor Nativo PE32 Autónomo**: Generación directa de archivos binarios ejecutables `.exe` de 32 bits (arquitectura x86) sin necesidad de tener instalado el compilador clásico de Microsoft (`VB6.EXE` ni `LINK.EXE`).
+* **Enlace Canónico a `msvbvm60.dll`**: Importación estándar de `msvbvm60.dll!ThunRTMain` mediante tabla de importación IAT y stub x86 de inicio (`push offset VBHeader; call [IAT_ThunRTMain]; ret`).
+* **Estructuras Binarias VB6 (`VB5!`)**: Construcción en bajo nivel del grafo binario oficial de VB6 (`VBHeader`, `ProjInfo`, `ProjectData`, `ObjectTable`, `ObjectInfo`).
+* **Diálogo de Compilación (`Make EXE`)**:
+  * Accesible desde `Archivo ➔ Generar <Proyecto>.exe...`, atajo <kbd>Ctrl+Shift+B</kbd> o botón con engranaje en la barra de herramientas.
+  * Exploración de disco para definir la ruta y nombre del binario.
+  * Control total de propiedades de versión (Mayor, Menor, Revisión) con soporte de auto-incremento automático.
+  * Metadatos descriptivos completos incrustados en el ejecutable: Nombre de la compañía, descripción del archivo y copyright legal.
+* **Compatibilidad Universal sin Dependencias**: Los binarios generados se ejecutan de manera transparente en cualquier versión de Windows (desde Windows 98 hasta Windows 11 64-bit) gracias al runtime nativo preinstalado de fábrica en el sistema (`SysWOW64\msvbvm60.dll`).
+
 ---
 
 ## 🛡️ Principios e Invariantes de Seguridad
@@ -119,9 +130,9 @@ Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado 
 VB7x64.sln
 ├── src/
 │   ├── VB7x64.IDE/             # Shell WPF x64: Menús, Toolbar, Editor, Diseñador, Hot-Run, Immediate Window y UI
-│   └── VB7x64.ProjectModel/    # Modelo de proyectos, Parsers, Motor Hot-Run (Execution), ActiveX y E/S segura
+│   └── VB7x64.ProjectModel/    # Modelo de proyectos, Parsers, Motor Hot-Run (Execution), Compilador PE32, ActiveX y E/S segura
 ├── tests/
-│   ├── VB7x64.Tests/           # Suite de pruebas unitarias xUnit (154 pruebas / 100% éxito)
+│   ├── VB7x64.Tests/           # Suite de pruebas unitarias xUnit (158 pruebas / 100% éxito)
 │   └── fixtures/               # Proyectos de muestra de VB6 para pruebas de round-trip
 └── docs/                       # Arquitectura y Decisiones de Diseño (ADRs)
 ```
@@ -144,7 +155,7 @@ cd VB6-x64-NEW-IDE
 # Restaurar paquetes y compilar la solución
 dotnet build
 
-# Ejecutar la suite de pruebas unitarias automatizadas (154 pruebas)
+# Ejecutar la suite de pruebas unitarias automatizadas (158 pruebas)
 dotnet test
 
 # Iniciar el IDE
@@ -163,6 +174,6 @@ dotnet run --project src/VB7x64.IDE
 | **M4: Editor de Menús (<kbd>Ctrl+E</kbd>)** | ✅ Completado | Editor jerárquico de menús, indentación por puntos `....`, atajos de teclado y sincronización `.frm`. |
 | **M5: IntelliSense y Carga de OCX en Diseño** | ✅ Completado | List Members, Parameter Info, Complete Word, lector COM TypeLib nativo x64, diálogo Componentes (<kbd>Ctrl+T</kbd>). |
 | **M6: Ejecución en Caliente (Hot-Run / <kbd>F5</kbd>)** | ✅ Completado | Motor de ejecución en memoria sin compilar a disco, ventana en vivo interactiva (`LiveFormWindow`), breakpoints (<kbd>F9</kbd>), paso a paso (<kbd>F8</kbd>), Ventana Inmediata (<kbd>Ctrl+G</kbd>, `?` / `Print`) y `Debug.Print` en tiempo real. |
-| **M7: Compilación Nativa x32 (MSVBVM60.DLL)** | ⏳ **En Curso** | Emisor nativo de ejecutables PE32 (x86) independientes con cabeceras VB6 clásicas y enlace directo al runtime del sistema `msvbvm60.dll` (Opción B). |
-| **M8: UserControls en Diseño y Ejecución** | ⏳ **Planificado** | Renderizado de controles `.ctl`, aparición en Toolbox del proyecto, composición visual dentro de formularios y ejecución interactiva en caliente. |
+| **M7: Compilación Nativa x32 (MSVBVM60.DLL)** | ✅ Completado | Emisor nativo de ejecutables PE32 (x86) autónomos con cabeceras `VB5!` clásicas, stubs x86 y enlace canónico a `msvbvm60.dll!ThunRTMain`. Diálogo Make EXE, atajo <kbd>Ctrl+Shift+B</kbd> y metadatos completos. |
+| **M8: UserControls en Diseño y Ejecución** | ⏳ **En Curso** | Renderizado de controles `.ctl`, aparición en Toolbox del proyecto, composición visual dentro de formularios y ejecución interactiva en caliente. |
 | **M9: Generación y Compilación Nativa x64** | ⏳ **Planificado** | Compilador / emisor nativo a ejecutables y librerías de 64 bits para arquitectura Windows x64 moderna. |

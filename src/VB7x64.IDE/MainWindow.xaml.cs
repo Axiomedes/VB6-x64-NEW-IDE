@@ -25,6 +25,7 @@ using VB7x64.ProjectModel.IntelliSense;
 using VB7x64.IDE.Execution;
 using VB7x64.ProjectModel.Execution;
 using VB7x64.ProjectModel.Navigation;
+using VB7x64.ProjectModel.Compilation;
 using VB7x64.ProjectModel.Settings;
 using VB7x64.ProjectModel.Vbp;
 
@@ -622,6 +623,8 @@ public partial class MainWindow : Window
                 FontStyle = FontStyles.Italic
             });
         }
+
+        UpdateMakeExeMenuState();
     }
 
     private TreeViewItem? CreateProjectNode(VB6Project project, bool isStartup, string filter, ProjectExplorerMode mode)
@@ -1391,6 +1394,73 @@ public partial class MainWindow : Window
         CloseProjectAndAllDocuments();
     }
 
+    private void UpdateMakeExeMenuState()
+    {
+        if (MenuMakeExe == null) return;
+
+        if (_currentProject != null)
+        {
+            string name = !string.IsNullOrWhiteSpace(_currentProject.Name) ? _currentProject.Name : "Proyecto1";
+            MenuMakeExe.Header = $"Generar _{name}.exe...";
+            MenuMakeExe.IsEnabled = true;
+            if (BtnToolbarMakeExe != null) BtnToolbarMakeExe.IsEnabled = true;
+        }
+        else
+        {
+            MenuMakeExe.Header = "Generar _Ejecutable...";
+            MenuMakeExe.IsEnabled = false;
+            if (BtnToolbarMakeExe != null) BtnToolbarMakeExe.IsEnabled = false;
+        }
+    }
+
+    private void MenuMakeExe_Click(object sender, RoutedEventArgs e)
+    {
+        if (_currentProject == null)
+        {
+            MessageBox.Show("No hay ningún proyecto activo cargado para generar el ejecutable.\n\nPor favor abra o cree un proyecto primero.", "Generar Ejecutable", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var dlg = new MakeProjectExeDialog(_currentProject)
+        {
+            Owner = this
+        };
+
+        if (dlg.ShowDialog() == true && dlg.CompileResult != null)
+        {
+            var res = dlg.CompileResult;
+            SetStatusMessage($"Ejecutable '{Path.GetFileName(res.OutputExePath)}' generado exitosamente ({res.OutputSizeBytes:N0} bytes).");
+            AppLogger.Info($"Compilación nativa x32 exitosa: {res.OutputExePath} ({res.OutputSizeBytes} bytes)");
+
+            var ask = MessageBox.Show(
+                $"El ejecutable nativo PE32 fue generado exitosamente:\n\n{res.OutputExePath}\nTamaño: {res.OutputSizeBytes:N0} bytes\nEnlace: msvbvm60.dll!ThunRTMain\n\n¿Desea abrir la carpeta contenedora?",
+                "Compilación Exitosa",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Information);
+
+            if (ask == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    string? dir = Path.GetDirectoryName(res.OutputExePath);
+                    if (!string.IsNullOrEmpty(dir) && Directory.Exists(dir))
+                    {
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "explorer.exe",
+                            Arguments = $"/select,\"{res.OutputExePath}\"",
+                            UseShellExecute = true
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AppLogger.Warn($"No se pudo abrir el explorador para {res.OutputExePath}: {ex.Message}");
+                }
+            }
+        }
+    }
+
     private void MenuExit_Click(object sender, RoutedEventArgs e)
     {
         Close();
@@ -1756,6 +1826,14 @@ public partial class MainWindow : Window
             {
                 MenuRunStart_Click(this, new RoutedEventArgs());
             }
+            e.Handled = true;
+            return;
+        }
+
+        // Ctrl+Shift+B: Generar Ejecutable (Build / Make EXE)
+        if (e.Key == Key.B && Keyboard.Modifiers == (ModifierKeys.Control | ModifierKeys.Shift))
+        {
+            MenuMakeExe_Click(this, new RoutedEventArgs());
             e.Handled = true;
             return;
         }

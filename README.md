@@ -3,22 +3,56 @@
 [![Build & Test](https://img.shields.io/badge/.NET-10.0%20LTS-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20x64-0078D6?logo=windows)](https://microsoft.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSES.md)
-[![Tests](https://img.shields.io/badge/Tests-100%20Passing-success.svg)](tests/VB7x64.Tests)
+[![Tests](https://img.shields.io/badge/Tests-144%20Passing-success.svg)](tests/VB7x64.Tests)
 
-Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado en **Microsoft Visual Basic 6.0**, diseñado para abrir, explorar, editar y refactorizar proyectos clásicos de VB6 (`.vbp`, `.vbg`, `.bas`, `.cls`, `.frm`, `.ctl`, `.pag`) de forma segura y sin corromper sus formatos ni recursos binarios.
+Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado en **Microsoft Visual Basic 6.0**, diseñado para abrir, explorar, editar, diseñar y refactorizar proyectos clásicos de VB6 (`.vbp`, `.vbg`, `.bas`, `.cls`, `.frm`, `.ctl`, `.pag`) de forma nativa en sistemas de 64 bits, con total seguridad y sin corromper sus formatos ni recursos binarios.
 
 ---
 
-## 🌟 Características Principales
+## 🌟 Características Implementadas
 
-### 1. Editor de Código y Productividad Visual
+### 1. Diseñador Visual de Formularios (Form Designer WYSIWYG)
+* **Superficie de Diseño Bidireccional**: Renderizado fiel del formulario visual a partir de la cabecera `Begin VB.Form...End` de archivos `.frm`.
+* **Soporte de Contenedores y Jerarquías**: Capacidad para dibujar controles directamente sobre o dentro de contenedores (e.g. botones o cajas de texto dentro de un `Frame` o `PictureBox`), manteniendo su pertenencia en la jerarquía visual.
+* **Portapapeles en el Diseñador**: Operaciones completas de **Copiar**, **Cortar** y **Pegar** (<kbd>Ctrl+C</kbd>, <kbd>Ctrl+X</kbd>, <kbd>Ctrl+V</kbd>) que permiten duplicar controles con nombres únicos autogenerados, mover controles entre contenedores o pegarlos en otros formularios.
+* **Diferenciación entre Form y UserControl**: Detección del tipo de raíz; los formularios disponen de barra de título y borde estándar de Windows, mientras que los `UserControl` se presentan como lienzos puros sin barra superior.
+* **Controles No Visibles en Ejecución**: Controles como `Timer` mantienen un tamaño fijo (32×32 px / 480×480 twips) no redimensionable en diseño.
+* **Rejilla y Ajuste (Grid & Snap to Grid)**: Rejilla de puntos visual personalizable con paso ajustable y alineación magnética automática.
+* **Alternancia Rápida Código ↔ Objeto**: Botones dedicados en la barra de herramientas y atajos estándar (<kbd>F7</kbd> para Código, <kbd>Shift+F7</kbd> para Diseñador visual).
+
+### 2. Editor de Menús Clásico de VB6 (<kbd>Ctrl+E</kbd>)
+* **Diálogo de Edición Jerárquica de Menús**: Réplica moderna del editor de menús de VB6 accesible con <kbd>Ctrl+E</kbd> o desde el menú de herramientas.
+* **Estructura en Árbol con Puntos de Nivel**: Visualización de niveles de profundidad mediante puntos guía (`....Menú`) al utilizar los botones de sangría (**►** / **◄**).
+* **Propiedades de Menú**: Configuración de `Caption`, `Name`, `Index`, `Shortcut` (atajos de teclado estándar como <kbd>Ctrl+O</kbd>, <kbd>F1</kbd>, etc.), `Checked`, `Enabled` y `Visible`.
+* **Reordenación Dinámica**: Botones de navegación (Subir **▲**, Bajar **▼**, Insertar, Eliminar, Siguiente).
+* **Sincronización Automática**: Serialización y deserialización transparente de las estructuras `Begin VB.Menu...End` en el archivo `.frm`.
+
+### 3. Servicios de Lenguaje e IntelliSense
+* **Auto List Members (<kbd>Ctrl+J</kbd> / `.`)**: Despliegue automático de listas de miembros con iconos descriptivos para propiedades, métodos y eventos al escribir el punto (`.`) o de forma manual.
+* **Auto Parameter Info (<kbd>Ctrl+I</kbd>)**: Tooltip interactivo con firmas completas de argumentos para funciones del runtime y métodos de objetos, con resaltado dinámico en negrita del parámetro actualmente activo.
+* **Auto Complete Word (<kbd>Ctrl+Espacio</kbd>)**: Autocompletado inteligente de palabras clave, nombres de controles y variables locales/globales con filtrado incremental.
+* **Catálogo Exhaustivo de VB6**: Biblioteca preconfigurada con todas las funciones intrínsecas (`Mid`, `MsgBox`, `InStr`, etc.), constantes de sistema (`vbCrLf`, `vbInformation`, `vbNormal`, etc.), tipos de datos y miembros de todos los controles estándar.
+
+### 4. Soporte para Componentes ActiveX / OCX en Tiempo de Diseño
+* **Lector Nativo TypeLib COM x64**: Motor P/Invoke a `oleaut32.dll!LoadTypeLibEx` con modo `REGKIND_NONE` que lee metadatos COM directamente desde archivos `.ocx`, `.dll` o `.tlb` en procesos x64 **sin requerir registro en Windows ni permisos de administrador**.
+* **Diálogo de Componentes (<kbd>Ctrl+T</kbd>)**:
+  * Accesible desde `Proyecto ➔ Componentes...` o con el atajo clásico <kbd>Ctrl+T</kbd>.
+  * Exploración de disco mediante el botón **Examinar...** para cargar cualquier archivo `.ocx` o `.tlb`.
+  * Visualización de ruta, biblioteca, GUID, versión y controles expuestos.
+  * Persistencia automática de directivas `Object={GUID}#Ver#0; Archivo.ocx` en el archivo de proyecto `.vbp`.
+  * Carga y registro automático de componentes al abrir cualquier `.vbp` o `.vbg`.
+* **Integración en la Caja de Herramientas (*Toolbox*)**: Los controles del OCX se incorporan dinámicamente como herramientas seleccionables para dibujarse en el formulario.
+* **Expansión Dinámica de IntelliSense**: Al instanciar un control OCX o declarar una variable tipada (e.g. `Dim c As axJColCombo`), IntelliSense ofrece todas sus propiedades, métodos, firmas y eventos en tiempo real.
+* **Renderizado Adaptativo en Diseñador**: Los controles OCX se representan gráficamente en el formulario según su categoría (controles de lista/combo se visualizan interactivos y controles generales muestran el distintivo `🧩`).
+
+### 5. Editor de Código y Productividad Visual
 * **Editor AvalonEdit Optimizado**: Resaltado sintáctico fiel para VB6 (keywords, tipos, literales de fecha `#mm/dd/yyyy#`, cadenas escapadas, comentarios con apóstrofe y `Rem`).
 * **Resaltado de Línea Activa**: Resaltado sutil y configurable de la línea donde se ubica el cursor.
 * **Guías de Estructura de Control (Branch Lines)**: Líneas verticales que conectan bloques `If...End If`, `Select Case`, `For...Next`, `Do...Loop`, `With...End With` y procedimientos.
 * **Detalles de Fin de Bloque (Inlay Hints / Ghost Text)**: Anotaciones discretas al final de bloques extensos (ej. `End If  ' [If precio > 100]`).
-* **Edición Rápida**: Comentar/descomentar en bloque (<kbd>Ctrl+K, Ctrl+C</kbd> / <kbd>Ctrl+K, Ctrl+U</kbd>), invertir asignaciones (`A = B` ➔ `B = A`) y conversión de mayúsculas/minúsculas.
+* **Edición Rápida**: Comentar/descomentar en bloque (<kbd>Ctrl+K, Ctrl+C</kbd> / <kbd>Ctrl+K, Ctrl+U</kbd>), invertir asignaciones (`A = B` ⇄ `B = A`) y conversión de mayúsculas/minúsculas.
 
-### 2. Exploración y Navegación Avanzada
+### 6. Exploración y Navegación Avanzada
 * **Explorador de Proyectos Dual**:
   * **Modo Estándar**: Árbol clásico purista de VB6 (Proyecto ➔ Carpetas de tipos ➔ Archivos).
   * **Modo Avanzado**: Expansión en profundidad de componentes internos (Sub, Function, Property, Eventos, Constantes, Variables de módulo, Enums y Types).
@@ -29,13 +63,13 @@ Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado 
   * Marcadores visuales en el margen (`🔖`) con navegación secuencial (<kbd>F2</kbd> / <kbd>Shift+F2</kbd>) y alternancia rápida (<kbd>Ctrl+F2</kbd>).
 * **Explorador de Tareas (TODO / Task List)**: Escaneo automático de etiquetas `' TODO:`, `' BUG:`, `' FIXME:`, `' NOTE:` y `' HACK:` con priorización y salto a la línea.
 
-### 3. Asistentes de Código y Snippets
+### 7. Asistentes de Código y Snippets
 * **Asistente de Propiedades (Property Builder)**: Generación automática de bloques `Property Get/Let` (tipos primitivos) y `Property Get/Set` (objetos) con variable de respaldo tipada.
 * **Asistente de Procedimientos (Procedure Builder)**: Diálogo interactivo para declarar métodos con visibilidad, tipos de retorno, argumentos tipados (`ByVal`/`ByRef`/`Optional`) y manejo de errores.
 * **Biblioteca de Snippets (AutoText con expansión por <kbd>Tab</kbd>)**: Plantillas para `if`, `ife`, `sel`, `for`, `fore`, `dow`, `dou`, `whi`, `with`, `prop`, `sub`, `fn`, `err`.
 * **Portapapeles Múltiple (Clipboard Ring - <kbd>Ctrl+Shift+V</kbd>)**: Historial rotativo de los últimos fragmentos copiados con previsualización e inserción directa.
 
-### 4. Mantenimiento y Calidad de Código
+### 8. Mantenimiento y Calidad de Código
 * **Formateador de Código VB6 (Code Formatter)**: Indentación automática según profundidad de anidación, alineación estética de cláusulas `As` en declaraciones `Dim` y normalización de líneas en blanco.
 * **Ordenador de Procedimientos (Sort Procedures)**: Reorganización alfabética o por visibilidad preservando el bloque de declaraciones de módulo.
 * **Comparador de Cambios (File Diff Viewer)**: Visor de diferencias lado a lado y unificado con coloreado de adiciones y supresiones frente a la versión en disco.
@@ -63,10 +97,10 @@ Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado 
 ```text
 VB7x64.sln
 ├── src/
-│   ├── VB7x64.IDE/             # Shell WPF x64: Menús, Barra de herramientas, Editor, Diálogos y UI
-│   └── VB7x64.ProjectModel/    # Modelo de proyectos, Parsers, Motores de refactorización y E/S segura
+│   ├── VB7x64.IDE/             # Shell WPF x64: Menús, Barra de herramientas, Editor, Diseñador, Diálogos y UI
+│   └── VB7x64.ProjectModel/    # Modelo de proyectos, Parsers, Motores de refactorización, ActiveX y E/S segura
 ├── tests/
-│   ├── VB7x64.Tests/           # Suite de pruebas unitarias xUnit (100 pruebas / 100% éxito)
+│   ├── VB7x64.Tests/           # Suite de pruebas unitarias xUnit (144 pruebas / 100% éxito)
 │   └── fixtures/               # Proyectos de muestra de VB6 para pruebas de round-trip
 └── docs/                       # Arquitectura y Decisiones de Diseño (ADRs)
 ```
@@ -89,7 +123,7 @@ cd VB6-x64-NEW-IDE
 # Restaurar paquetes y compilar la solución
 dotnet build
 
-# Ejecutar la suite de pruebas unitarias automatizadas
+# Ejecutar la suite de pruebas unitarias automatizadas (144 pruebas)
 dotnet test
 
 # Iniciar el IDE
@@ -98,16 +132,15 @@ dotnet run --project src/VB7x64.IDE
 
 ---
 
-## 🗺️ Próximos Pasos (Roadmap)
+## 🗺️ Roadmap de Milestones
 
-1. **Diseñador Visual de Formularios (Form Designer WYSIWYG)**:
-   * Superficie de diseño interactiva con rejilla (*Grid / Snap to Grid*).
-   * Renderizado gráfico fiel de controles de VB6.
-   * Manipulación interactiva (8 sizing handles, arrastre y redimensión).
-   * Caja de herramientas (*Toolbox*) y Ventana de propiedades (*Property Grid*).
-   * Flujo dual Código ↔ Diseñador (<kbd>F7</kbd> / <kbd>Shift+F7</kbd>).
-2. **Servicios de Lenguaje e IntelliSense**:
-   * Auto List Members tras el punto (`.`) y <kbd>Ctrl+J</kbd>.
-   * Auto Quick Info (<kbd>Ctrl+I</kbd>) para firmas de funciones del runtime y APIs de usuario.
-   * Auto Complete Word (<kbd>Ctrl+Espacio</kbd>).
-
+| Milestone | Estado | Descripción |
+| :--- | :---: | :--- |
+| **M1: Núcleo y Seguridad de Archivos** | ✅ Completado | Modelos `.vbp`/`.vbg`, manejo ANSI/CRLF, preservación `.frx`, pruebas de round-trip. |
+| **M2: Productividad Visual y Refactorización** | ✅ Completado | Branch lines, Inlay hints, Property/Procedure Builder, AutoText, Tab Order, Hotkey Checker. |
+| **M3: Diseñador de Formularios (Form Designer)** | ✅ Completado | WYSIWYG bidireccional, contenedores (`Frame`/`PictureBox`), portapapeles, Grid Snap, UserControls. |
+| **M4: Editor de Menús (<kbd>Ctrl+E</kbd>)** | ✅ Completado | Editor jerárquico de menús, indentación por puntos `....`, atajos de teclado y sincronización `.frm`. |
+| **M5: IntelliSense y Carga de OCX en Diseño** | ✅ Completado | List Members, Parameter Info, Complete Word, lector COM TypeLib nativo x64, diálogo Componentes (<kbd>Ctrl+T</kbd>). |
+| **M6: Ventana Inmediata y Consola de Depuración** | ⏳ Próximo | Ventana Inmediata (*Immediate Window*) para evaluación de expresiones y comandos interactivos `?` / `Print`. |
+| **M7: Motor de Depuración y Ejecución (F5 / Breakpoints)** | ⏳ Pendiente | Ejecución en proceso, puntos de interrupción, paso a paso (<kbd>F8</kbd>), inspección de variables locales (*Watch / Locals*). |
+| **M8: Generación y Compilación Nativa x64** | ⏳ Pendiente | Compilador / emisor nativo a ejecutables y librerías de 64 bits a partir del código fuente de VB6. |

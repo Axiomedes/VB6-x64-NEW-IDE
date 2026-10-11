@@ -263,4 +263,39 @@ End Sub
         var sig2 = host.InvokeProcedure("Calcular", "Modulo1", p2);
         Assert.Equal(FlowSignal.ExitSub, sig2);
     }
+
+    [Fact]
+    public void LiveExecutionHost_SupportsControlsInsideContainers_SuchAsFrame()
+    {
+        var ctx = new VbExecutionContext();
+        var host = new LiveExecutionHost(ctx);
+
+        var form = new MockLiveForm("Form1");
+        var frame = new MockLiveControl("Frame1", "Frame");
+        frame.SetProperty("Caption", VbValue.FromString("Marco"));
+
+        var txt = new MockLiveControl("TextInsideFrame", "TextBox");
+        txt.SetProperty("Text", VbValue.FromString("Inicial"));
+
+        form.AddControl(frame);
+        form.AddControl(txt);
+
+        ctx.ActiveForms["Form1"] = form;
+        ctx.SetVariable("Frame1", VbValue.FromObject(frame));
+        ctx.SetVariable("TextInsideFrame", VbValue.FromObject(txt));
+
+        string code = @"
+Sub ModificarContenido()
+    Frame1.Caption = ""Datos del Usuario""
+    TextInsideFrame.Text = ""Contenido Actualizado""
+End Sub
+";
+        host.LoadSourceCode(code, "Form1");
+
+        var sig = host.InvokeProcedure("ModificarContenido", "Form1");
+
+        Assert.Equal(FlowSignal.Normal, sig);
+        Assert.Equal("Datos del Usuario", frame.GetProperty("Caption").AsString());
+        Assert.Equal("Contenido Actualizado", txt.GetProperty("Text").AsString());
+    }
 }

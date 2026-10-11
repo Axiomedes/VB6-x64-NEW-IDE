@@ -62,29 +62,72 @@ public partial class LiveFormWindow : Window
         // 2. Construir menús de formulario si existen
         BuildMenus();
 
-        // 3. Construir controles en el lienzo (Canvas)
-        foreach (var ctrl in _model.GetAllControls())
+        // 3. Construir controles jerárquicamente a partir de los controles de primer nivel
+        foreach (var ctrl in _model.Children)
         {
             if (ctrl.TypeName.Equals("VB.Menu", StringComparison.OrdinalIgnoreCase))
             {
                 continue; // Ya procesado en BuildMenus
             }
 
-            var visual = CreateLiveControlVisual(ctrl);
-            if (visual != null)
+            BuildControlRecursive(ctrl, FormCanvas);
+        }
+    }
+
+    private void BuildControlRecursive(FormDesignerControl ctrl, Canvas parentCanvas)
+    {
+        var visual = CreateLiveControlVisual(ctrl);
+        if (visual != null)
+        {
+            Canvas.SetLeft(visual, ctrl.LeftPixels);
+            Canvas.SetTop(visual, ctrl.TopPixels);
+            visual.Width = ctrl.WidthPixels;
+            visual.Height = ctrl.HeightPixels;
+
+            parentCanvas.Children.Add(visual);
+
+            var proxy = new LiveControlProxy(ctrl, visual);
+            _formProxy.RegisterControl(proxy);
+            _host.Context.SetVariable(ctrl.Name, VbValue.FromObject(proxy));
+
+            // Si es un contenedor, obtener su lienzo interno para añadir sus hijos
+            Canvas innerCanvas = GetContainerInnerCanvas(visual) ?? parentCanvas;
+
+            foreach (var child in ctrl.Children)
             {
-                Canvas.SetLeft(visual, ctrl.LeftPixels);
-                Canvas.SetTop(visual, ctrl.TopPixels);
-                visual.Width = ctrl.WidthPixels;
-                visual.Height = ctrl.HeightPixels;
+                if (child.TypeName.Equals("VB.Menu", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
 
-                FormCanvas.Children.Add(visual);
-
-                var proxy = new LiveControlProxy(ctrl, visual);
-                _formProxy.RegisterControl(proxy);
-                _host.Context.SetVariable(ctrl.Name, VbValue.FromObject(proxy));
+                BuildControlRecursive(child, innerCanvas);
             }
         }
+        else
+        {
+            // Para controles sin representación visual en runtime (ej. Timer)
+            var dummyVisual = new FrameworkElement { Name = ctrl.Name };
+            var proxy = new LiveControlProxy(ctrl, dummyVisual);
+            _formProxy.RegisterControl(proxy);
+            _host.Context.SetVariable(ctrl.Name, VbValue.FromObject(proxy));
+        }
+    }
+
+    private static Canvas? GetContainerInnerCanvas(FrameworkElement visual)
+    {
+        if (visual is GroupBox gb && gb.Content is Canvas c1)
+        {
+            return c1;
+        }
+        if (visual is Border b && b.Child is Canvas c2)
+        {
+            return c2;
+        }
+        if (visual is Canvas c3)
+        {
+            return c3;
+        }
+        return null;
     }
 
     private void BuildMenus()
@@ -230,11 +273,38 @@ public partial class LiveFormWindow : Window
             case "FRAME":
                 var gb = new GroupBox
                 {
-                    Header = ctrl.Caption,
+                    Header = string.IsNullOrEmpty(ctrl.Caption) ? ctrl.Name : ctrl.Caption,
                     IsEnabled = ctrl.Enabled,
-                    Visibility = ctrl.Visible ? Visibility.Visible : Visibility.Hidden
+                    Visibility = ctrl.Visible ? Visibility.Visible : Visibility.Hidden,
+                    BorderBrush = new SolidColorBrush(Color.FromRgb(208, 206, 191)),
+                    BorderThickness = new Thickness(1),
+                    Background = VbColorHelper.ToBrush(ctrl.BackColorHex, Brushes.Transparent),
+                    Padding = new Thickness(2)
                 };
+                var frameCanvas = new Canvas
+                {
+                    ClipToBounds = true,
+                    Background = Brushes.Transparent
+                };
+                gb.Content = frameCanvas;
                 return gb;
+
+            case "PICTUREBOX":
+                var picBorder = new Border
+                {
+                    Background = VbColorHelper.ToBrush(ctrl.BackColorHex, Brushes.White),
+                    BorderBrush = new SolidColorBrush(Color.FromRgb(128, 128, 128)),
+                    BorderThickness = new Thickness(ctrl.BorderStyle == 0 ? 0 : 1),
+                    ClipToBounds = true
+                };
+                var picCanvas = new Canvas
+                {
+                    ClipToBounds = true,
+                    Background = Brushes.Transparent
+                };
+                picBorder.Child = picCanvas;
+                picBorder.MouseDown += (s, e) => _host.InvokeProcedure($"{ctrlName}_Click", _model.Name);
+                return picBorder;
 
             case "TIMER":
                 int intervalMs = 1000;

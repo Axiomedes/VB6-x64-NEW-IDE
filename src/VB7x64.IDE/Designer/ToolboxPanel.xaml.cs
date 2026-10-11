@@ -118,7 +118,9 @@ public partial class ToolboxPanel : UserControl, INotifyPropertyChanged
             "VB.Image" => "Icon_Tool_Image",
             "VB.Data" => "Icon_Tool_Data",
             "VB.OLE" => "Icon_Tool_OLE",
-            _ => "Icon_Tool_CommandButton"
+            _ => (ControlToolboxRegistry.Find(typeName)?.Glyph == "🎛️" || ControlToolboxRegistry.Find(typeName)?.ToolTip.StartsWith("Control de Usuario", StringComparison.OrdinalIgnoreCase) == true)
+                ? "Icon_FileUserControl"
+                : "Icon_Tool_CommandButton"
         };
 
         return Application.Current?.TryFindResource(resourceKey) as ImageSource;

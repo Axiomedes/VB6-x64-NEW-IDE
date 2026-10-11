@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using VB7x64.ProjectModel.Designers;
+using VB7x64.ProjectModel.Documents;
 
 namespace VB7x64.ProjectModel.Vbp;
 
@@ -104,6 +107,78 @@ public class VB6Project
             });
 
             RawLines.Add(rawLine);
+        }
+    }
+
+    private readonly Dictionary<string, FormDesignModel> _cachedUserControlModels = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Busca un ProjectItem de tipo UserControl por su nombre, tipo o nombre de archivo.
+    /// </summary>
+    public ProjectItem? FindUserControl(string typeOrName)
+    {
+        if (string.IsNullOrWhiteSpace(typeOrName)) return null;
+
+        string cleanName = typeOrName.Trim();
+        if (cleanName.StartsWith($"{Name}.", StringComparison.OrdinalIgnoreCase))
+        {
+            cleanName = cleanName[(Name.Length + 1)..];
+        }
+
+        return UserControls.FirstOrDefault(u =>
+            string.Equals(u.Name, cleanName, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(Path.GetFileNameWithoutExtension(u.RelativePath), cleanName, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(Path.GetFileName(u.RelativePath), cleanName, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals($"{Name}.{u.Name}", typeOrName, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Obtiene y parsea el modelo de diseño (FormDesignModel) de un UserControl del proyecto.
+    /// </summary>
+    public FormDesignModel? GetUserControlDesignModel(string typeOrName)
+    {
+        var item = FindUserControl(typeOrName);
+        if (item == null) return null;
+
+        string key = item.AbsolutePath ?? item.Name;
+        if (_cachedUserControlModels.TryGetValue(key, out var cached))
+        {
+            return cached;
+        }
+
+        if (!string.IsNullOrEmpty(item.AbsolutePath) && File.Exists(item.AbsolutePath))
+        {
+            try
+            {
+                var doc = SafeFileStorage.LoadDocument(item.AbsolutePath);
+                if (!string.IsNullOrWhiteSpace(doc.Header))
+                {
+                    var model = FormDesignParser.Parse(doc.Header);
+                    _cachedUserControlModels[key] = model;
+                    return model;
+                }
+            }
+            catch
+            {
+                // Fallback silencioso si no se puede leer
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Invalida la caché del modelo visual de un UserControl (por ejemplo cuando se guardan cambios en el editor).
+    /// </summary>
+    public void InvalidateUserControlCache(string? keyOrPath = null)
+    {
+        if (string.IsNullOrEmpty(keyOrPath))
+        {
+            _cachedUserControlModels.Clear();
+        }
+        else
+        {
+            _cachedUserControlModels.Remove(keyOrPath);
         }
     }
 }

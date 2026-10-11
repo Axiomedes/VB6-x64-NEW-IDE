@@ -21,26 +21,44 @@ public partial class LiveFormWindow : Window
     private readonly LiveExecutionHost _host;
     private readonly LiveFormProxy _formProxy;
     private readonly List<DispatcherTimer> _activeTimers = new();
+    private readonly Func<string, FormDesignModel?>? _userControlResolver;
 
     public LiveFormProxy FormProxy => _formProxy;
 
-    public LiveFormWindow(FormDesignModel model, LiveExecutionHost host, string? sourceCode = null)
+    public LiveFormWindow(
+        FormDesignModel model,
+        LiveExecutionHost host,
+        string? sourceCode = null,
+        Func<string, FormDesignModel?>? userControlResolver = null)
     {
         InitializeComponent();
 
         _model = model ?? throw new ArgumentNullException(nameof(model));
         _host = host ?? throw new ArgumentNullException(nameof(host));
+        _userControlResolver = userControlResolver;
         _formProxy = new LiveFormProxy(_model, this);
 
-        Title = string.IsNullOrEmpty(_model.Caption) ? _model.Name : _model.Caption;
-        Width = Math.Max(200, _model.ClientWidthPixels);
-        Height = Math.Max(150, _model.ClientHeightPixels);
-
-        if (!string.IsNullOrWhiteSpace(_model.BackColorHex))
+        if (_model.IsUserControl)
         {
-            var brush = VbColorHelper.ToBrush(_model.BackColorHex, SystemColors.ControlBrush);
-            Background = brush;
-            FormCanvas.Background = brush;
+            Title = $"[Contenedor de Prueba de UserControl: {_model.Name}]";
+            Width = Math.Max(340, _model.ClientWidthPixels + 50);
+            Height = Math.Max(260, _model.ClientHeightPixels + 70);
+            var testBg = new SolidColorBrush(Color.FromRgb(128, 128, 128));
+            Background = testBg;
+            FormCanvas.Background = testBg;
+        }
+        else
+        {
+            Title = string.IsNullOrEmpty(_model.Caption) ? _model.Name : _model.Caption;
+            Width = Math.Max(200, _model.ClientWidthPixels);
+            Height = Math.Max(150, _model.ClientHeightPixels);
+
+            if (!string.IsNullOrWhiteSpace(_model.BackColorHex))
+            {
+                var brush = VbColorHelper.ToBrush(_model.BackColorHex, SystemColors.ControlBrush);
+                Background = brush;
+                FormCanvas.Background = brush;
+            }
         }
 
         if (sourceCode != null)
@@ -65,7 +83,33 @@ public partial class LiveFormWindow : Window
         // 3. Normalizar jerarquía del modelo para asegurar que ningún control hijo permanezca en la raíz
         NormalizeModelHierarchy();
 
-        // 4. Construir controles jerárquicamente a partir de los controles de primer nivel
+        // 4. Si se está ejecutando directamente un UserControl en modo Test Container:
+        if (_model.IsUserControl)
+        {
+            var ucBorder = new Border
+            {
+                Width = _model.ClientWidthPixels,
+                Height = _model.ClientHeightPixels,
+                Background = VbColorHelper.ToBrush(_model.BackColorHex, SystemColors.ControlBrush),
+                BorderBrush = new SolidColorBrush(Color.FromRgb(64, 64, 64)),
+                BorderThickness = new Thickness(1),
+                ClipToBounds = true
+            };
+            Canvas.SetLeft(ucBorder, 20);
+            Canvas.SetTop(ucBorder, 20);
+            var innerCanvas = new Canvas { ClipToBounds = true, Background = Brushes.Transparent };
+            ucBorder.Child = innerCanvas;
+            FormCanvas.Children.Add(ucBorder);
+
+            foreach (var ctrl in _model.Children)
+            {
+                if (ctrl.TypeName.Equals("VB.Menu", StringComparison.OrdinalIgnoreCase)) continue;
+                BuildControlRecursive(ctrl, innerCanvas);
+            }
+            return;
+        }
+
+        // 5. Construir controles jerárquicamente a partir de los controles de primer nivel
         foreach (var ctrl in _model.Children)
         {
             if (ctrl.TypeName.Equals("VB.Menu", StringComparison.OrdinalIgnoreCase))
@@ -200,8 +244,21 @@ public partial class LiveFormWindow : Window
         return item;
     }
 
-    private FrameworkElement? CreateLiveControlVisual(FormDesignerControl ctrl)
+    private FrameworkElement? CreateLiveControlVisual(
+        FormDesignerControl ctrl,
+        string? targetModuleName = null,
+        string? parentControlPrefix = null)
     {
+        // 1. Si es un UserControl registrado o resuelto, componerlo en vivo a partir de su definición .ctl
+        if (_userControlResolver != null)
+        {
+            var ucModel = _userControlResolver(ctrl.TypeName);
+            if (ucModel != null)
+            {
+                return CreateLiveUserControlVisual(ctrl, ucModel);
+            }
+        }
+
         string normType = ctrl.TypeName.ToUpperInvariant();
         if (normType.StartsWith("VB.", StringComparison.OrdinalIgnoreCase))
         {
@@ -209,6 +266,16 @@ public partial class LiveFormWindow : Window
         }
 
         string ctrlName = ctrl.Name;
+        string modName = targetModuleName ?? _model.Name;
+
+        void DispatchEvent(string eventName)
+        {
+            _host.InvokeProcedure($"{ctrlName}_{eventName}", modName);
+            if (!string.IsNullOrEmpty(parentControlPrefix))
+            {
+                _host.InvokeProcedure($"{parentControlPrefix}_{ctrlName}_{eventName}", _model.Name);
+            }
+        }
 
         switch (normType)
         {
@@ -221,7 +288,7 @@ public partial class LiveFormWindow : Window
                     Background = VbColorHelper.ToBrush(ctrl.BackColorHex, SystemColors.ControlBrush),
                     Foreground = VbColorHelper.ToBrush(ctrl.ForeColorHex, SystemColors.ControlTextBrush)
                 };
-                btn.Click += (s, e) => _host.InvokeProcedure($"{ctrlName}_Click", _model.Name);
+                btn.Click += (s, e) => DispatchEvent("Click");
                 return btn;
 
             case "TEXTBOX":
@@ -239,7 +306,7 @@ public partial class LiveFormWindow : Window
                     tb.TextWrapping = TextWrapping.Wrap;
                     tb.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
                 }
-                tb.TextChanged += (s, e) => _host.InvokeProcedure($"{ctrlName}_Change", _model.Name);
+                tb.TextChanged += (s, e) => DispatchEvent("Change");
                 return tb;
 
             case "LABEL":
@@ -251,7 +318,7 @@ public partial class LiveFormWindow : Window
                     Foreground = VbColorHelper.ToBrush(ctrl.ForeColorHex, SystemColors.ControlTextBrush),
                     VerticalAlignment = VerticalAlignment.Center
                 };
-                lbl.MouseDown += (s, e) => _host.InvokeProcedure($"{ctrlName}_Click", _model.Name);
+                lbl.MouseDown += (s, e) => DispatchEvent("Click");
                 return lbl;
 
             case "CHECKBOX":
@@ -262,7 +329,7 @@ public partial class LiveFormWindow : Window
                     Visibility = ctrl.Visible ? Visibility.Visible : Visibility.Hidden,
                     Foreground = VbColorHelper.ToBrush(ctrl.ForeColorHex, SystemColors.ControlTextBrush)
                 };
-                chk.Click += (s, e) => _host.InvokeProcedure($"{ctrlName}_Click", _model.Name);
+                chk.Click += (s, e) => DispatchEvent("Click");
                 return chk;
 
             case "OPTIONBUTTON":
@@ -273,7 +340,7 @@ public partial class LiveFormWindow : Window
                     Visibility = ctrl.Visible ? Visibility.Visible : Visibility.Hidden,
                     Foreground = VbColorHelper.ToBrush(ctrl.ForeColorHex, SystemColors.ControlTextBrush)
                 };
-                rad.Click += (s, e) => _host.InvokeProcedure($"{ctrlName}_Click", _model.Name);
+                rad.Click += (s, e) => DispatchEvent("Click");
                 return rad;
 
             case "LISTBOX":
@@ -282,8 +349,8 @@ public partial class LiveFormWindow : Window
                     IsEnabled = ctrl.Enabled,
                     Visibility = ctrl.Visible ? Visibility.Visible : Visibility.Hidden
                 };
-                lb.SelectionChanged += (s, e) => _host.InvokeProcedure($"{ctrlName}_Click", _model.Name);
-                lb.MouseDoubleClick += (s, e) => _host.InvokeProcedure($"{ctrlName}_DblClick", _model.Name);
+                lb.SelectionChanged += (s, e) => DispatchEvent("Click");
+                lb.MouseDoubleClick += (s, e) => DispatchEvent("DblClick");
                 return lb;
 
             case "COMBOBOX":
@@ -293,7 +360,7 @@ public partial class LiveFormWindow : Window
                     Visibility = ctrl.Visible ? Visibility.Visible : Visibility.Hidden,
                     IsEditable = true
                 };
-                cb.SelectionChanged += (s, e) => _host.InvokeProcedure($"{ctrlName}_Click", _model.Name);
+                cb.SelectionChanged += (s, e) => DispatchEvent("Click");
                 return cb;
 
             case "FRAME":
@@ -329,7 +396,7 @@ public partial class LiveFormWindow : Window
                     Background = Brushes.Transparent
                 };
                 picBorder.Child = picCanvas;
-                picBorder.MouseDown += (s, e) => _host.InvokeProcedure($"{ctrlName}_Click", _model.Name);
+                picBorder.MouseDown += (s, e) => DispatchEvent("Click");
                 return picBorder;
 
             case "TIMER":
@@ -345,7 +412,7 @@ public partial class LiveFormWindow : Window
                     Interval = TimeSpan.FromMilliseconds(intervalMs),
                     IsEnabled = ctrl.Enabled
                 };
-                timer.Tick += (s, e) => _host.InvokeProcedure($"{ctrlName}_Timer", _model.Name);
+                timer.Tick += (s, e) => DispatchEvent("Timer");
                 _activeTimers.Add(timer);
                 timer.Start();
 
@@ -353,26 +420,117 @@ public partial class LiveFormWindow : Window
                 return null;
 
             default:
-                // Para otros controles gráficos (Shape, Image, PictureBox, etc.)
+                // Para otros controles gráficos (Shape, Image, etc.)
                 return ControlVisualRenderer.CreateVisual(ctrl);
         }
+    }
+
+    private FrameworkElement CreateLiveUserControlVisual(FormDesignerControl ctrl, FormDesignModel ucModel)
+    {
+        var ucBorder = new Border
+        {
+            Background = VbColorHelper.ToBrush(ctrl.BackColorHex ?? ucModel.BackColorHex, SystemColors.ControlBrush),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(140, 140, 140)),
+            BorderThickness = new Thickness(ctrl.BorderStyle == 0 ? 0 : 1),
+            ClipToBounds = true,
+            Visibility = ctrl.Visible ? Visibility.Visible : Visibility.Hidden,
+            IsEnabled = ctrl.Enabled
+        };
+
+        var ucCanvas = new Canvas
+        {
+            ClipToBounds = true,
+            Background = Brushes.Transparent
+        };
+        ucBorder.Child = ucCanvas;
+
+        // Disparar ciclo de vida inicial del UserControl
+        _host.InvokeProcedure("UserControl_Initialize", ucModel.Name);
+        _host.InvokeProcedure($"{ctrl.Name}_Initialize", _model.Name);
+        _host.InvokeProcedure("UserControl_Resize", ucModel.Name);
+
+        // Construir cada control constitutivo del UserControl dentro de su lienzo
+        foreach (var child in ucModel.Children)
+        {
+            if (child.TypeName.Equals("VB.Menu", StringComparison.OrdinalIgnoreCase)) continue;
+
+            var childVisual = CreateLiveControlVisual(child, ucModel.Name, ctrl.Name);
+            if (childVisual != null)
+            {
+                Canvas.SetLeft(childVisual, child.LeftPixels);
+                Canvas.SetTop(childVisual, child.TopPixels);
+                childVisual.Width = child.WidthPixels;
+                childVisual.Height = child.HeightPixels;
+                ucCanvas.Children.Add(childVisual);
+
+                // Registrar proxy constitutivo accesible tanto como uc1_btn como btn
+                var childProxy = new LiveControlProxy(child, childVisual);
+                _formProxy.RegisterControl(childProxy);
+                _host.Context.SetVariable($"{ctrl.Name}_{child.Name}", VbValue.FromObject(childProxy));
+                _host.Context.SetVariable(child.Name, VbValue.FromObject(childProxy));
+            }
+        }
+
+        // Clic en el área del UserControl
+        ucBorder.MouseDown += (s, e) =>
+        {
+            _host.InvokeProcedure($"{ctrl.Name}_Click", _model.Name);
+            _host.InvokeProcedure("UserControl_Click", ucModel.Name);
+        };
+
+        return ucBorder;
     }
 
     private void WireEvents()
     {
         Loaded += (s, e) =>
         {
-            _host.InvokeProcedure("Form_Load", _model.Name);
+            if (_model.IsUserControl)
+            {
+                _host.InvokeProcedure("UserControl_Initialize", _model.Name);
+                _host.InvokeProcedure("UserControl_Resize", _model.Name);
+                _host.InvokeProcedure("UserControl_Paint", _model.Name);
+            }
+            else
+            {
+                _host.InvokeProcedure("Form_Load", _model.Name);
+            }
         };
 
         FormCanvas.MouseDown += (s, e) =>
         {
-            _host.InvokeProcedure("Form_Click", _model.Name);
+            if (_model.IsUserControl)
+            {
+                _host.InvokeProcedure("UserControl_Click", _model.Name);
+            }
+            else
+            {
+                _host.InvokeProcedure("Form_Click", _model.Name);
+            }
+        };
+
+        SizeChanged += (s, e) =>
+        {
+            if (_model.IsUserControl)
+            {
+                _host.InvokeProcedure("UserControl_Resize", _model.Name);
+            }
+            else
+            {
+                _host.InvokeProcedure("Form_Resize", _model.Name);
+            }
         };
 
         Closing += (s, e) =>
         {
-            _host.InvokeProcedure("Form_Unload", _model.Name, VbValue.FromLong(0));
+            if (_model.IsUserControl)
+            {
+                _host.InvokeProcedure("UserControl_Terminate", _model.Name);
+            }
+            else
+            {
+                _host.InvokeProcedure("Form_Unload", _model.Name, VbValue.FromLong(0));
+            }
         };
 
         Closed += (s, e) =>

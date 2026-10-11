@@ -276,11 +276,39 @@ public static class FormDesignParser
             case "CLIENTTOP":
                 if (int.TryParse(cleanVal, out int ct)) model.ClientTop = ct;
                 break;
+            case "WIDTH":
+                if (int.TryParse(cleanVal, out int w)) model.ClientWidth = w;
+                break;
+            case "HEIGHT":
+                if (int.TryParse(cleanVal, out int h)) model.ClientHeight = h;
+                break;
             case "SCALEWIDTH":
-                if (int.TryParse(cleanVal, out int sw)) model.ScaleWidth = sw;
+                if (int.TryParse(cleanVal, out int sw))
+                {
+                    model.ScaleWidth = sw;
+                    if (model.ClientWidth <= 0 || model.ClientWidth == 4680) model.ClientWidth = sw;
+                }
                 break;
             case "SCALEHEIGHT":
-                if (int.TryParse(cleanVal, out int sh)) model.ScaleHeight = sh;
+                if (int.TryParse(cleanVal, out int sh))
+                {
+                    model.ScaleHeight = sh;
+                    if (model.ClientHeight <= 0 || model.ClientHeight == 3195) model.ClientHeight = sh;
+                }
+                break;
+            case "_EXTENTX":
+                if (int.TryParse(cleanVal, out int ex) && ex > 0)
+                {
+                    int tw = (int)Math.Round(ex * 0.567);
+                    if (model.ClientWidth <= 0 || model.ClientWidth == 4680) model.ClientWidth = tw;
+                }
+                break;
+            case "_EXTENTY":
+                if (int.TryParse(cleanVal, out int ey) && ey > 0)
+                {
+                    int th = (int)Math.Round(ey * 0.567);
+                    if (model.ClientHeight <= 0 || model.ClientHeight == 3195) model.ClientHeight = th;
+                }
                 break;
             case "SCALEMODE":
                 if (int.TryParse(cleanVal, out int sm)) model.ScaleMode = sm;
@@ -321,6 +349,18 @@ public static class FormDesignParser
                 break;
             case "HEIGHT":
                 if (int.TryParse(cleanVal, out int height)) ctrl.Height = height;
+                break;
+            case "_EXTENTX":
+                if (ctrl.Width <= 0 && int.TryParse(cleanVal, out int ex) && ex > 0)
+                {
+                    ctrl.Width = (int)Math.Round(ex * 0.567);
+                }
+                break;
+            case "_EXTENTY":
+                if (ctrl.Height <= 0 && int.TryParse(cleanVal, out int ey) && ey > 0)
+                {
+                    ctrl.Height = (int)Math.Round(ey * 0.567);
+                }
                 break;
             case "TABINDEX":
                 if (int.TryParse(cleanVal, out int tidx)) ctrl.TabIndex = tidx;

@@ -3,7 +3,7 @@
 [![Build & Test](https://img.shields.io/badge/.NET-10.0%20LTS-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20x64-0078D6?logo=windows)](https://microsoft.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSES.md)
-[![Tests](https://img.shields.io/badge/Tests-158%20Passing-success.svg)](tests/VB7x64.Tests)
+[![Tests](https://img.shields.io/badge/Tests-165%20Passing-success.svg)](tests/VB7x64.Tests)
 
 Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado en **Microsoft Visual Basic 6.0**, diseñado para abrir, explorar, editar, diseñar y refactorizar proyectos clásicos de VB6 (`.vbp`, `.vbg`, `.bas`, `.cls`, `.frm`, `.ctl`, `.pag`) de forma nativa en sistemas de 64 bits, con total seguridad y sin corromper sus formatos ni recursos binarios.
 
@@ -112,6 +112,16 @@ Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado 
   * Metadatos descriptivos completos incrustados en el ejecutable: Nombre de la compañía, descripción del archivo y copyright legal.
 * **Compatibilidad Universal sin Dependencias**: Los binarios generados se ejecutan de manera transparente en cualquier versión de Windows (desde Windows 98 hasta Windows 11 64-bit) gracias al runtime nativo preinstalado de fábrica en el sistema (`SysWOW64\msvbvm60.dll`).
 
+### 11. Soporte Completo de UserControls (`.ctl`) en Diseño y Ejecución en Caliente
+* **Aparición Dinámica en la Caja de Herramientas (*Toolbox*)**: Los UserControls presentes en el proyecto se registran automáticamente en la Toolbox con el icono distintivo `🎛️` y nombre calificado (`Proyecto.MiUserControl`).
+* **Composición Visual Fiel en el Diseñador**: Al arrastrar o incrustar un UserControl en un formulario, el diseñador compone y dibuja recursivamente todos sus controles constitutivos (botones, etiquetas, cajas de texto, etc.) leídos directamente desde el archivo `.ctl`.
+* **Soporte de Propiedades de Geometría y Escala**: Conversión bidireccional exacta de dimensiones HiMetric (`_ExtentX`, `_ExtentY`) a Twips y píxeles (`Twips = HiMetric * 0.567`).
+* **Contenedor de Pruebas de UserControl (*Test Container*)**: Al pulsar <kbd>F5</kbd> sobre un archivo `.ctl` activo, se lanza en un contenedor de prueba interactivo con marco de prueba y fondo neutro `#808080` para evaluar su comportamiento y eventos de forma aislada.
+* **Ejecución en Caliente Interactiva (Hot-Run / <kbd>F5</kbd>)**:
+  * Instanciación y renderizado dinámico de los controles internos del UserControl dentro de formularios en tiempo de ejecución.
+  * Disparo automático de eventos de ciclo de vida (`UserControl_Initialize`, `Resize`, `Paint`, `Terminate`).
+  * Despacho y propagación bidireccional de eventos entre los controles internos del UserControl y el formulario anfitrión.
+
 ---
 
 ## 🛡️ Principios e Invariantes de Seguridad
@@ -132,7 +142,7 @@ VB7x64.sln
 │   ├── VB7x64.IDE/             # Shell WPF x64: Menús, Toolbar, Editor, Diseñador, Hot-Run, Immediate Window y UI
 │   └── VB7x64.ProjectModel/    # Modelo de proyectos, Parsers, Motor Hot-Run (Execution), Compilador PE32, ActiveX y E/S segura
 ├── tests/
-│   ├── VB7x64.Tests/           # Suite de pruebas unitarias xUnit (158 pruebas / 100% éxito)
+│   ├── VB7x64.Tests/           # Suite de pruebas unitarias xUnit (165 pruebas / 100% éxito)
 │   └── fixtures/               # Proyectos de muestra de VB6 para pruebas de round-trip
 └── docs/                       # Arquitectura y Decisiones de Diseño (ADRs)
 ```
@@ -155,7 +165,7 @@ cd VB6-x64-NEW-IDE
 # Restaurar paquetes y compilar la solución
 dotnet build
 
-# Ejecutar la suite de pruebas unitarias automatizadas (158 pruebas)
+# Ejecutar la suite de pruebas unitarias automatizadas (165 pruebas)
 dotnet test
 
 # Iniciar el IDE
@@ -175,5 +185,5 @@ dotnet run --project src/VB7x64.IDE
 | **M5: IntelliSense y Carga de OCX en Diseño** | ✅ Completado | List Members, Parameter Info, Complete Word, lector COM TypeLib nativo x64, diálogo Componentes (<kbd>Ctrl+T</kbd>). |
 | **M6: Ejecución en Caliente (Hot-Run / <kbd>F5</kbd>)** | ✅ Completado | Motor de ejecución en memoria sin compilar a disco, ventana en vivo interactiva (`LiveFormWindow`), breakpoints (<kbd>F9</kbd>), paso a paso (<kbd>F8</kbd>), Ventana Inmediata (<kbd>Ctrl+G</kbd>, `?` / `Print`) y `Debug.Print` en tiempo real. |
 | **M7: Compilación Nativa x32 (MSVBVM60.DLL)** | ✅ Completado | Emisor nativo de ejecutables PE32 (x86) autónomos con cabeceras `VB5!` clásicas, stubs x86 y enlace canónico a `msvbvm60.dll!ThunRTMain`. Diálogo Make EXE, atajo <kbd>Ctrl+Shift+B</kbd> y metadatos completos. |
-| **M8: UserControls en Diseño y Ejecución** | ⏳ **En Curso** | Renderizado de controles `.ctl`, aparición en Toolbox del proyecto, composición visual dentro de formularios y ejecución interactiva en caliente. |
+| **M8: UserControls en Diseño y Ejecución** | ✅ Completado | Renderizado de controles `.ctl`, aparición en Toolbox del proyecto, composición visual dentro de formularios, contenedor de prueba aislado y ejecución interactiva en caliente. |
 | **M9: Generación y Compilación Nativa x64** | ⏳ **Planificado** | Compilador / emisor nativo a ejecutables y librerías de 64 bits para arquitectura Windows x64 moderna. |

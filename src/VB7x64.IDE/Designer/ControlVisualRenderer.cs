@@ -17,6 +17,11 @@ public static class ControlVisualRenderer
     private static readonly FontFamily DefaultFontFamily = new("Tahoma, MS Sans Serif, Segoe UI, Arial");
 
     /// <summary>
+    /// Delegado global para resolver la definición de modelo de diseño de un UserControl por su TypeName.
+    /// </summary>
+    public static Func<string, FormDesignModel?>? UserControlModelResolver { get; set; }
+
+    /// <summary>
     /// Crea el elemento visual de WPF para un control del diseñador.
     /// </summary>
     public static FrameworkElement CreateVisual(FormDesignerControl control, Action<FormDesignerControl, FrameworkElement>? onChildCreated = null)
@@ -27,7 +32,19 @@ public static class ControlVisualRenderer
             normType = normType[3..];
         }
 
-        FrameworkElement visual = normType switch
+        FrameworkElement? visual = null;
+
+        // Si es un UserControl registrado en el proyecto, componerlo visualmente a partir de sus controles constitutivos
+        if (UserControlModelResolver != null)
+        {
+            var ucModel = UserControlModelResolver(control.TypeName) ?? UserControlModelResolver(normType);
+            if (ucModel != null)
+            {
+                visual = CreateUserControlVisual(control, ucModel, onChildCreated);
+            }
+        }
+
+        visual ??= normType switch
         {
             "COMMANDBUTTON" => CreateCommandButton(control),
             "TEXTBOX" => CreateTextBox(control),
@@ -527,6 +544,61 @@ public static class ControlVisualRenderer
             StrokeThickness = 1
         };
         return line;
+    }
+
+    private static FrameworkElement CreateUserControlVisual(
+        FormDesignerControl ctrl,
+        FormDesignModel ucModel,
+        Action<FormDesignerControl, FrameworkElement>? onChildCreated)
+    {
+        var border = new Border
+        {
+            Background = VbColorHelper.ToBrush(ctrl.BackColorHex ?? ucModel.BackColorHex, new SolidColorBrush(Color.FromRgb(240, 240, 240))),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(140, 140, 140)),
+            BorderThickness = new Thickness(ctrl.BorderStyle == 0 ? 0 : 1),
+            ClipToBounds = true
+        };
+
+        var ucCanvas = new Canvas
+        {
+            ClipToBounds = true,
+            Background = Brushes.Transparent
+        };
+        border.Child = ucCanvas;
+
+        if (ucModel.Children.Count > 0)
+        {
+            foreach (var child in ucModel.Children)
+            {
+                if (child.IsMenu) continue;
+                var childVisual = CreateVisual(child, onChildCreated);
+                Canvas.SetLeft(childVisual, child.LeftPixels);
+                Canvas.SetTop(childVisual, child.TopPixels);
+                childVisual.Width = child.WidthPixels;
+                childVisual.Height = child.HeightPixels;
+                ucCanvas.Children.Add(childVisual);
+                onChildCreated?.Invoke(child, childVisual);
+            }
+        }
+        else
+        {
+            var sp = new StackPanel
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            sp.Children.Add(new TextBlock
+            {
+                Text = $"🎛️ {ucModel.Name}",
+                FontSize = 10,
+                FontWeight = FontWeights.SemiBold,
+                Foreground = Brushes.DarkSlateGray,
+                HorizontalAlignment = HorizontalAlignment.Center
+            });
+            ucCanvas.Children.Add(sp);
+        }
+
+        return border;
     }
 
     private static FrameworkElement CreateGenericControl(FormDesignerControl ctrl)

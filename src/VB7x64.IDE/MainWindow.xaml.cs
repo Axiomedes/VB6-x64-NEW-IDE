@@ -10,6 +10,7 @@ using System.Windows.Media;
 using Microsoft.Win32;
 using ICSharpCode.AvalonEdit;
 using VB7x64.IDE.CodeBuilders;
+using VB7x64.IDE.Designer;
 using VB7x64.IDE.Dialogs;
 using VB7x64.IDE.Editor;
 using VB7x64.IDE.Logging;
@@ -248,6 +249,9 @@ public partial class MainWindow : Window
 
     private void InitializeDesignerPanels()
     {
+        // Resolver de modelos visuales para UserControls del proyecto actual
+        ControlVisualRenderer.UserControlModelResolver = (typeName) => _currentProject?.GetUserControlDesignModel(typeName);
+
         // Enlazar eventos de Toolbox global al diseñador activo
         MainToolboxPanel.ToolSelected += typeName =>
         {
@@ -480,6 +484,8 @@ public partial class MainWindow : Window
         ProjectTreeView.Items.Clear();
 
         MainPropertyGridPanel.ClearModel();
+        ControlToolboxRegistry.UnregisterUserControlTools();
+        MainToolboxPanel.ReloadTools();
         MainToolboxPanel.ResetToPointer();
 
         Title = "VB7-x64 IDE - Entorno de Desarrollo VB6 Clásico";
@@ -514,6 +520,12 @@ public partial class MainWindow : Window
                 LoadProjectActiveXComponents(p);
             }
 
+            if (_currentProject != null)
+            {
+                ControlToolboxRegistry.RegisterUserControlTools(_currentProject);
+                MainToolboxPanel.ReloadTools();
+            }
+
             RefreshProjectTree();
             SetStatusMessage($"Grupo de proyectos '{group.Name}' cargado con {group.Projects.Count} proyectos.");
             Title = $"VB7-x64 IDE - [Grupo] {group.Name} ({Path.GetFileName(group.GroupFilePath)})";
@@ -539,6 +551,8 @@ public partial class MainWindow : Window
             _currentProjectGroup = null;
 
             LoadProjectActiveXComponents(project);
+            ControlToolboxRegistry.RegisterUserControlTools(project);
+            MainToolboxPanel.ReloadTools();
 
             RefreshProjectTree();
             SetStatusMessage($"Proyecto '{project.Name}' cargado exitosamente.");
@@ -1333,6 +1347,10 @@ public partial class MainWindow : Window
         switch (result.Status)
         {
             case SaveStatus.Success:
+                if (ActiveTab.Document.FilePath?.EndsWith(".ctl", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    _currentProject?.InvalidateUserControlCache();
+                }
                 SetStatusMessage($"'{ActiveTab.Document.DisplayName}' guardado exitosamente.");
                 break;
             case SaveStatus.NotModified:
@@ -1370,14 +1388,28 @@ public partial class MainWindow : Window
     private void MenuSaveAll_Click(object sender, RoutedEventArgs e)
     {
         int count = 0;
+        bool userControlSaved = false;
         foreach (var item in DocumentsTabControl.Items)
         {
             if (item is EditorTabItem tab && tab.Document.IsDirty)
             {
                 var result = tab.Save(_settings.CreateBackupBeforeSave);
-                if (result.Status == SaveStatus.Success) count++;
+                if (result.Status == SaveStatus.Success)
+                {
+                    count++;
+                    if (tab.Document.FilePath?.EndsWith(".ctl", StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        userControlSaved = true;
+                    }
+                }
             }
         }
+
+        if (userControlSaved)
+        {
+            _currentProject?.InvalidateUserControlCache();
+        }
+
         SetStatusMessage(count > 0 ? $"Se guardaron {count} documentos modificados." : "Todos los documentos están actualizados.");
     }
 
@@ -3491,6 +3523,16 @@ public partial class MainWindow : Window
                         _liveExecutionHost.LoadSourceCode(modCode, mod.Name);
                     }
                 }
+
+                // Cargar UserControls (.ctl) del proyecto en el host
+                foreach (var uc in _currentProject.UserControls)
+                {
+                    if (!string.IsNullOrEmpty(uc.AbsolutePath) && File.Exists(uc.AbsolutePath))
+                    {
+                        var doc = SafeFileStorage.LoadDocument(uc.AbsolutePath);
+                        _liveExecutionHost.LoadSourceCode(doc.Text, uc.Name);
+                    }
+                }
             }
 
             // 4. Cargar el código del formulario en el host
@@ -3524,7 +3566,11 @@ public partial class MainWindow : Window
             };
 
             // 6. Instanciar la ventana en vivo (LiveFormWindow)
-            _liveFormWindow = new LiveFormWindow(targetFormModel, _liveExecutionHost, targetFormCode)
+            Func<string, FormDesignModel?>? ucResolver = _currentProject != null
+                ? typeName => _currentProject.GetUserControlDesignModel(typeName)
+                : null;
+
+            _liveFormWindow = new LiveFormWindow(targetFormModel, _liveExecutionHost, targetFormCode, ucResolver)
             {
                 Owner = this
             };

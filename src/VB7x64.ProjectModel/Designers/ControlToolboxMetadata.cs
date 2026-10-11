@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using VB7x64.ProjectModel.Vbp;
 
 namespace VB7x64.ProjectModel.Designers;
 
@@ -305,6 +307,59 @@ public static class ControlToolboxRegistry
     }
 
     /// <summary>
+    /// Registra en la caja de herramientas todos los UserControls (.ctl) pertenecientes al proyecto actual.
+    /// </summary>
+    public static void RegisterUserControlTools(VB6Project project)
+    {
+        if (project == null) return;
+
+        // Limpiar controles de usuario previos
+        UnregisterUserControlTools();
+
+        string projName = !string.IsNullOrWhiteSpace(project.Name) ? project.Name : "Proyecto1";
+
+        foreach (var ucItem in project.UserControls)
+        {
+            string ucName = !string.IsNullOrWhiteSpace(ucItem.Name)
+                ? ucItem.Name
+                : Path.GetFileNameWithoutExtension(ucItem.RelativePath);
+
+            string fullTypeName = $"{projName}.{ucName}";
+
+            // Dimensiones por defecto leídas del archivo .ctl
+            int defaultWidth = 2400;
+            int defaultHeight = 1800;
+            var ucModel = project.GetUserControlDesignModel(ucName);
+            if (ucModel != null)
+            {
+                if (ucModel.ClientWidth > 0) defaultWidth = ucModel.ClientWidth;
+                if (ucModel.ClientHeight > 0) defaultHeight = ucModel.ClientHeight;
+            }
+
+            var toolInfo = new ToolboxItemInfo(
+                TypeName: fullTypeName,
+                DisplayName: ucName,
+                DefaultPrefix: ucName,
+                Glyph: "🎛️",
+                ToolTip: $"Control de Usuario: {ucName} ({projName})",
+                DefaultWidthTwips: defaultWidth,
+                DefaultHeightTwips: defaultHeight,
+                IsContainer: false
+            );
+
+            RegisterCustomTool(toolInfo);
+        }
+    }
+
+    /// <summary>
+    /// Elimina de la caja de herramientas todos los UserControls personalizados registrados del proyecto.
+    /// </summary>
+    public static void UnregisterUserControlTools()
+    {
+        UnregisterCustomTools(t => t.Glyph == "🎛️" || t.ToolTip.StartsWith("Control de Usuario:", StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
     /// Instancia un nuevo control con nombre autogenerado único, dimensiones estándar y textos por defecto.
     /// </summary>
     public static FormDesignerControl CreateControl(
@@ -328,7 +383,8 @@ public static class ControlToolboxRegistry
         if (h <= 0 && !string.Equals(typeName, "VB.Line", StringComparison.OrdinalIgnoreCase)) h = 300;
 
         string finalTypeName = typeName;
-        if (!finalTypeName.StartsWith("VB.", StringComparison.OrdinalIgnoreCase) && !finalTypeName.Contains('.'))
+        bool isCustomUserControl = info != null && (info.Glyph == "🎛️" || info.ToolTip.StartsWith("Control de Usuario:", StringComparison.OrdinalIgnoreCase));
+        if (!isCustomUserControl && !finalTypeName.StartsWith("VB.", StringComparison.OrdinalIgnoreCase) && !finalTypeName.Contains('.'))
         {
             finalTypeName = $"VB.{finalTypeName}";
         }

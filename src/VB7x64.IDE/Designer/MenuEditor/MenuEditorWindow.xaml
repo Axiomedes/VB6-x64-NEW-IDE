@@ -105,7 +105,22 @@
                      FontFamily="Consolas, Segoe UI" FontSize="12.5"
                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
                      ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     SelectionChanged="LstMenuItems_SelectionChanged"/>
+                     HorizontalContentAlignment="Stretch"
+                     SelectionChanged="LstMenuItems_SelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel LastChildFill="True">
+                            <TextBlock DockPanel.Dock="Right" 
+                                       Text="{Binding ShortcutDisplay}" 
+                                       Foreground="#0055EA" 
+                                       Margin="20,0,8,0" 
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Right"/>
+                            <TextBlock Text="{Binding IndentedCaption}"/>
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </Border>
     </Grid>
 </Window>

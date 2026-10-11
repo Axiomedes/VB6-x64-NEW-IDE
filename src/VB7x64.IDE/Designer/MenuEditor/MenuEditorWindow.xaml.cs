@@ -35,7 +35,13 @@ public partial class MenuEditorWindow : Window
         public string Caption
         {
             get => _caption;
-            set { _caption = value; OnPropertyChanged(nameof(Caption)); OnPropertyChanged(nameof(DisplayText)); }
+            set
+            {
+                _caption = value;
+                OnPropertyChanged(nameof(Caption));
+                OnPropertyChanged(nameof(IndentedCaption));
+                OnPropertyChanged(nameof(DisplayText));
+            }
         }
 
         public string Name
@@ -53,7 +59,13 @@ public partial class MenuEditorWindow : Window
         public string Shortcut
         {
             get => _shortcut;
-            set { _shortcut = value; OnPropertyChanged(nameof(Shortcut)); OnPropertyChanged(nameof(DisplayText)); }
+            set
+            {
+                _shortcut = value;
+                OnPropertyChanged(nameof(Shortcut));
+                OnPropertyChanged(nameof(ShortcutDisplay));
+                OnPropertyChanged(nameof(DisplayText));
+            }
         }
 
         public int HelpContextID
@@ -95,21 +107,36 @@ public partial class MenuEditorWindow : Window
         public int Level
         {
             get => _level;
-            set { _level = Math.Max(0, value); OnPropertyChanged(nameof(Level)); OnPropertyChanged(nameof(DisplayText)); }
+            set
+            {
+                _level = Math.Max(0, value);
+                OnPropertyChanged(nameof(Level));
+                OnPropertyChanged(nameof(IndentedCaption));
+                OnPropertyChanged(nameof(DisplayText));
+            }
         }
 
-        public string DisplayText
+        public string IndentedCaption
         {
             get
             {
                 string indentDots = new string('.', Level * 4);
                 string text = string.IsNullOrEmpty(Caption) ? "(Menú sin título)" : Caption;
-                string shortcutText = string.IsNullOrEmpty(Shortcut) || Shortcut.Equals("(None)", StringComparison.OrdinalIgnoreCase)
-                    ? string.Empty
-                    : $"\t[{VbMenuShortcutHelper.ToDisplayText(Shortcut)}]";
-                return $"{indentDots}{text}{shortcutText}";
+                return $"{indentDots}{text}";
             }
         }
+
+        public string ShortcutDisplay
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Shortcut) || Shortcut.Equals("(None)", StringComparison.OrdinalIgnoreCase))
+                    return string.Empty;
+                return VbMenuShortcutHelper.ToDisplayText(Shortcut);
+            }
+        }
+
+        public string DisplayText => $"{IndentedCaption}{(string.IsNullOrEmpty(ShortcutDisplay) ? "" : $"   [{ShortcutDisplay}]")}";
 
         public MenuItemViewModel(FormDesignerControl control, int level = 0)
         {
@@ -330,7 +357,12 @@ public partial class MenuEditorWindow : Window
         var item = _items[idx];
         _items.RemoveAt(idx);
         _items.Insert(idx - 1, item);
+        if (idx - 1 == 0 && item.Level > 0)
+        {
+            item.Level = 0;
+        }
         LstMenuItems.SelectedIndex = idx - 1;
+        UpdateFormFieldsFromSelection();
     }
 
     private void BtnDown_Click(object sender, RoutedEventArgs e)
@@ -341,7 +373,12 @@ public partial class MenuEditorWindow : Window
         var item = _items[idx];
         _items.RemoveAt(idx);
         _items.Insert(idx + 1, item);
+        if (_items[0].Level > 0)
+        {
+            _items[0].Level = 0;
+        }
         LstMenuItems.SelectedIndex = idx + 1;
+        UpdateFormFieldsFromSelection();
     }
 
     private void BtnNext_Click(object sender, RoutedEventArgs e)
@@ -374,7 +411,7 @@ public partial class MenuEditorWindow : Window
     private void BtnInsert_Click(object sender, RoutedEventArgs e)
     {
         int idx = Math.Max(0, LstMenuItems.SelectedIndex);
-        int currentLevel = SelectedItem != null ? SelectedItem.Level : 0;
+        int currentLevel = (idx == 0) ? 0 : (SelectedItem != null ? SelectedItem.Level : 0);
         string newName = GenerateNextMenuName();
         var newCtrl = new FormDesignerControl
         {

@@ -1,0 +1,62 @@
+<UserControl x:Class="VB7x64.IDE.Execution.ImmediateWindowControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="600"
+             Background="#FFFFFF">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Barra de herramientas superior de la Ventana Inmediata -->
+        <Border Grid.Row="0" Background="#F4F4F4" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Padding="6,3">
+            <DockPanel LastChildFill="True">
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                    <Button Content="Limpiar" Padding="6,1" FontSize="11" Margin="4,0,0,0" Click="BtnClear_Click" Cursor="Hand" ToolTip="Borrar el contenido de la ventana inmediata"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="⚡ Ventana Inmediata (Immediate Window)" FontWeight="SemiBold" FontSize="11.5" Foreground="#333333"/>
+                    <TextBlock Text=" - Ejecuta sentencias y evalúa expresiones con ? expr" FontSize="11" Foreground="#777777" Margin="6,0,0,0"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Historial y salidas de Debug.Print -->
+        <TextBox x:Name="TxtHistory" Grid.Row="1"
+                 FontFamily="Consolas, Courier New" FontSize="12"
+                 Background="#FFFFFF" Foreground="#1E1E1E"
+                 BorderThickness="0" Padding="6"
+                 IsReadOnly="True"
+                 VerticalScrollBarVisibility="Auto"
+                 HorizontalScrollBarVisibility="Auto"
+                 TextWrapping="NoWrap"/>
+
+        <!-- Línea de entrada interactiva de comandos -->
+        <Border Grid.Row="2" Background="#FAFAFA" BorderBrush="#D0D0D0" BorderThickness="0,1,0,0" Padding="4,3">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="?" FontWeight="Bold" FontSize="13" Foreground="#007ACC" VerticalAlignment="Center" Margin="4,0,6,0"/>
+
+                <TextBox x:Name="TxtInput" Grid.Column="1"
+                         FontFamily="Consolas, Courier New" FontSize="12"
+                         VerticalContentAlignment="Center"
+                         BorderThickness="1" BorderBrush="#B0B0B0"
+                         Padding="4,2"
+                         KeyDown="TxtInput_KeyDown"
+                         ToolTip="Escribe una expresión (ej. ? 2 + 2 o ? Text1.Text) o sentencia (ej. Text1.Text = 'Hola') y presiona Enter"/>
+
+                <Button Grid.Column="2" Content="Ejecutar" Padding="8,2" Margin="4,0,0,0" FontSize="11" Click="BtnExecute_Click" Cursor="Hand"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

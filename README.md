@@ -80,6 +80,22 @@ Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado 
 * **Verificador de Teclas Rápidas (Hotkey Designer)**: Detección y auto-resolución de conflictos de aceleradores `&` en `Caption`.
 * **Analizador de Calidad de Código (Code Analyzer)**: Auditoría estática que reporta falta de `Option Explicit`, código muerto en rutinas `Private` huérfanas, variables sin utilizar y procedimientos vacíos.
 
+### 9. Ejecución en Caliente (Hot-Run / <kbd>F5</kbd>) y Ventana Inmediata
+* **Ejecución Instantánea en Memoria**: Lanzamiento inmediato de formularios y módulos de código sin compilar a disco, utilizando el motor de evaluación e interpretación con semántica exacta de VB6.
+* **Anfitrión Visual Interactivo (`LiveFormWindow`)**: Instanciación dinámica de controles nativos (`CommandButton`, `TextBox`, `Label`, `CheckBox`, `OptionButton`, `ListBox`, `ComboBox`, `Frame`, `Timer`, `Menu`) con proxies bidireccionales (`LiveControlProxy` y `LiveFormProxy`).
+* **Despacho Reactivo de Eventos**: Soporte completo para `Form_Load`, `Click`, `Change`, `Timer`, `DblClick` y `Form_Unload`.
+* **Ventana Inmediata (Immediate Window - <kbd>Ctrl+G</kbd>)**:
+  * Evaluación instantánea de expresiones mediante `? expr` o `Print expr`.
+  * Ejecución directa de sentencias (`Variable = Valor`, llamadas a procedimientos).
+  * Consola de salida de `Debug.Print` en tiempo de ejecución.
+  * Historial de comandos navegable con las flechas <kbd>↑</kbd> y <kbd>↓</kbd>.
+* **Controles de Depuración**:
+  * Iniciar (<kbd>F5</kbd> / Botón ▶️ en Toolbar).
+  * Interrumpir / Pausa (<kbd>Ctrl+Break</kbd> / Botón ⏸️).
+  * Detener / Terminar (<kbd>Shift+F5</kbd> / Botón ⏹️).
+  * Paso a paso por instrucciones (<kbd>F8</kbd>) y por procedimientos (<kbd>Shift+F8</kbd>).
+  * Gestión de Puntos de Interrupción (<kbd>F9</kbd> / <kbd>Ctrl+Shift+F9</kbd>).
+
 ---
 
 ## 🛡️ Principios e Invariantes de Seguridad
@@ -97,10 +113,10 @@ Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado 
 ```text
 VB7x64.sln
 ├── src/
-│   ├── VB7x64.IDE/             # Shell WPF x64: Menús, Barra de herramientas, Editor, Diseñador, Diálogos y UI
-│   └── VB7x64.ProjectModel/    # Modelo de proyectos, Parsers, Motores de refactorización, ActiveX y E/S segura
+│   ├── VB7x64.IDE/             # Shell WPF x64: Menús, Toolbar, Editor, Diseñador, Hot-Run, Immediate Window y UI
+│   └── VB7x64.ProjectModel/    # Modelo de proyectos, Parsers, Motor Hot-Run (Execution), ActiveX y E/S segura
 ├── tests/
-│   ├── VB7x64.Tests/           # Suite de pruebas unitarias xUnit (144 pruebas / 100% éxito)
+│   ├── VB7x64.Tests/           # Suite de pruebas unitarias xUnit (152 pruebas / 100% éxito)
 │   └── fixtures/               # Proyectos de muestra de VB6 para pruebas de round-trip
 └── docs/                       # Arquitectura y Decisiones de Diseño (ADRs)
 ```
@@ -123,7 +139,7 @@ cd VB6-x64-NEW-IDE
 # Restaurar paquetes y compilar la solución
 dotnet build
 
-# Ejecutar la suite de pruebas unitarias automatizadas (144 pruebas)
+# Ejecutar la suite de pruebas unitarias automatizadas (152 pruebas)
 dotnet test
 
 # Iniciar el IDE
@@ -141,6 +157,6 @@ dotnet run --project src/VB7x64.IDE
 | **M3: Diseñador de Formularios (Form Designer)** | ✅ Completado | WYSIWYG bidireccional, contenedores (`Frame`/`PictureBox`), portapapeles, Grid Snap, UserControls. |
 | **M4: Editor de Menús (<kbd>Ctrl+E</kbd>)** | ✅ Completado | Editor jerárquico de menús, indentación por puntos `....`, atajos de teclado y sincronización `.frm`. |
 | **M5: IntelliSense y Carga de OCX en Diseño** | ✅ Completado | List Members, Parameter Info, Complete Word, lector COM TypeLib nativo x64, diálogo Componentes (<kbd>Ctrl+T</kbd>). |
-| **M6: Ejecución en Caliente (Hot-Run / <kbd>F5</kbd>)** | ⏳ **Próximo** | Ejecución instantánea en memoria sin compilar a disco, formularios interactivos, breakpoints (<kbd>F9</kbd>), paso a paso (<kbd>F8</kbd>), Ventana Inmediata (`?` / `Print`) y Edit & Continue. |
-| **M7: Compilación Nativa x32 (MSVBVM60.DLL)** | ⏳ **Planificado** | Emisor nativo de ejecutables PE32 (x86) independientes con cabeceras VB6 clásicas y enlace directo al runtime del sistema `msvbvm60.dll` (Opción B). |
+| **M6: Ejecución en Caliente (Hot-Run / <kbd>F5</kbd>)** | ✅ Completado | Motor de ejecución en memoria sin compilar a disco, ventana en vivo interactiva (`LiveFormWindow`), breakpoints (<kbd>F9</kbd>), paso a paso (<kbd>F8</kbd>), Ventana Inmediata (<kbd>Ctrl+G</kbd>, `?` / `Print`) y `Debug.Print` en tiempo real. |
+| **M7: Compilación Nativa x32 (MSVBVM60.DLL)** | ⏳ **Próximo** | Emisor nativo de ejecutables PE32 (x86) independientes con cabeceras VB6 clásicas y enlace directo al runtime del sistema `msvbvm60.dll` (Opción B). |
 | **M8: Generación y Compilación Nativa x64** | ⏳ **Planificado** | Compilador / emisor nativo a ejecutables y librerías de 64 bits para arquitectura Windows x64 moderna. |

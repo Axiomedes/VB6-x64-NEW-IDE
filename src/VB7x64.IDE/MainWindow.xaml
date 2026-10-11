@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:designer="clr-namespace:VB7x64.IDE.Designer"
+        xmlns:exec="clr-namespace:VB7x64.IDE.Execution"
         mc:Ignorable="d"
         Title="VB7-x64 IDE - Entorno de Desarrollo VB6 Clásico"
         Height="720" Width="1100"
@@ -104,6 +105,7 @@
                 <MenuItem x:Name="MenuToggleOutput" Header="Panel de _Salida / Logs" IsCheckable="True" IsChecked="False" Click="MenuToggleOutput_Click"/>
                 <MenuItem x:Name="MenuToggleReferences" Header="Panel de _Referencias y Usos" Click="MenuToggleReferences_Click"/>
                 <MenuItem x:Name="MenuToggleTasks" Header="Lista de _Tareas (TODO)" Click="MenuToggleTasks_Click"/>
+                <MenuItem x:Name="MenuImmediateWindow" Header="Ventana _Inmediata" InputGestureText="Ctrl+G" Click="MenuImmediateWindow_Click"/>
                 <MenuItem x:Name="MenuToggleStatusBar" Header="_Barra de Estado" IsCheckable="True" IsChecked="True" Click="MenuToggleStatusBar_Click"/>
                 <Separator/>
                 <MenuItem Header="Abrir Carpeta de _Logs" Click="MenuOpenLogsFolder_Click"/>
@@ -114,6 +116,29 @@
                 <MenuItem Header="Agregar Módulo de _Clase..." Click="MenuAddClass_Click"/>
                 <Separator/>
                 <MenuItem Header="_Componentes..." InputGestureText="Ctrl+T" Click="MenuComponents_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Ejecutar">
+                <MenuItem x:Name="MenuRunStart" Header="_Iniciar" InputGestureText="F5" Click="MenuRunStart_Click">
+                    <MenuItem.Icon>
+                        <TextBlock Text="▶" Foreground="#0E8A16" FontWeight="Bold" FontSize="11" VerticalAlignment="Center"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem x:Name="MenuRunPause" Header="I_nterrumpir (Pausa)" InputGestureText="Ctrl+Break" Click="MenuRunPause_Click" IsEnabled="False">
+                    <MenuItem.Icon>
+                        <TextBlock Text="❚❚" Foreground="#B08800" FontWeight="Bold" FontSize="10" VerticalAlignment="Center"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem x:Name="MenuRunStop" Header="_Terminar (Detener)" Click="MenuRunStop_Click" IsEnabled="False">
+                    <MenuItem.Icon>
+                        <TextBlock Text="■" Foreground="#CB2431" FontWeight="Bold" FontSize="11" VerticalAlignment="Center"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Paso a paso _por instrucciones" InputGestureText="F8" Click="MenuStepInto_Click"/>
+                <MenuItem Header="Paso a paso por _procedimientos" InputGestureText="Shift+F8" Click="MenuStepOver_Click"/>
+                <Separator/>
+                <MenuItem Header="_Alternar Punto de Interrupción" InputGestureText="F9" Click="MenuToggleBreakpoint_Click"/>
+                <MenuItem Header="_Borrar Todos los Puntos de Interrupción" InputGestureText="Ctrl+Shift+F9" Click="MenuClearAllBreakpoints_Click"/>
             </MenuItem>
             <MenuItem Header="_Funciones Avanzadas">
                 <MenuItem x:Name="MenuToggleLineHighlight" Header="Resaltar _Línea Activa" IsCheckable="True" IsChecked="True" Click="MenuToggleLineHighlight_Click"/>
@@ -233,6 +258,19 @@
                 <Separator/>
                 <Button x:Name="BtnToolbarMenuEditor" ToolTip="Editor de Menús (Ctrl+E)" Click="MenuMenuEditor_Click" Width="28" Height="24" Padding="0">
                     <Image Source="{StaticResource Icon_MenuEditor}" Width="16" Height="16"/>
+                </Button>
+                <Separator/>
+                <Button x:Name="BtnToolbarRunStart" ToolTip="Iniciar Ejecución en Caliente (F5)" Click="MenuRunStart_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="▶" Foreground="#0E8A16" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button x:Name="BtnToolbarRunPause" ToolTip="Interrumpir / Pausa (Ctrl+Break)" Click="MenuRunPause_Click" Width="28" Height="24" Padding="0" IsEnabled="False">
+                    <TextBlock Text="❚❚" Foreground="#B08800" FontWeight="Bold" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button x:Name="BtnToolbarRunStop" ToolTip="Terminar / Detener" Click="MenuRunStop_Click" Width="28" Height="24" Padding="0" IsEnabled="False">
+                    <TextBlock Text="■" Foreground="#CB2431" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Button>
+                <Button x:Name="BtnToolbarImmediate" ToolTip="Ventana Inmediata (Ctrl+G)" Click="MenuImmediateWindow_Click" Width="28" Height="24" Padding="0">
+                    <TextBlock Text="⚡" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
             </ToolBar>
 
@@ -531,6 +569,8 @@
                                              Style="{StaticResource BottomTabRadioStyle}" Click="BottomTabRadio_Click"/>
                                 <RadioButton x:Name="TabRadioAnalysis" Content="🩺 Analizador de Código" GroupName="BottomPanelTabs"
                                              Style="{StaticResource BottomTabRadioStyle}" Click="BottomTabRadio_Click"/>
+                                <RadioButton x:Name="TabRadioImmediate" Content="⚡ Ventana Inmediata" GroupName="BottomPanelTabs"
+                                             Style="{StaticResource BottomTabRadioStyle}" Click="BottomTabRadio_Click"/>
                             </StackPanel>
                         </DockPanel>
                     </Border>
@@ -648,6 +688,11 @@
                                     </GridView>
                                 </ListView.View>
                             </ListView>
+                        </Grid>
+
+                        <!-- 5. Ventana Inmediata (Immediate Window) -->
+                        <Grid x:Name="ViewImmediate" Visibility="Collapsed">
+                            <exec:ImmediateWindowControl x:Name="MainImmediateWindowControl"/>
                         </Grid>
                     </Grid>
                 </Grid>

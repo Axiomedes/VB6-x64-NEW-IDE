@@ -1,0 +1,11 @@
+<Window x:Class="VB7x64.IDE.Execution.LiveFormWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ejecución en Vivo"
+        WindowStartupLocation="CenterScreen"
+        Background="#ECE9D8">
+    <DockPanel LastChildFill="True">
+        <Menu x:Name="FormMenuBar" DockPanel.Dock="Top" Visibility="Collapsed" Background="#ECE9D8" BorderBrush="#808080" BorderThickness="0,0,0,1"/>
+        <Canvas x:Name="FormCanvas" ClipToBounds="True" Background="#ECE9D8"/>
+    </DockPanel>
+</Window>

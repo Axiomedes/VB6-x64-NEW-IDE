@@ -22,6 +22,8 @@ using VB7x64.ProjectModel.Documents;
 using VB7x64.ProjectModel.ErrorHandling;
 using VB7x64.ProjectModel.Formatting;
 using VB7x64.ProjectModel.IntelliSense;
+using VB7x64.IDE.Execution;
+using VB7x64.ProjectModel.Execution;
 using VB7x64.ProjectModel.Navigation;
 using VB7x64.ProjectModel.Settings;
 using VB7x64.ProjectModel.Vbp;
@@ -33,6 +35,8 @@ public partial class MainWindow : Window
     private readonly AppSettings _settings;
     private VB6Project? _currentProject;
     private VB6ProjectGroup? _currentProjectGroup;
+    private LiveExecutionHost? _liveExecutionHost;
+    private LiveFormWindow? _liveFormWindow;
 
     public EditorTabItem? ActiveTab => DocumentsTabControl.SelectedItem as EditorTabItem;
     public TextEditor? ActiveEditor => ActiveTab?.Editor;
@@ -1595,24 +1599,33 @@ public partial class MainWindow : Window
         else if (TabRadioReferences?.IsChecked == true) ShowBottomTab("References");
         else if (TabRadioTasks?.IsChecked == true) ShowBottomTab("Tasks");
         else if (TabRadioAnalysis?.IsChecked == true) ShowBottomTab("Analysis");
+        else if (TabRadioImmediate?.IsChecked == true) ShowBottomTab("Immediate");
     }
 
     public void ShowBottomTab(string tabName)
     {
-        if (ViewOutput == null || ViewReferences == null || ViewTasks == null || ViewAnalysis == null) return;
-        if (TabRadioOutput == null || TabRadioReferences == null || TabRadioTasks == null || TabRadioAnalysis == null) return;
+        if (ViewOutput == null || ViewReferences == null || ViewTasks == null || ViewAnalysis == null || ViewImmediate == null) return;
+        if (TabRadioOutput == null || TabRadioReferences == null || TabRadioTasks == null || TabRadioAnalysis == null || TabRadioImmediate == null) return;
 
         ViewOutput.Visibility = (tabName == "Output") ? Visibility.Visible : Visibility.Collapsed;
         ViewReferences.Visibility = (tabName == "References") ? Visibility.Visible : Visibility.Collapsed;
         ViewTasks.Visibility = (tabName == "Tasks") ? Visibility.Visible : Visibility.Collapsed;
         ViewAnalysis.Visibility = (tabName == "Analysis") ? Visibility.Visible : Visibility.Collapsed;
+        ViewImmediate.Visibility = (tabName == "Immediate") ? Visibility.Visible : Visibility.Collapsed;
 
         TabRadioOutput.IsChecked = (tabName == "Output");
         TabRadioReferences.IsChecked = (tabName == "References");
         TabRadioTasks.IsChecked = (tabName == "Tasks");
         TabRadioAnalysis.IsChecked = (tabName == "Analysis");
+        TabRadioImmediate.IsChecked = (tabName == "Immediate");
 
         SetOutputPanelVisibility(true);
+    }
+
+    private void MenuImmediateWindow_Click(object sender, RoutedEventArgs e)
+    {
+        ShowBottomTab("Immediate");
+        MainImmediateWindowControl?.TxtInput.Focus();
     }
 
     private void MenuToggleReferences_Click(object sender, RoutedEventArgs e)
@@ -1732,6 +1745,60 @@ public partial class MainWindow : Window
 
     private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        // F5: Iniciar Ejecución en Caliente / Shift+F5: Detener
+        if (e.Key == Key.F5)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {
+                MenuRunStop_Click(this, new RoutedEventArgs());
+            }
+            else
+            {
+                MenuRunStart_Click(this, new RoutedEventArgs());
+            }
+            e.Handled = true;
+            return;
+        }
+
+        // Ctrl+G: Ventana Inmediata (Immediate Window)
+        if (e.Key == Key.G && Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            MenuImmediateWindow_Click(this, new RoutedEventArgs());
+            e.Handled = true;
+            return;
+        }
+
+        // Ctrl+Break / Pause: Interrumpir / Pausa
+        if (e.Key is Key.Pause or Key.Cancel && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+        {
+            MenuRunPause_Click(this, new RoutedEventArgs());
+            e.Handled = true;
+            return;
+        }
+
+        // F8: Paso a paso por instrucciones / Shift+F8: Paso a paso por procedimientos
+        if (e.Key == Key.F8)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {
+                MenuStepOver_Click(this, new RoutedEventArgs());
+            }
+            else
+            {
+                MenuStepInto_Click(this, new RoutedEventArgs());
+            }
+            e.Handled = true;
+            return;
+        }
+
+        // F9: Alternar punto de interrupción
+        if (e.Key == Key.F9 && Keyboard.Modifiers == ModifierKeys.None)
+        {
+            MenuToggleBreakpoint_Click(this, new RoutedEventArgs());
+            e.Handled = true;
+            return;
+        }
+
         // Ctrl+Shift+N: Nuevo Proyecto / Ctrl+N: Nuevo Formulario
         if (e.Key == Key.N && (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
         {
@@ -3182,4 +3249,268 @@ public partial class MainWindow : Window
             CloseTab(tabItem);
         }
     }
+
+    #region Ejecución en Caliente (Hot-Run / F5)
+
+    private void MenuRunStart_Click(object sender, RoutedEventArgs e)
+    {
+        StartHotRun();
+    }
+
+    private void MenuRunPause_Click(object sender, RoutedEventArgs e)
+    {
+        if (_liveExecutionHost != null)
+        {
+            _liveExecutionHost.Context.State = ExecutionState.Paused;
+            SetStatusMessage("Ejecución en pausa (Interrupción)");
+            MenuRunStart.IsEnabled = true;
+            BtnToolbarRunStart.IsEnabled = true;
+            MenuRunPause.IsEnabled = false;
+            BtnToolbarRunPause.IsEnabled = false;
+        }
+    }
+
+    private void MenuRunStop_Click(object sender, RoutedEventArgs e)
+    {
+        StopHotRun();
+    }
+
+    private void MenuStepInto_Click(object sender, RoutedEventArgs e)
+    {
+        if (_liveExecutionHost == null)
+        {
+            StartHotRun();
+        }
+        else
+        {
+            _liveExecutionHost.Context.CurrentStepMode = StepMode.StepInto;
+            _liveExecutionHost.Context.State = ExecutionState.Running;
+            SetStatusMessage("Paso a paso por instrucciones (Step Into)");
+        }
+    }
+
+    private void MenuStepOver_Click(object sender, RoutedEventArgs e)
+    {
+        if (_liveExecutionHost == null)
+        {
+            StartHotRun();
+        }
+        else
+        {
+            _liveExecutionHost.Context.CurrentStepMode = StepMode.StepOver;
+            _liveExecutionHost.Context.State = ExecutionState.Running;
+            SetStatusMessage("Paso a paso por procedimientos (Step Over)");
+        }
+    }
+
+    private void MenuToggleBreakpoint_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveEditor != null && ActiveTab?.Document?.FilePath != null)
+        {
+            int line = ActiveEditor.TextArea.Caret.Line;
+            string file = ActiveTab.Document.FilePath;
+            if (_liveExecutionHost == null)
+            {
+                _liveExecutionHost = new LiveExecutionHost();
+                MainImmediateWindowControl?.AttachHost(_liveExecutionHost);
+            }
+            if (_liveExecutionHost.Context.Breakpoints.Contains((file, line)))
+            {
+                _liveExecutionHost.Context.Breakpoints.Remove((file, line));
+                SetStatusMessage($"Punto de interrupción eliminado en línea {line}");
+            }
+            else
+            {
+                _liveExecutionHost.Context.Breakpoints.Add((file, line));
+                SetStatusMessage($"Punto de interrupción establecido en línea {line}");
+            }
+        }
+    }
+
+    private void MenuClearAllBreakpoints_Click(object sender, RoutedEventArgs e)
+    {
+        _liveExecutionHost?.Context.Breakpoints.Clear();
+        SetStatusMessage("Todos los puntos de interrupción eliminados.");
+    }
+
+    public void StartHotRun()
+    {
+        try
+        {
+            // 1. Determinar el formulario objetivo para ejecutar
+            FormDesignModel? targetFormModel = null;
+            string? targetFormCode = null;
+
+            // Opción A: La pestaña activa tiene un diseñador de formulario abierto
+            if (ActiveTab?.DesignModel != null)
+            {
+                targetFormModel = ActiveTab.DesignModel;
+                targetFormCode = ActiveTab.Document.Text;
+            }
+            else
+            {
+                // Opción B: Buscar cualquier pestaña abierta que tenga diseñador de formulario
+                foreach (var item in DocumentsTabControl.Items)
+                {
+                    if (item is EditorTabItem tab && tab.DesignModel != null)
+                    {
+                        targetFormModel = tab.DesignModel;
+                        targetFormCode = tab.Document.Text;
+                        break;
+                    }
+                }
+            }
+
+            // Opción C: Buscar en el proyecto actual el formulario de inicio o el primer formulario
+            if (targetFormModel == null && _currentProject != null)
+            {
+                var startupFormRef = _currentProject.Startup;
+                var formItem = !string.IsNullOrEmpty(startupFormRef)
+                    ? _currentProject.Forms.FirstOrDefault(f => f.Name.Equals(startupFormRef, StringComparison.OrdinalIgnoreCase) || Path.GetFileNameWithoutExtension(f.RelativePath).Equals(startupFormRef, StringComparison.OrdinalIgnoreCase))
+                    : _currentProject.Forms.FirstOrDefault();
+
+                if (formItem != null && !string.IsNullOrEmpty(formItem.AbsolutePath) && File.Exists(formItem.AbsolutePath))
+                {
+                    var doc = SafeFileStorage.LoadDocument(formItem.AbsolutePath);
+                    if (!string.IsNullOrEmpty(doc.Header))
+                    {
+                        targetFormModel = FormDesignParser.Parse(doc.Header);
+                    }
+                    targetFormCode = doc.Text;
+                }
+            }
+
+            if (targetFormModel == null)
+            {
+                MessageBox.Show(
+                    "No se encontró ningún formulario para iniciar la ejecución en caliente.\nAbra un formulario o agregue uno al proyecto.",
+                    "Ejecución en Caliente",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+                return;
+            }
+
+            // 2. Preparar el LiveExecutionHost
+            if (_liveExecutionHost == null)
+            {
+                _liveExecutionHost = new LiveExecutionHost();
+            }
+            else
+            {
+                _liveExecutionHost.Reset();
+            }
+
+            MainImmediateWindowControl?.AttachHost(_liveExecutionHost);
+
+            // 3. Indexar módulos estándar (.bas) del proyecto
+            if (_currentProject != null)
+            {
+                foreach (var mod in _currentProject.Modules)
+                {
+                    if (!string.IsNullOrEmpty(mod.AbsolutePath) && File.Exists(mod.AbsolutePath))
+                    {
+                        string modCode = File.ReadAllText(mod.AbsolutePath);
+                        _liveExecutionHost.LoadSourceCode(modCode, mod.Name);
+                    }
+                }
+            }
+
+            // 4. Cargar el código del formulario en el host
+            if (!string.IsNullOrEmpty(targetFormCode))
+            {
+                _liveExecutionHost.LoadSourceCode(targetFormCode, targetFormModel.Name);
+            }
+
+            // 5. Configurar manejador de MsgBox del host para integrarlo con WPF
+            _liveExecutionHost.Context.MsgBoxHandler = (prompt, buttons, title) =>
+            {
+                var icon = MessageBoxImage.Information;
+                if ((buttons & 16) != 0) icon = MessageBoxImage.Error;
+                else if ((buttons & 32) != 0) icon = MessageBoxImage.Question;
+                else if ((buttons & 48) != 0) icon = MessageBoxImage.Warning;
+
+                var btn = MessageBoxButton.OK;
+                if ((buttons & 1) != 0) btn = MessageBoxButton.OKCancel;
+                else if ((buttons & 4) != 0) btn = MessageBoxButton.YesNo;
+                else if ((buttons & 3) != 0) btn = MessageBoxButton.YesNoCancel;
+
+                var mbr = MessageBox.Show(prompt, string.IsNullOrEmpty(title) ? targetFormModel.Caption : title, btn, icon);
+                return mbr switch
+                {
+                    MessageBoxResult.OK => 1,
+                    MessageBoxResult.Cancel => 2,
+                    MessageBoxResult.Yes => 6,
+                    MessageBoxResult.No => 7,
+                    _ => 1
+                };
+            };
+
+            // 6. Instanciar la ventana en vivo (LiveFormWindow)
+            _liveFormWindow = new LiveFormWindow(targetFormModel, _liveExecutionHost, targetFormCode)
+            {
+                Owner = this
+            };
+
+            _liveFormWindow.Closed += (s, ev) =>
+            {
+                OnLiveExecutionStopped();
+            };
+
+            // 7. Actualizar estado de la interfaz
+            MenuRunStart.IsEnabled = false;
+            BtnToolbarRunStart.IsEnabled = false;
+            MenuRunPause.IsEnabled = true;
+            BtnToolbarRunPause.IsEnabled = true;
+            MenuRunStop.IsEnabled = true;
+            BtnToolbarRunStop.IsEnabled = true;
+
+            SetStatusMessage($"Ejecutando en caliente: {targetFormModel.Name}");
+            ShowBottomTab("Immediate");
+
+            // 8. Mostrar la ventana y arrancar
+            _liveFormWindow.Show();
+        }
+        catch (Exception ex)
+        {
+            AppLogger.Error($"Error al iniciar ejecución en caliente: {ex.Message}", ex);
+            MessageBox.Show($"Error al iniciar la ejecución en caliente:\n{ex.Message}", "Error de Ejecución", MessageBoxButton.OK, MessageBoxImage.Error);
+            OnLiveExecutionStopped();
+        }
+    }
+
+    public void StopHotRun()
+    {
+        if (_liveFormWindow != null)
+        {
+            var win = _liveFormWindow;
+            _liveFormWindow = null;
+            try { win.Close(); } catch { }
+        }
+
+        OnLiveExecutionStopped();
+    }
+
+    private void OnLiveExecutionStopped()
+    {
+        if (_liveExecutionHost != null)
+        {
+            _liveExecutionHost.Context.State = ExecutionState.Stopped;
+        }
+
+        _liveFormWindow = null;
+
+        Dispatcher.Invoke(() =>
+        {
+            MenuRunStart.IsEnabled = true;
+            BtnToolbarRunStart.IsEnabled = true;
+            MenuRunPause.IsEnabled = false;
+            BtnToolbarRunPause.IsEnabled = false;
+            MenuRunStop.IsEnabled = false;
+            BtnToolbarRunStop.IsEnabled = false;
+
+            SetStatusMessage("Listo");
+        });
+    }
+
+    #endregion
 }

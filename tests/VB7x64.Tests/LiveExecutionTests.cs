@@ -298,4 +298,20 @@ End Sub
         Assert.Equal("Datos del Usuario", frame.GetProperty("Caption").AsString());
         Assert.Equal("Contenido Actualizado", txt.GetProperty("Text").AsString());
     }
+
+    [Fact]
+    public void FormDesignerControl_IsContainer_RecognizesBothStandardAndVbPrefixedNames()
+    {
+        var f1 = new VB7x64.ProjectModel.Designers.FormDesignerControl { TypeName = "VB.Frame" };
+        var f2 = new VB7x64.ProjectModel.Designers.FormDesignerControl { TypeName = "Frame" };
+        var p1 = new VB7x64.ProjectModel.Designers.FormDesignerControl { TypeName = "VB.PictureBox" };
+        var p2 = new VB7x64.ProjectModel.Designers.FormDesignerControl { TypeName = "PictureBox" };
+        var btn = new VB7x64.ProjectModel.Designers.FormDesignerControl { TypeName = "VB.CommandButton" };
+
+        Assert.True(f1.IsContainer);
+        Assert.True(f2.IsContainer);
+        Assert.True(p1.IsContainer);
+        Assert.True(p2.IsContainer);
+        Assert.False(btn.IsContainer);
+    }
 }

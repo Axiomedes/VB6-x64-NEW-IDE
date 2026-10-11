@@ -137,7 +137,9 @@ public class FormDesignerControl
 
     public bool IsContainer =>
         TypeName.Equals("VB.Frame", StringComparison.OrdinalIgnoreCase) ||
-        TypeName.Equals("VB.PictureBox", StringComparison.OrdinalIgnoreCase);
+        TypeName.Equals("Frame", StringComparison.OrdinalIgnoreCase) ||
+        TypeName.Equals("VB.PictureBox", StringComparison.OrdinalIgnoreCase) ||
+        TypeName.Equals("PictureBox", StringComparison.OrdinalIgnoreCase);
 
     public bool IsMenu =>
         TypeName.Equals("VB.Menu", StringComparison.OrdinalIgnoreCase);

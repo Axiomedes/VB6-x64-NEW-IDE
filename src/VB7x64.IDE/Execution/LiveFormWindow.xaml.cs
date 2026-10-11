@@ -62,7 +62,10 @@ public partial class LiveFormWindow : Window
         // 2. Construir menús de formulario si existen
         BuildMenus();
 
-        // 3. Construir controles jerárquicamente a partir de los controles de primer nivel
+        // 3. Normalizar jerarquía del modelo para asegurar que ningún control hijo permanezca en la raíz
+        NormalizeModelHierarchy();
+
+        // 4. Construir controles jerárquicamente a partir de los controles de primer nivel
         foreach (var ctrl in _model.Children)
         {
             if (ctrl.TypeName.Equals("VB.Menu", StringComparison.OrdinalIgnoreCase))
@@ -70,7 +73,28 @@ public partial class LiveFormWindow : Window
                 continue; // Ya procesado en BuildMenus
             }
 
+            if (ctrl.ParentControl != null)
+            {
+                continue; // Los controles anidados solo se construyen dentro de su contenedor padre
+            }
+
             BuildControlRecursive(ctrl, FormCanvas);
+        }
+    }
+
+    private void NormalizeModelHierarchy()
+    {
+        var allControls = _model.GetAllControls();
+        foreach (var ctrl in allControls)
+        {
+            if (ctrl.ParentControl != null)
+            {
+                _model.Children.Remove(ctrl);
+                if (!ctrl.ParentControl.Children.Contains(ctrl))
+                {
+                    ctrl.ParentControl.Children.Add(ctrl);
+                }
+            }
         }
     }
 
@@ -91,16 +115,18 @@ public partial class LiveFormWindow : Window
             _host.Context.SetVariable(ctrl.Name, VbValue.FromObject(proxy));
 
             // Si es un contenedor, obtener su lienzo interno para añadir sus hijos
-            Canvas innerCanvas = GetContainerInnerCanvas(visual) ?? parentCanvas;
-
-            foreach (var child in ctrl.Children)
+            Canvas? innerCanvas = GetContainerInnerCanvas(visual);
+            if (innerCanvas != null)
             {
-                if (child.TypeName.Equals("VB.Menu", StringComparison.OrdinalIgnoreCase))
+                foreach (var child in ctrl.Children)
                 {
-                    continue;
-                }
+                    if (child.TypeName.Equals("VB.Menu", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
 
-                BuildControlRecursive(child, innerCanvas);
+                    BuildControlRecursive(child, innerCanvas);
+                }
             }
         }
         else

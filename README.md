@@ -116,7 +116,7 @@ VB7x64.sln
 │   ├── VB7x64.IDE/             # Shell WPF x64: Menús, Toolbar, Editor, Diseñador, Hot-Run, Immediate Window y UI
 │   └── VB7x64.ProjectModel/    # Modelo de proyectos, Parsers, Motor Hot-Run (Execution), ActiveX y E/S segura
 ├── tests/
-│   ├── VB7x64.Tests/           # Suite de pruebas unitarias xUnit (153 pruebas / 100% éxito)
+│   ├── VB7x64.Tests/           # Suite de pruebas unitarias xUnit (154 pruebas / 100% éxito)
 │   └── fixtures/               # Proyectos de muestra de VB6 para pruebas de round-trip
 └── docs/                       # Arquitectura y Decisiones de Diseño (ADRs)
 ```
@@ -139,7 +139,7 @@ cd VB6-x64-NEW-IDE
 # Restaurar paquetes y compilar la solución
 dotnet build
 
-# Ejecutar la suite de pruebas unitarias automatizadas (153 pruebas)
+# Ejecutar la suite de pruebas unitarias automatizadas (154 pruebas)
 dotnet test
 
 # Iniciar el IDE

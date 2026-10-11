@@ -530,6 +530,7 @@ public partial class FormDesignSurface : UserControl
         {
             _isDraggingControls = false;
             GridCanvas.ReleaseMouseCapture();
+            CheckAndReparentDraggedControls();
             NotifySelectionChanged();
             ModelModified?.Invoke();
         }
@@ -564,10 +565,11 @@ public partial class FormDesignSurface : UserControl
     #endregion
 
     #region Detección de Contenedores (Frame, PictureBox) y Operaciones de Portapapeles
-    private FormDesignerControl? FindContainerAt(Point canvasPoint)
+    private FormDesignerControl? FindContainerAt(Point canvasPoint, IEnumerable<FormDesignerControl>? exclude = null)
     {
         if (CurrentModel == null) return null;
 
+        var excludeSet = exclude != null ? new HashSet<FormDesignerControl>(exclude) : null;
         FormDesignerControl? bestContainer = null;
         int bestDepth = -1;
 
@@ -575,22 +577,24 @@ public partial class FormDesignSurface : UserControl
         {
             foreach (var ctrl in controls)
             {
-                if (ctrl.IsContainer && _visualMap.TryGetValue(ctrl, out var vis))
+                if (excludeSet != null && excludeSet.Contains(ctrl))
                 {
-                    try
+                    continue;
+                }
+
+                if (ctrl.IsContainer)
+                {
+                    double ox = ctrl.AbsoluteLeftPixels;
+                    double oy = ctrl.AbsoluteTopPixels;
+                    var bounds = new Rect(ox, oy, Math.Max(10, ctrl.WidthPixels), Math.Max(10, ctrl.HeightPixels));
+                    if (bounds.Contains(canvasPoint))
                     {
-                        Point origin = vis.TranslatePoint(new Point(0, 0), GridCanvas);
-                        var bounds = new Rect(origin.X, origin.Y, Math.Max(10, ctrl.WidthPixels), Math.Max(10, ctrl.HeightPixels));
-                        if (bounds.Contains(canvasPoint))
+                        if (depth > bestDepth)
                         {
-                            if (depth > bestDepth)
-                            {
-                                bestDepth = depth;
-                                bestContainer = ctrl;
-                            }
+                            bestDepth = depth;
+                            bestContainer = ctrl;
                         }
                     }
-                    catch { }
                 }
 
                 if (ctrl.Children.Count > 0)
@@ -606,7 +610,30 @@ public partial class FormDesignSurface : UserControl
 
     private Point GetContainerInnerOrigin(FormDesignerControl container)
     {
-        Point origin = new Point(container.LeftPixels, container.TopPixels);
+        double baseLeft = container.AbsoluteLeftPixels;
+        double baseTop = container.AbsoluteTopPixels;
+
+        string normType = container.TypeName.ToUpperInvariant();
+        if (normType.StartsWith("VB.", StringComparison.OrdinalIgnoreCase))
+        {
+            normType = normType[3..];
+        }
+
+        double fallbackOffsetX = 2.0;
+        double fallbackOffsetY = 2.0;
+
+        if (normType == "FRAME")
+        {
+            // Un GroupBox en WPF tiene bisel exterior y encabezado de texto
+            fallbackOffsetX = 4.0;
+            fallbackOffsetY = 16.0;
+        }
+        else if (normType == "PICTUREBOX")
+        {
+            fallbackOffsetX = (container.BorderStyle == 0) ? 0.0 : 2.0;
+            fallbackOffsetY = (container.BorderStyle == 0) ? 0.0 : 2.0;
+        }
+
         if (_visualMap.TryGetValue(container, out var containerVis))
         {
             Canvas? innerCanvas = null;
@@ -619,23 +646,117 @@ public partial class FormDesignSurface : UserControl
                 innerCanvas = c2;
             }
 
-            if (innerCanvas != null)
+            if (innerCanvas != null && innerCanvas.IsLoaded)
             {
                 try
                 {
-                    origin = innerCanvas.TranslatePoint(new Point(0, 0), GridCanvas);
+                    Point pt = innerCanvas.TranslatePoint(new Point(0, 0), GridCanvas);
+                    if (pt.X >= baseLeft && pt.Y >= baseTop &&
+                        pt.X < baseLeft + container.WidthPixels && pt.Y < baseTop + container.HeightPixels)
+                    {
+                        return pt;
+                    }
                 }
-                catch
-                {
-                    try { origin = containerVis.TranslatePoint(new Point(0, 0), GridCanvas); } catch { }
-                }
-            }
-            else
-            {
-                try { origin = containerVis.TranslatePoint(new Point(0, 0), GridCanvas); } catch { }
+                catch { }
             }
         }
-        return origin;
+
+        return new Point(baseLeft + fallbackOffsetX, baseTop + fallbackOffsetY);
+    }
+
+    private void CheckAndReparentDraggedControls()
+    {
+        if (CurrentModel == null || _selectedControls.Count == 0) return;
+
+        bool reparentedAny = false;
+
+        foreach (var ctrl in _selectedControls.ToList())
+        {
+            // Colección de controles excluidos (el propio control y toda su descendencia)
+            var exclude = new HashSet<FormDesignerControl>();
+            CollectDescendants(ctrl, exclude);
+
+            // Centro geométrico absoluto del control en GridCanvas
+            Point center = new Point(
+                ctrl.AbsoluteLeftPixels + (ctrl.WidthPixels / 2.0),
+                ctrl.AbsoluteTopPixels + (ctrl.HeightPixels / 2.0)
+            );
+
+            // Buscar contenedor en esa posición absoluta
+            var targetContainer = FindContainerAt(center, exclude);
+
+            if (targetContainer != ctrl.ParentControl)
+            {
+                double currentAbsLeft = ctrl.AbsoluteLeftPixels;
+                double currentAbsTop = ctrl.AbsoluteTopPixels;
+
+                // 1. Remover de su contenedor/padre actual
+                if (ctrl.ParentControl != null)
+                {
+                    ctrl.ParentControl.Children.Remove(ctrl);
+                }
+                else
+                {
+                    CurrentModel.Children.Remove(ctrl);
+                }
+
+                // 2. Insertar en el nuevo contenedor o en el lienzo raíz
+                if (targetContainer != null)
+                {
+                    ctrl.ParentControl = targetContainer;
+                    if (!targetContainer.Children.Contains(ctrl))
+                    {
+                        targetContainer.Children.Add(ctrl);
+                    }
+
+                    Point innerOrigin = GetContainerInnerOrigin(targetContainer);
+                    double relLeft = Math.Max(0, currentAbsLeft - innerOrigin.X);
+                    double relTop = Math.Max(0, currentAbsTop - innerOrigin.Y);
+
+                    if (GridCanvas.SnapToGrid)
+                    {
+                        relLeft = GridCanvas.SnapValue(relLeft);
+                        relTop = GridCanvas.SnapValue(relTop);
+                    }
+
+                    ctrl.LeftPixels = relLeft;
+                    ctrl.TopPixels = relTop;
+                }
+                else
+                {
+                    ctrl.ParentControl = null;
+                    if (!CurrentModel.Children.Contains(ctrl))
+                    {
+                        CurrentModel.Children.Add(ctrl);
+                    }
+
+                    if (GridCanvas.SnapToGrid)
+                    {
+                        currentAbsLeft = GridCanvas.SnapValue(currentAbsLeft);
+                        currentAbsTop = GridCanvas.SnapValue(currentAbsTop);
+                    }
+
+                    ctrl.LeftPixels = Math.Max(0, currentAbsLeft);
+                    ctrl.TopPixels = Math.Max(0, currentAbsTop);
+                }
+
+                reparentedAny = true;
+            }
+        }
+
+        if (reparentedAny)
+        {
+            RefreshCanvas();
+        }
+    }
+
+    private static void CollectDescendants(FormDesignerControl ctrl, HashSet<FormDesignerControl> set)
+    {
+        set.Add(ctrl);
+        foreach (var child in ctrl.Children)
+        {
+            CollectDescendants(child, set);
+        }
     }
 
     public void CopySelectedControls()

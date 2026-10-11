@@ -3,7 +3,7 @@
 [![Build & Test](https://img.shields.io/badge/.NET-10.0%20LTS-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20x64-0078D6?logo=windows)](https://microsoft.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSES.md)
-[![Tests](https://img.shields.io/badge/Tests-144%20Passing-success.svg)](tests/VB7x64.Tests)
+[![Tests](https://img.shields.io/badge/Tests-154%20Passing-success.svg)](tests/VB7x64.Tests)
 
 Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado en **Microsoft Visual Basic 6.0**, diseñado para abrir, explorar, editar, diseñar y refactorizar proyectos clásicos de VB6 (`.vbp`, `.vbg`, `.bas`, `.cls`, `.frm`, `.ctl`, `.pag`) de forma nativa en sistemas de 64 bits, con total seguridad y sin corromper sus formatos ni recursos binarios.
 

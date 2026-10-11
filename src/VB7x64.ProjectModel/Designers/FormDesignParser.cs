@@ -337,6 +337,25 @@ public static class FormDesignParser
                 ctrl.Visible = !cleanVal.Equals("0", StringComparison.OrdinalIgnoreCase) &&
                                !cleanVal.Equals("False", StringComparison.OrdinalIgnoreCase);
                 break;
+            case "CHECKED":
+                ctrl.Checked = cleanVal.Equals("-1", StringComparison.OrdinalIgnoreCase) ||
+                               cleanVal.Equals("1", StringComparison.OrdinalIgnoreCase) ||
+                               cleanVal.Equals("True", StringComparison.OrdinalIgnoreCase);
+                break;
+            case "SHORTCUT":
+                ctrl.Shortcut = cleanVal;
+                break;
+            case "WINDOWLIST":
+                ctrl.WindowList = cleanVal.Equals("-1", StringComparison.OrdinalIgnoreCase) ||
+                                  cleanVal.Equals("1", StringComparison.OrdinalIgnoreCase) ||
+                                  cleanVal.Equals("True", StringComparison.OrdinalIgnoreCase);
+                break;
+            case "NEGOTIATEPOSITION":
+                if (int.TryParse(cleanVal, out int np)) ctrl.NegotiatePosition = np;
+                break;
+            case "HELPCONTEXTID":
+                if (int.TryParse(cleanVal, out int hcid)) ctrl.HelpContextID = hcid;
+                break;
             case "INDEX":
                 if (int.TryParse(cleanVal, out int idx)) ctrl.Index = idx;
                 break;

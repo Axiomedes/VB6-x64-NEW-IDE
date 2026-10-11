@@ -155,6 +155,12 @@
                 <MenuItem Header="Ejecutar _Analizador de Calidad de Código..." Click="MenuRunAnalysis_Click"/>
             </MenuItem>
             <MenuItem Header="_Herramientas">
+                <MenuItem Header="Editor de _Menús..." InputGestureText="Ctrl+E" Click="MenuMenuEditor_Click">
+                    <MenuItem.Icon>
+                        <Image Source="{StaticResource Icon_MenuEditor}" Width="16" Height="16"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
                 <MenuItem Header="_Opciones..." Click="MenuOptions_Click"/>
             </MenuItem>
             <MenuItem Header="_Ayuda">
@@ -221,6 +227,10 @@
                 </Button>
                 <Button ToolTip="Lista de Tareas (TODO Explorer)" Click="MenuToggleTasks_Click" Width="28" Height="24" Padding="0">
                     <Image Source="{StaticResource Icon_TaskList}" Width="16" Height="16"/>
+                </Button>
+                <Separator/>
+                <Button x:Name="BtnToolbarMenuEditor" ToolTip="Editor de Menús (Ctrl+E)" Click="MenuMenuEditor_Click" Width="28" Height="24" Padding="0">
+                    <Image Source="{StaticResource Icon_MenuEditor}" Width="16" Height="16"/>
                 </Button>
             </ToolBar>
 

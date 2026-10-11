@@ -128,4 +128,84 @@ public class FormDesignModel
         }
         return $"{prefix}{index}";
     }
+
+    #region Soporte para Menús (VB.Menu)
+    /// <summary>
+    /// Retorna los menús de nivel superior del formulario.
+    /// </summary>
+    public List<FormDesignerControl> TopLevelMenus => Children.Where(c => c.IsMenu).ToList();
+
+    /// <summary>
+    /// Retorna los controles del formulario que no son menús.
+    /// </summary>
+    public List<FormDesignerControl> NonMenuControls => Children.Where(c => !c.IsMenu).ToList();
+
+    /// <summary>
+    /// Retorna la lista aplanada de todos los elementos de menú con su respectivo nivel de sangría (0 para menú principal, 1 para submenú, etc.).
+    /// </summary>
+    public List<(FormDesignerControl Control, int Level)> GetFlattenedMenuItems()
+    {
+        var result = new List<(FormDesignerControl Control, int Level)>();
+        foreach (var topMenu in TopLevelMenus)
+        {
+            CollectMenusFlattened(topMenu, 0, result);
+        }
+        return result;
+    }
+
+    private static void CollectMenusFlattened(FormDesignerControl current, int level, List<(FormDesignerControl Control, int Level)> list)
+    {
+        list.Add((current, level));
+        foreach (var child in current.Children.Where(c => c.IsMenu))
+        {
+            CollectMenusFlattened(child, level + 1, list);
+        }
+    }
+
+    /// <summary>
+    /// Reemplaza la estructura completa de menús del formulario a partir de una lista aplanada con niveles de indentación.
+    /// </summary>
+    public void ReplaceMenus(IEnumerable<(FormDesignerControl Control, int Level)> flattenedList)
+    {
+        // 1. Quitar todos los menús existentes de Children
+        Children.RemoveAll(c => c.IsMenu);
+
+        var stack = new List<(FormDesignerControl Control, int Level)>();
+
+        foreach (var (ctrl, level) in flattenedList)
+        {
+            ctrl.Children.Clear();
+            ctrl.ParentControl = null;
+
+            if (level == 0)
+            {
+                Children.Add(ctrl);
+                stack.Clear();
+                stack.Add((ctrl, 0));
+            }
+            else
+            {
+                // Buscar el padre directo en el stack (el último elemento con nivel = level - 1)
+                while (stack.Count > 0 && stack[^1].Level >= level)
+                {
+                    stack.RemoveAt(stack.Count - 1);
+                }
+
+                if (stack.Count > 0)
+                {
+                    var parent = stack[^1].Control;
+                    ctrl.ParentControl = parent;
+                    parent.Children.Add(ctrl);
+                }
+                else
+                {
+                    // Fallback: si no hay padre disponible, agregar a nivel raíz
+                    Children.Add(ctrl);
+                }
+
+                stack.Add((ctrl, level));
+            }
+        }
+    }
+    #endregion
 }

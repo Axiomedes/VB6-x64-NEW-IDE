@@ -900,6 +900,46 @@
         </DrawingImage.Drawing>
     </DrawingImage>
 
+    <!-- Editor de Menús (Ctrl+E) -->
+    <DrawingImage x:Key="Icon_MenuEditor">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Ventana formulario base -->
+                <GeometryDrawing Brush="#ECE9D8" Geometry="M 1,2 L 15,2 L 15,14 L 1,14 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0A246A" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Barra de título azul clásica -->
+                <GeometryDrawing Brush="#0A246A" Geometry="M 1,2 L 15,2 L 15,5 L 1,5 Z"/>
+                <!-- Barra de menú horizontal -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 1,5 L 15,5 L 15,7.5 L 1,7.5 Z"/>
+                <GeometryDrawing Brush="#404040" Geometry="M 2.5,6.2 L 5.5,6.2 M 7,6.2 L 10,6.2 M 11.5,6.2 L 13.5,6.2">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#404040" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Menú desplegable flotante con sombra/borde -->
+                <GeometryDrawing Brush="#FFFFFF" Geometry="M 2,7.5 L 8.5,7.5 L 8.5,13.5 L 2,13.5 Z">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#0055EA" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <!-- Elementos del menú desplegable con check verde y líneas -->
+                <GeometryDrawing Brush="#107C41" Geometry="M 3,9.2 L 3.8,10 L 4.8,8.5">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#107C41" Thickness="0.8"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+                <GeometryDrawing Brush="#2B2B2B" Geometry="M 5.5,9.2 L 7.5,9.2 M 3.5,11.2 L 7.5,11.2">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#2B2B2B" Thickness="1"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
     <!-- Alternar Cuadrícula / Rejilla -->
     <DrawingImage x:Key="Icon_Grid">
         <DrawingImage.Drawing>

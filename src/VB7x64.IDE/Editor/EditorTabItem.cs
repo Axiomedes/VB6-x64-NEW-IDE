@@ -707,6 +707,14 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             {
                 NavigateToControlEvent(ctrl);
             };
+
+            DesignSurface.RequestMenuEditor += () =>
+            {
+                if (Application.Current.MainWindow is MainWindow mw)
+                {
+                    mw.OpenMenuEditor();
+                }
+            };
         }
         catch (Exception ex)
         {
@@ -768,10 +776,11 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         }
         else
         {
-            string codeSnippet = $"\r\nPrivate Sub {procName}()\r\n    \r\nEnd Sub\r\n";
+            string parameters = ctrl.Index.HasValue ? "(Index As Integer)" : "()";
+            string codeSnippet = $"\r\nPrivate Sub {procName}{parameters}\r\n    \r\nEnd Sub\r\n";
             int offset = Editor.Document.TextLength;
             Editor.Document.Insert(offset, codeSnippet);
-            Editor.CaretOffset = offset + $"\r\nPrivate Sub {procName}()\r\n    ".Length;
+            Editor.CaretOffset = offset + $"\r\nPrivate Sub {procName}{parameters}\r\n    ".Length;
             Editor.ScrollToLine(Editor.Document.LineCount);
         }
     }
@@ -786,6 +795,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         if (typeName.EndsWith("OptionButton", StringComparison.OrdinalIgnoreCase)) return "Click";
         if (typeName.EndsWith("ListBox", StringComparison.OrdinalIgnoreCase)) return "Click";
         if (typeName.EndsWith("ComboBox", StringComparison.OrdinalIgnoreCase)) return "Click";
+        if (typeName.EndsWith("Menu", StringComparison.OrdinalIgnoreCase)) return "Click";
         return "Click";
     }
     #endregion

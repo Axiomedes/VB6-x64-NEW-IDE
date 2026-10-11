@@ -29,6 +29,13 @@ public class FormDesignerControl
     public bool Enabled { get; set; } = true;
     public bool Visible { get; set; } = true;
 
+    // Propiedades específicas de menú (VB.Menu)
+    public bool Checked { get; set; }
+    public string Shortcut { get; set; } = string.Empty;
+    public bool WindowList { get; set; }
+    public int NegotiatePosition { get; set; }
+    public int HelpContextID { get; set; }
+
     // Apariencia
     public string? BackColorHex { get; set; }
     public string? ForeColorHex { get; set; }
@@ -164,6 +171,11 @@ public class FormDesignerControl
             TabStop = TabStop,
             Enabled = Enabled,
             Visible = Visible,
+            Checked = Checked,
+            Shortcut = Shortcut,
+            WindowList = WindowList,
+            NegotiatePosition = NegotiatePosition,
+            HelpContextID = HelpContextID,
             BackColorHex = BackColorHex,
             ForeColorHex = ForeColorHex,
             BorderStyle = BorderStyle,

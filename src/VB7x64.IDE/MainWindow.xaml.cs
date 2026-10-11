@@ -1533,6 +1533,41 @@ public partial class MainWindow : Window
     #endregion
 
     #region Tools & Options
+    private void MenuMenuEditor_Click(object sender, RoutedEventArgs e)
+    {
+        OpenMenuEditor();
+    }
+
+    public void OpenMenuEditor()
+    {
+        if (ActiveTab == null)
+        {
+            MessageBox.Show("No hay ningún documento activo para editar menús.", "Editor de Menús", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        if (ActiveTab.DesignModel == null)
+        {
+            MessageBox.Show("El Editor de Menús solo está disponible para formularios y controles de usuario de Visual Basic (.frm / .ctl).", "Editor de Menús", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var editorWnd = new VB7x64.IDE.Designer.MenuEditor.MenuEditorWindow(ActiveTab.DesignModel)
+        {
+            Owner = this
+        };
+
+        if (editorWnd.ShowDialog() == true)
+        {
+            // El modelo fue actualizado con la nueva jerarquía de menús
+            ActiveTab.Document.Header = FormDesignSerializer.Serialize(ActiveTab.DesignModel);
+            ActiveTab.Document.IsDirty = true;
+            ActiveTab.DesignSurface?.RefreshVisuals();
+            MainPropertyGridPanel.RefreshObjectList();
+            SetStatusMessage("Estructura de menús actualizada.");
+        }
+    }
+
     private void MenuOptions_Click(object sender, RoutedEventArgs e)
     {
         var opt = new OptionsWindow(_settings) { Owner = this };
@@ -1615,6 +1650,14 @@ public partial class MainWindow : Window
             {
                 MenuCloseDoc_Click(this, new RoutedEventArgs());
             }
+            e.Handled = true;
+            return;
+        }
+
+        // Ctrl+E: Editor de Menús (VB6 Clásico)
+        if (e.Key == Key.E && Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            OpenMenuEditor();
             e.Handled = true;
             return;
         }

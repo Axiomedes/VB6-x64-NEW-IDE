@@ -29,6 +29,7 @@ public partial class FormDesignSurface : UserControl
     public event Action? ToolCreationFinished;
     public event Action? ModelModified;
     public event Action? RequestCodeView;
+    public event Action? RequestMenuEditor;
 
     // Herramienta activa para creación desde la Toolbox
     public string? ActiveCreationTool { get; set; }
@@ -69,6 +70,8 @@ public partial class FormDesignSurface : UserControl
             UpdateDimensionText();
             ModelModified?.Invoke();
         };
+
+        SetupCanvasContextMenu();
     }
 
     private void FormDesignSurface_Loaded(object sender, RoutedEventArgs e)
@@ -79,6 +82,11 @@ public partial class FormDesignSurface : UserControl
     private void BtnSwitchToCode_Click(object sender, RoutedEventArgs e)
     {
         RequestCodeView?.Invoke();
+    }
+
+    private void BtnOpenMenuEditor_Click(object sender, RoutedEventArgs e)
+    {
+        RequestMenuEditor?.Invoke();
     }
 
     /// <summary>
@@ -119,6 +127,7 @@ public partial class FormDesignSurface : UserControl
         );
 
         UpdateDimensionText();
+        RebuildMenuBar();
         RefreshCanvas();
         UpdateResizeThumbs();
     }
@@ -142,7 +151,7 @@ public partial class FormDesignSurface : UserControl
 
         if (CurrentModel == null) return;
 
-        foreach (var control in CurrentModel.Children)
+        foreach (var control in CurrentModel.NonMenuControls)
         {
             var visual = ControlVisualRenderer.CreateVisual(control, OnChildVisualCreated);
             AttachControlEvents(visual, control);
@@ -743,6 +752,22 @@ public partial class FormDesignSurface : UserControl
         CopySelectedControls();
         PasteControls();
     }
+
+    public void DeleteSelectedControls()
+    {
+        if (_selectedControls.Count == 0 || CurrentModel == null) return;
+        var controlsToDelete = _selectedControls.ToList();
+        foreach (var ctrl in controlsToDelete)
+        {
+            CurrentModel.RemoveControl(ctrl);
+            ControlDeleted?.Invoke(ctrl);
+        }
+
+        ClearSelection();
+        RefreshCanvas();
+        ModelModified?.Invoke();
+        TxtDesignerStatus.Text = $"{controlsToDelete.Count} control(es) eliminado(s).";
+    }
     #endregion
 
     #region Manejo de Teclado (Flechas para Mover/Redimensionar, Supr, Ctrl+C/X/V/D, Ctrl+A, Esc)
@@ -800,18 +825,7 @@ public partial class FormDesignSurface : UserControl
 
         if (e.Key == Key.Delete)
         {
-            // Eliminar controles seleccionados
-            var controlsToDelete = _selectedControls.ToList();
-            foreach (var ctrl in controlsToDelete)
-            {
-                CurrentModel.RemoveControl(ctrl);
-                ControlDeleted?.Invoke(ctrl);
-            }
-
-            ClearSelection();
-            RefreshCanvas();
-            ModelModified?.Invoke();
-            TxtDesignerStatus.Text = $"{controlsToDelete.Count} control(es) eliminado(s).";
+            DeleteSelectedControls();
             e.Handled = true;
             return;
         }
@@ -893,9 +907,10 @@ public partial class FormDesignSurface : UserControl
     private void UpdateResizeThumbs()
     {
         double titleH = (CurrentModel?.HasTitleBar == false) ? 0.0 : TitleBarHeight;
+        double menuH = (BorderMenuBar.Visibility == Visibility.Visible) ? (BorderMenuBar.ActualHeight > 0 ? BorderMenuBar.ActualHeight : 24.0) : 0.0;
         double borderThick = (CurrentModel?.HasTitleBar == false) ? 1.0 : WindowBorderThickness;
         double formW = GridCanvas.Width + (borderThick * 2);
-        double formH = GridCanvas.Height + titleH + (borderThick * 2);
+        double formH = GridCanvas.Height + titleH + menuH + (borderThick * 2);
 
         Canvas.SetLeft(ThumbResizeCorner, formW);
         Canvas.SetTop(ThumbResizeCorner, formH);
@@ -1084,8 +1099,172 @@ public partial class FormDesignSurface : UserControl
         );
 
         UpdateDimensionText();
+        RebuildMenuBar();
         UpdateResizeThumbs();
         RefreshCanvas();
+    }
+    #endregion
+
+    #region Barra de Menús del Formulario (VB.Menu)
+    /// <summary>
+    /// Reconstruye la barra de menús visual del formulario según los menús definidos en el modelo.
+    /// </summary>
+    public void RebuildMenuBar()
+    {
+        FormDesignMenuBar.Items.Clear();
+
+        if (CurrentModel == null || CurrentModel.TopLevelMenus.Count == 0)
+        {
+            BorderMenuBar.Visibility = Visibility.Collapsed;
+            MenuBarRow.Height = new GridLength(0);
+            return;
+        }
+
+        BorderMenuBar.Visibility = Visibility.Visible;
+        MenuBarRow.Height = GridLength.Auto;
+
+        foreach (var menuCtrl in CurrentModel.TopLevelMenus)
+        {
+            var wpfItem = new MenuItem
+            {
+                Header = VbCaptionToWpfHeader(menuCtrl.Caption),
+                InputGestureText = VbMenuShortcutHelper.ToDisplayString(menuCtrl.Shortcut),
+                IsChecked = menuCtrl.Checked,
+                IsEnabled = menuCtrl.Enabled,
+                Visibility = menuCtrl.Visible ? Visibility.Visible : Visibility.Collapsed,
+                Tag = menuCtrl
+            };
+
+            SetupMenuItemContextMenu(wpfItem, menuCtrl);
+
+            if (menuCtrl.Children.Any(c => c.IsMenu))
+            {
+                PopulateMenuChildren(wpfItem, menuCtrl);
+            }
+            else
+            {
+                wpfItem.Click += (s, e) =>
+                {
+                    e.Handled = true;
+                    OnMenuItemClicked(menuCtrl);
+                };
+            }
+
+            FormDesignMenuBar.Items.Add(wpfItem);
+        }
+
+        SetupMenuBarContextMenu();
+    }
+
+    private void PopulateMenuChildren(MenuItem parentWpfItem, FormDesignerControl parentCtrl)
+    {
+        foreach (var childCtrl in parentCtrl.Children.Where(c => c.IsMenu))
+        {
+            if (childCtrl.Caption == "-")
+            {
+                var sep = new Separator { Tag = childCtrl };
+                parentWpfItem.Items.Add(sep);
+            }
+            else
+            {
+                var childWpfItem = new MenuItem
+                {
+                    Header = VbCaptionToWpfHeader(childCtrl.Caption),
+                    InputGestureText = VbMenuShortcutHelper.ToDisplayString(childCtrl.Shortcut),
+                    IsChecked = childCtrl.Checked,
+                    IsEnabled = childCtrl.Enabled,
+                    Visibility = childCtrl.Visible ? Visibility.Visible : Visibility.Collapsed,
+                    Tag = childCtrl
+                };
+
+                SetupMenuItemContextMenu(childWpfItem, childCtrl);
+
+                if (childCtrl.Children.Any(c => c.IsMenu))
+                {
+                    PopulateMenuChildren(childWpfItem, childCtrl);
+                }
+                else
+                {
+                    childWpfItem.Click += (s, e) =>
+                    {
+                        e.Handled = true;
+                        OnMenuItemClicked(childCtrl);
+                    };
+                }
+
+                parentWpfItem.Items.Add(childWpfItem);
+            }
+        }
+    }
+
+    private void OnMenuItemClicked(FormDesignerControl menuCtrl)
+    {
+        SelectSingleControl(menuCtrl);
+        ControlDoubleClicked?.Invoke(menuCtrl);
+    }
+
+    private static string VbCaptionToWpfHeader(string caption)
+    {
+        if (string.IsNullOrEmpty(caption)) return string.Empty;
+        // VB6 '&' para acelerador, '&&' para ampersand literal
+        return caption.Replace("_", "__").Replace("&&", "\0").Replace('&', '_').Replace("\0", "&");
+    }
+
+    private void SetupMenuBarContextMenu()
+    {
+        var cm = new ContextMenu();
+        var miEditor = new MenuItem { Header = "Editor de Menús (Ctrl+E)..." };
+        miEditor.Click += (_, _) => RequestMenuEditor?.Invoke();
+        cm.Items.Add(miEditor);
+
+        BorderMenuBar.ContextMenu = cm;
+    }
+
+    private void SetupMenuItemContextMenu(MenuItem wpfItem, FormDesignerControl menuCtrl)
+    {
+        var cm = new ContextMenu();
+        var miCode = new MenuItem { Header = "Ver Código de Evento (Click)" };
+        miCode.Click += (_, _) => OnMenuItemClicked(menuCtrl);
+        cm.Items.Add(miCode);
+
+        var miEditor = new MenuItem { Header = "Editor de Menús (Ctrl+E)..." };
+        miEditor.Click += (_, _) => RequestMenuEditor?.Invoke();
+        cm.Items.Add(miEditor);
+
+        wpfItem.ContextMenu = cm;
+    }
+
+    private void SetupCanvasContextMenu()
+    {
+        var cm = new ContextMenu();
+
+        var miCode = new MenuItem { Header = "Ver Código", InputGestureText = "F7" };
+        miCode.Click += (_, _) => RequestCodeView?.Invoke();
+        cm.Items.Add(miCode);
+
+        var miMenuEditor = new MenuItem { Header = "Editor de Menús...", InputGestureText = "Ctrl+E" };
+        miMenuEditor.Click += (_, _) => RequestMenuEditor?.Invoke();
+        cm.Items.Add(miMenuEditor);
+
+        cm.Items.Add(new Separator());
+
+        var miCut = new MenuItem { Header = "Cortar", InputGestureText = "Ctrl+X" };
+        miCut.Click += (_, _) => CutSelectedControls();
+        cm.Items.Add(miCut);
+
+        var miCopy = new MenuItem { Header = "Copiar", InputGestureText = "Ctrl+C" };
+        miCopy.Click += (_, _) => CopySelectedControls();
+        cm.Items.Add(miCopy);
+
+        var miPaste = new MenuItem { Header = "Pegar", InputGestureText = "Ctrl+V" };
+        miPaste.Click += (_, _) => PasteControls();
+        cm.Items.Add(miPaste);
+
+        var miDelete = new MenuItem { Header = "Eliminar", InputGestureText = "Supr" };
+        miDelete.Click += (_, _) => DeleteSelectedControls();
+        cm.Items.Add(miDelete);
+
+        GridCanvas.ContextMenu = cm;
     }
     #endregion
 }

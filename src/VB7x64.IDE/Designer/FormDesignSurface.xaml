@@ -27,6 +27,15 @@
                         </StackPanel>
                     </Button>
 
+                    <!-- Botón para abrir el Editor de Menús (Ctrl+E) -->
+                    <Button x:Name="BtnOpenMenuEditor" ToolTip="Editor de Menús (Ctrl+E)" 
+                            Padding="6,2" Margin="0,0,6,0" FontSize="11" Click="BtnOpenMenuEditor_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{StaticResource Icon_MenuEditor}" Width="14" Height="14" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Menús" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
                     <!-- Alternar visualización de cuadrícula -->
                     <ToggleButton x:Name="BtnToggleGrid" IsChecked="True" ToolTip="Mostrar u ocultar cuadrícula de puntos" 
                             Padding="6,2" Margin="0,0,4,0" FontSize="11" Click="BtnToggleGrid_Click">
@@ -82,6 +91,7 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition x:Name="TitleBarRow" Height="26"/> <!-- Barra de título -->
+                            <RowDefinition x:Name="MenuBarRow" Height="Auto"/> <!-- Barra de menús (VB.Menu) -->
                             <RowDefinition Height="Auto"/> <!-- Área de cliente del formulario -->
                         </Grid.RowDefinitions>
 
@@ -107,8 +117,15 @@
                             </DockPanel>
                         </Border>
 
+                        <!-- 1.5 Barra de Menús del Formulario (VB.Menu) -->
+                        <Border x:Name="BorderMenuBar" Grid.Row="1" Background="#ECE9D8" 
+                                BorderBrush="#D0D0D0" BorderThickness="0,0,0,1" 
+                                Visibility="Collapsed">
+                            <Menu x:Name="FormDesignMenuBar" Background="Transparent" FontSize="11" Margin="2,1"/>
+                        </Border>
+
                         <!-- 2. Área cliente del Formulario con rejilla de puntos y controles -->
-                        <Border Grid.Row="1" x:Name="FormClientArea" Background="#F0F0F0">
+                        <Border Grid.Row="2" x:Name="FormClientArea" Background="#F0F0F0">
                             <local:DesignGridCanvas x:Name="GridCanvas" Width="312" Height="213"
                                                     Focusable="True"
                                                     MouseLeftButtonDown="GridCanvas_MouseLeftButtonDown"

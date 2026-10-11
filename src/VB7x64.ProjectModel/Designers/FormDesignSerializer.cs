@@ -160,6 +160,12 @@ public static class FormDesignSerializer
 
     private static void SerializeControl(StringBuilder sb, FormDesignerControl ctrl, int indentLevel)
     {
+        if (ctrl.IsMenu)
+        {
+            SerializeMenuControl(sb, ctrl, indentLevel);
+            return;
+        }
+
         string indent = new string(' ', indentLevel * 3);
         string propIndent = new string(' ', (indentLevel + 1) * 3);
 
@@ -248,5 +254,58 @@ public static class FormDesignSerializer
         sb.AppendLine($"{propIndent}{"Italic".PadRight(16)}=   {(font.Italic ? "-1  'True" : "0   'False")}");
         sb.AppendLine($"{propIndent}{"Strikethrough".PadRight(16)}=   {(font.Strikethrough ? "-1  'True" : "0   'False")}");
         sb.AppendLine($"{indent}EndProperty");
+    }
+
+    private static void SerializeMenuControl(StringBuilder sb, FormDesignerControl ctrl, int indentLevel)
+    {
+        string indent = new string(' ', indentLevel * 3);
+        string propIndent = new string(' ', (indentLevel + 1) * 3);
+
+        sb.AppendLine($"{indent}Begin VB.Menu {ctrl.Name} ");
+
+        var writtenProps = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        void WriteProp(string name, string value, string? comment = null)
+        {
+            writtenProps.Add(name);
+            string formattedComment = string.IsNullOrEmpty(comment) ? string.Empty : $"  {comment}";
+            string propPadded = name.Length < 16 ? name.PadRight(16) : name + " ";
+            sb.AppendLine($"{propIndent}{propPadded}=   {value}{formattedComment}");
+        }
+
+        if (!string.IsNullOrEmpty(ctrl.Caption)) WriteProp("Caption", $"\"{ctrl.Caption}\"");
+        if (ctrl.Index.HasValue) WriteProp("Index", ctrl.Index.Value.ToString(CultureInfo.InvariantCulture));
+        if (!string.IsNullOrEmpty(ctrl.Shortcut)) WriteProp("Shortcut", ctrl.Shortcut);
+        if (ctrl.Checked) WriteProp("Checked", "-1  'True");
+        if (!ctrl.Enabled) WriteProp("Enabled", "0  'False");
+        if (!ctrl.Visible) WriteProp("Visible", "0  'False");
+        if (ctrl.WindowList) WriteProp("WindowList", "-1  'True");
+        if (ctrl.NegotiatePosition > 0) WriteProp("NegotiatePosition", ctrl.NegotiatePosition.ToString(CultureInfo.InvariantCulture));
+        if (ctrl.HelpContextID > 0) WriteProp("HelpContextID", ctrl.HelpContextID.ToString(CultureInfo.InvariantCulture));
+
+        // Propiedades conservadas en CustomProperties que no hayan sido escritas
+        foreach (var prop in ctrl.CustomProperties)
+        {
+            if (writtenProps.Contains(prop.Name)) continue;
+            if (prop.IsBeginProperty)
+            {
+                foreach (var line in prop.RawPropertyLines)
+                {
+                    sb.AppendLine(line);
+                }
+            }
+            else
+            {
+                WriteProp(prop.Name, prop.Value, prop.TrailingComment);
+            }
+        }
+
+        // Submenús anidados
+        foreach (var child in ctrl.Children)
+        {
+            SerializeControl(sb, child, indentLevel + 1);
+        }
+
+        sb.AppendLine($"{indent}End");
     }
 }

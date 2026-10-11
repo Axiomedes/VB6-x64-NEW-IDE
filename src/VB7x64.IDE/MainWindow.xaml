@@ -353,14 +353,37 @@
                 <!-- Área Central de Pestañas / Documentos -->
                 <Border Grid.Column="2" Background="#ECECEC">
                     <Grid>
-                        <TabControl x:Name="DocumentsTabControl" BorderThickness="0" Background="#FFFFFF" Padding="0">
+                        <TabControl x:Name="DocumentsTabControl" BorderThickness="0" Background="#FFFFFF" Padding="0"
+                                    HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                            <TabControl.Template>
+                                <ControlTemplate TargetType="TabControl">
+                                    <Grid KeyboardNavigation.TabNavigation="Local">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <!-- Fila 0: Barra de pestañas -->
+                                        <Border Grid.Row="0" Background="#ECECEC" BorderThickness="0,0,0,1" BorderBrush="#D0D0D0">
+                                            <TabPanel x:Name="HeaderPanel" IsItemsHost="True" Margin="2,2,2,0"/>
+                                        </Border>
+                                        <!-- Fila 1: Contenido activo sin márgenes parásitos ni centrado indeseado -->
+                                        <Border Grid.Row="1" Background="#FFFFFF" BorderThickness="0">
+                                            <ContentPresenter x:Name="PART_SelectedContentHost" 
+                                                              ContentSource="SelectedContent"
+                                                              HorizontalAlignment="Stretch"
+                                                              VerticalAlignment="Stretch"/>
+                                        </Border>
+                                    </Grid>
+                                </ControlTemplate>
+                            </TabControl.Template>
                             <TabControl.ItemContainerStyle>
                                 <Style TargetType="TabItem">
                                     <Setter Property="MinHeight" Value="28"/>
                                     <Setter Property="MinWidth" Value="110"/>
                                     <Setter Property="Padding" Value="10,4,8,4"/>
                                     <Setter Property="FontSize" Value="12"/>
-                                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="VerticalContentAlignment" Value="Stretch"/>
                                     <Setter Property="ToolTip" Value="{Binding ToolTipText}"/>
                                     <Setter Property="Template">
                                         <Setter.Value>

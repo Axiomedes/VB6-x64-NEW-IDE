@@ -38,6 +38,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
 
     private Button? _btnToggleView;
     private Border _navPanel = null!;
+    private RowDefinition _navRow = null!;
 
     public event Action<int, int>? CaretPositionChanged;
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -162,20 +163,38 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         dockPanel.Children.Add(_cmbProcedures);
         _navPanel.Child = dockPanel;
 
-        var contentGrid = new Grid();
+        HorizontalContentAlignment = HorizontalAlignment.Stretch;
+        VerticalContentAlignment = VerticalAlignment.Stretch;
+
+        var contentGrid = new Grid
+        {
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch
+        };
         contentGrid.Children.Add(Editor);
+
+        _navRow = new RowDefinition { Height = GridLength.Auto };
+        var contentRow = new RowDefinition { Height = new GridLength(1, GridUnitType.Star) };
+
         if (DesignSurface != null)
         {
+            DesignSurface.HorizontalAlignment = HorizontalAlignment.Stretch;
+            DesignSurface.VerticalAlignment = VerticalAlignment.Stretch;
             contentGrid.Children.Add(DesignSurface);
             Editor.Visibility = Visibility.Collapsed;
             _navPanel.Visibility = Visibility.Collapsed;
+            _navRow.Height = new GridLength(0);
             DesignSurface.Visibility = Visibility.Visible;
             IsDesignerActive = true;
         }
 
-        var rootGrid = new Grid();
-        rootGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-        rootGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        var rootGrid = new Grid
+        {
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch
+        };
+        rootGrid.RowDefinitions.Add(_navRow);
+        rootGrid.RowDefinitions.Add(contentRow);
 
         Grid.SetRow(_navPanel, 0);
         Grid.SetRow(contentGrid, 1);
@@ -702,6 +721,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             Document.Header = FormDesignSerializer.Serialize(DesignModel);
             DesignSurface.Visibility = Visibility.Collapsed;
         }
+        if (_navRow != null) _navRow.Height = GridLength.Auto;
         Editor.Visibility = Visibility.Visible;
         _navPanel.Visibility = Visibility.Visible;
         IsDesignerActive = false;
@@ -714,6 +734,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         if (DesignSurface == null) return;
         Editor.Visibility = Visibility.Collapsed;
         _navPanel.Visibility = Visibility.Collapsed;
+        if (_navRow != null) _navRow.Height = new GridLength(0);
         DesignSurface.Visibility = Visibility.Visible;
         IsDesignerActive = true;
         ViewModeChanged?.Invoke(true);

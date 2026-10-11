@@ -7,7 +7,7 @@
 
 Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado en **Microsoft Visual Basic 6.0**, diseñado para abrir, explorar, editar, diseñar y refactorizar proyectos clásicos de VB6 (`.vbp`, `.vbg`, `.bas`, `.cls`, `.frm`, `.ctl`, `.pag`) de forma nativa en sistemas de 64 bits, con total seguridad y sin corromper sus formatos ni recursos binarios.
 
-<img width="2736" height="1728" alt="{B3C140AD-5074-4806-9E99-97C02727499A}" src="https://github.com/user-attachments/assets/c0e8be77-11b8-4247-b2a9-55ed0bca5943" />
+<img width="800" height="600" alt="{B3C140AD-5074-4806-9E99-97C02727499A}" src="https://github.com/user-attachments/assets/c0e8be77-11b8-4247-b2a9-55ed0bca5943" />
 
 ---
 
@@ -21,7 +21,7 @@ Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado 
 * **Controles No Visibles en Ejecución**: Controles como `Timer` mantienen un tamaño fijo (32×32 px / 480×480 twips) no redimensionable en diseño.
 * **Rejilla y Ajuste (Grid & Snap to Grid)**: Rejilla de puntos visual personalizable con paso ajustable y alineación magnética automática.
 * **Alternancia Rápida Código ↔ Objeto**: Botones dedicados en la barra de herramientas y atajos estándar (<kbd>F7</kbd> para Código, <kbd>Shift+F7</kbd> para Diseñador visual).
-  <img width="1239" height="1037" alt="{79B68E45-75E7-44B6-8E14-6BA66121F5E1}" src="https://github.com/user-attachments/assets/55b15372-5360-405d-8ef9-a94e40fea98f" />
+  <img width="600" height="510" alt="{79B68E45-75E7-44B6-8E14-6BA66121F5E1}" src="https://github.com/user-attachments/assets/55b15372-5360-405d-8ef9-a94e40fea98f" />
 
 ### 2. Editor de Menús Clásico de VB6 (<kbd>Ctrl+E</kbd>)
 * **Diálogo de Edición Jerárquica de Menús**: Réplica moderna del editor de menús de VB6 accesible con <kbd>Ctrl+E</kbd> o desde el menú de herramientas.
@@ -29,7 +29,7 @@ Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado 
 * **Propiedades de Menú**: Configuración de `Caption`, `Name`, `Index`, `Shortcut` (atajos de teclado estándar como <kbd>Ctrl+O</kbd>, <kbd>F1</kbd>, etc.), `Checked`, `Enabled` y `Visible`.
 * **Reordenación Dinámica**: Botones de navegación (Subir **▲**, Bajar **▼**, Insertar, Eliminar, Siguiente).
 * **Sincronización Automática**: Serialización y deserialización transparente de las estructuras `Begin VB.Menu...End` en el archivo `.frm`.
-<img width="1165" height="748" alt="{BB9529BE-444A-4D98-8047-FA142D1CC46C}" src="https://github.com/user-attachments/assets/7f7ff856-be5b-47a5-9062-19128916caef" />
+<img width="590" height="370" alt="{BB9529BE-444A-4D98-8047-FA142D1CC46C}" src="https://github.com/user-attachments/assets/7f7ff856-be5b-47a5-9062-19128916caef" />
 
 ### 3. Servicios de Lenguaje e IntelliSense
 * **Auto List Members (<kbd>Ctrl+J</kbd> / `.`)**: Despliegue automático de listas de miembros con iconos descriptivos para propiedades, métodos y eventos al escribir el punto (`.`) o de forma manual.

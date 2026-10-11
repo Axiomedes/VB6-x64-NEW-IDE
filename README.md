@@ -141,6 +141,6 @@ dotnet run --project src/VB7x64.IDE
 | **M3: Diseñador de Formularios (Form Designer)** | ✅ Completado | WYSIWYG bidireccional, contenedores (`Frame`/`PictureBox`), portapapeles, Grid Snap, UserControls. |
 | **M4: Editor de Menús (<kbd>Ctrl+E</kbd>)** | ✅ Completado | Editor jerárquico de menús, indentación por puntos `....`, atajos de teclado y sincronización `.frm`. |
 | **M5: IntelliSense y Carga de OCX en Diseño** | ✅ Completado | List Members, Parameter Info, Complete Word, lector COM TypeLib nativo x64, diálogo Componentes (<kbd>Ctrl+T</kbd>). |
-| **M6: Ventana Inmediata y Consola de Depuración** | ⏳ Próximo | Ventana Inmediata (*Immediate Window*) para evaluación de expresiones y comandos interactivos `?` / `Print`. |
-| **M7: Motor de Depuración y Ejecución (F5 / Breakpoints)** | ⏳ Pendiente | Ejecución en proceso, puntos de interrupción, paso a paso (<kbd>F8</kbd>), inspección de variables locales (*Watch / Locals*). |
-| **M8: Generación y Compilación Nativa x64** | ⏳ Pendiente | Compilador / emisor nativo a ejecutables y librerías de 64 bits a partir del código fuente de VB6. |
+| **M6: Ejecución en Caliente (Hot-Run / <kbd>F5</kbd>)** | ⏳ **Próximo** | Ejecución instantánea en memoria sin compilar a disco, formularios interactivos, breakpoints (<kbd>F9</kbd>), paso a paso (<kbd>F8</kbd>), Ventana Inmediata (`?` / `Print`) y Edit & Continue. |
+| **M7: Compilación Nativa x32 (MSVBVM60.DLL)** | ⏳ **Planificado** | Emisor nativo de ejecutables PE32 (x86) independientes con cabeceras VB6 clásicas y enlace directo al runtime del sistema `msvbvm60.dll` (Opción B). |
+| **M8: Generación y Compilación Nativa x64** | ⏳ **Planificado** | Compilador / emisor nativo a ejecutables y librerías de 64 bits para arquitectura Windows x64 moderna. |

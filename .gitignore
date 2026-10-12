@@ -13,6 +13,8 @@
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
+publish/
+dist/
 x64/
 x86/
 [Aa]rm/

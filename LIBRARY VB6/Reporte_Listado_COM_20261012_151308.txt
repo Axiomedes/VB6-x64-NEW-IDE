@@ -1,0 +1,116 @@
+﻿===============================================================================
+           CATÁLOGO RESUMIDO DE COMPONENTES OLE / COM (TEXTO PLANO)           
+===============================================================================
+Categoría        : Vista General Filtrada
+Filtro aplicado  : vb6.olb
+Total elementos  : 98
+Fecha y Hora     : 2026-10-12 15:13:08
+Equipo           : AXIOUK-ELITEX2
+-------------------------------------------------------------------------------
+
+GUID / CLSID                           | PROGID / NOMBRE                | HILOS        | RUTA BINARIO / SERVIDOR
+------------------------------------------------------------------------------------------------------------------------
+{33AD4ED0-6699-11CF-B70C-00AA0060D393} | PictureBox                     |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4ED1-6699-11CF-B70C-00AA0060D393} | _PictureBox                    |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4ED2-6699-11CF-B70C-00AA0060D393} | PictureBoxEvents               |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4ED8-6699-11CF-B70C-00AA0060D393} | Label                          |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4ED9-6699-11CF-B70C-00AA0060D393} | _Label                         |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4EDA-6699-11CF-B70C-00AA0060D393} | LabelEvents                    |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4EE0-6699-11CF-B70C-00AA0060D393} | TextBox                        |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4EE1-6699-11CF-B70C-00AA0060D393} | _TextBox                       |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4EE2-6699-11CF-B70C-00AA0060D393} | TextBoxEvents                  |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4EE8-6699-11CF-B70C-00AA0060D393} | Frame                          |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4EE9-6699-11CF-B70C-00AA0060D393} | _Frame                         |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4EEA-6699-11CF-B70C-00AA0060D393} | FrameEvents                    |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4EF0-6699-11CF-B70C-00AA0060D393} | CommandButton                  |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4EF1-6699-11CF-B70C-00AA0060D393} | _CommandButton                 |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4EF2-6699-11CF-B70C-00AA0060D393} | CommandButtonEvents            |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4EF8-6699-11CF-B70C-00AA0060D393} | CheckBox                       |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4EF9-6699-11CF-B70C-00AA0060D393} | _CheckBox                      |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4EFA-6699-11CF-B70C-00AA0060D393} | CheckBoxEvents                 |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F00-6699-11CF-B70C-00AA0060D393} | OptionButton                   |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F01-6699-11CF-B70C-00AA0060D393} | _OptionButton                  |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F02-6699-11CF-B70C-00AA0060D393} | OptionButtonEvents             |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F08-6699-11CF-B70C-00AA0060D393} | ComboBox                       |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F09-6699-11CF-B70C-00AA0060D393} | _ComboBox                      |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F0A-6699-11CF-B70C-00AA0060D393} | ComboBoxEvents                 |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F10-6699-11CF-B70C-00AA0060D393} | ListBox                        |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F11-6699-11CF-B70C-00AA0060D393} | _ListBox                       |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F12-6699-11CF-B70C-00AA0060D393} | ListBoxEvents                  |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F18-6699-11CF-B70C-00AA0060D393} | HScrollBar                     |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F19-6699-11CF-B70C-00AA0060D393} | _HScrollBar                    |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F1A-6699-11CF-B70C-00AA0060D393} | HScrollBarEvents               |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F20-6699-11CF-B70C-00AA0060D393} | VScrollBar                     |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F21-6699-11CF-B70C-00AA0060D393} | _VScrollBar                    |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F22-6699-11CF-B70C-00AA0060D393} | VScrollBarEvents               |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F28-6699-11CF-B70C-00AA0060D393} | Timer                          |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F29-6699-11CF-B70C-00AA0060D393} | _Timer                         |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F2A-6699-11CF-B70C-00AA0060D393} | TimerEvents                    |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F30-6699-11CF-B70C-00AA0060D393} | Printer                        |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F31-6699-11CF-B70C-00AA0060D393} | _Printer                       |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F32-6699-11CF-B70C-00AA0060D393} | PrinterEvents                  |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F38-6699-11CF-B70C-00AA0060D393} | Form                           |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F39-6699-11CF-B70C-00AA0060D393} | _Form                          |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F3A-6699-11CF-B70C-00AA0060D393} | FormEvents                     |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F40-6699-11CF-B70C-00AA0060D393} | Screen                         |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F41-6699-11CF-B70C-00AA0060D393} | _Screen                        |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F42-6699-11CF-B70C-00AA0060D393} | ScreenEvents                   |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F48-6699-11CF-B70C-00AA0060D393} | Clipboard                      |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F49-6699-11CF-B70C-00AA0060D393} | _Clipboard                     |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F4A-6699-11CF-B70C-00AA0060D393} | ClipboardEvents                |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F50-6699-11CF-B70C-00AA0060D393} | DriveListBox                   |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F51-6699-11CF-B70C-00AA0060D393} | _DriveListBox                  |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F52-6699-11CF-B70C-00AA0060D393} | DriveListBoxEvents             |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F58-6699-11CF-B70C-00AA0060D393} | DirListBox                     |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F59-6699-11CF-B70C-00AA0060D393} | _DirListBox                    |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F5A-6699-11CF-B70C-00AA0060D393} | DirListBoxEvents               |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F60-6699-11CF-B70C-00AA0060D393} | FileListBox                    |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F61-6699-11CF-B70C-00AA0060D393} | _FileListBox                   |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F62-6699-11CF-B70C-00AA0060D393} | FileListBoxEvents              |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F68-6699-11CF-B70C-00AA0060D393} | Menu                           |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F69-6699-11CF-B70C-00AA0060D393} | _Menu                          |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F6A-6699-11CF-B70C-00AA0060D393} | MenuEvents                     |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F70-6699-11CF-B70C-00AA0060D393} | MDIForm                        |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F71-6699-11CF-B70C-00AA0060D393} | _MDIForm                       |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F72-6699-11CF-B70C-00AA0060D393} | MDIFormEvents                  |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F78-6699-11CF-B70C-00AA0060D393} | App                            |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F79-6699-11CF-B70C-00AA0060D393} | _App                           |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F7A-6699-11CF-B70C-00AA0060D393} | AppEvents                      |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F80-6699-11CF-B70C-00AA0060D393} | Shape                          |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F81-6699-11CF-B70C-00AA0060D393} | _Shape                         |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F82-6699-11CF-B70C-00AA0060D393} | ShapeEvents                    |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F88-6699-11CF-B70C-00AA0060D393} | Line                           |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F89-6699-11CF-B70C-00AA0060D393} | _Line                          |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F8A-6699-11CF-B70C-00AA0060D393} | LineEvents                     |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F90-6699-11CF-B70C-00AA0060D393} | Image                          |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F91-6699-11CF-B70C-00AA0060D393} | _Image                         |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4F92-6699-11CF-B70C-00AA0060D393} | ImageEvents                    |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4FF8-6699-11CF-B70C-00AA0060D393} | Data                           |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4FF9-6699-11CF-B70C-00AA0060D393} | _Data                          |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD4FFA-6699-11CF-B70C-00AA0060D393} | DataEvents                     |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD5000-6699-11CF-B70C-00AA0060D393} | OLE                            |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD5001-6699-11CF-B70C-00AA0060D393} | _OLE                           |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD5002-6699-11CF-B70C-00AA0060D393} | OLEEvents                      |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD5010-6699-11CF-B70C-00AA0060D393} | UserControl                    |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD5011-6699-11CF-B70C-00AA0060D393} | _UserControl                   |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD5012-6699-11CF-B70C-00AA0060D393} | UserControlEvents              |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD5018-6699-11CF-B70C-00AA0060D393} | PropertyPage                   |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD5019-6699-11CF-B70C-00AA0060D393} | _PropertyPage                  |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD501A-6699-11CF-B70C-00AA0060D393} | PropertyPageEvents             |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD5020-6699-11CF-B70C-00AA0060D393} | UserDocument                   |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD5021-6699-11CF-B70C-00AA0060D393} | _UserDocument                  |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{33AD5022-6699-11CF-B70C-00AA0060D393} | UserDocumentEvents             |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{737361EC-467F-11D1-810F-0000F87557AA} | Licenses                       |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{FCFB3D25-A0FA-1068-A738-08002B3371B5} | Control                        |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{FCFB3D22-A0FA-1068-A738-08002B3371B5} | VBGlobal                       |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{FCFB3D23-A0FA-1068-A738-08002B3371B5} | Global                         |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{164CBDD0-7321-11D1-A1E8-00A0C90F2731} | _VBControlExtender             |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{164CBDD1-7321-11D1-A1E8-00A0C90F2731} | VBControlExtenderEvents        |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{164CBDD2-7321-11D1-A1E8-00A0C90F2731} | VBControlExtender              |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+{00025F02-0000-0000-C000-000000000046} | ___MSJetSQLHelp                |              | C:\Program Files (x86)\Microsoft Visual Studio\VB98\VB6.OLB
+------------------------------------------------------------------------------------------------------------------------
+Total registrado en este reporte: 98 componentes.
+
+===============================================================================
+                             FIN DEL CATÁLOGO                                  
+===============================================================================

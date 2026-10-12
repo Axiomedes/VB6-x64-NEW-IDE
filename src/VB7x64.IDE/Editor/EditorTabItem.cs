@@ -57,6 +57,10 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         _ => Application.Current?.TryFindResource("Icon_FileGeneric") as ImageSource
     };
 
+    public ICSharpCode.AvalonEdit.Folding.FoldingManager? FoldingManager { get; private set; }
+    public VB6FoldingStrategy FoldingStrategy { get; private set; } = new();
+    private readonly System.Windows.Threading.DispatcherTimer _foldingTimer;
+
     private Image _imgIcon = null!;
     private TextBlock _lblTitle = null!;
     private Button _btnClose = null!;
@@ -86,12 +90,37 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         Editor.TextArea.TextView.BackgroundRenderers.Add(CurrentLineHighlighter);
         Editor.TextArea.TextView.BackgroundRenderers.Add(BranchLinesRenderer);
         Editor.TextArea.TextView.BackgroundRenderers.Add(EndOfLineDetailsRenderer);
+
+        FoldingManager = ICSharpCode.AvalonEdit.Folding.FoldingManager.Install(Editor.TextArea);
         EnsureLeftMargins();
+
+        _foldingTimer = new System.Windows.Threading.DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(250)
+        };
+        _foldingTimer.Tick += (_, _) =>
+        {
+            _foldingTimer.Stop();
+            if (FoldingManager != null && Editor.Document != null)
+            {
+                FoldingStrategy.UpdateFoldings(FoldingManager, Editor.Document);
+            }
+        };
+
+        Editor.TextChanged += (_, _) =>
+        {
+            _foldingTimer.Stop();
+            _foldingTimer.Start();
+        };
 
         ApplyThemeSettings(settings);
         IntelliSenseController = new IntelliSenseController(this);
 
         Editor.Text = document.Text;
+        if (FoldingManager != null && Editor.Document != null)
+        {
+            FoldingStrategy.UpdateFoldings(FoldingManager, Editor.Document);
+        }
 
         InitializeHeader();
         SetupContextMenu();
@@ -579,7 +608,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
                 }
             }
 
-            // 2. Extraer BookmarkMargin y _spacerMargin para reubicarlos en el orden canónico
+            // 2. Extraer BookmarkMargin, FoldingMargin y _spacerMargin para reubicarlos en el orden canónico
             if (BookmarkMargin != null && Editor.TextArea.LeftMargins.Contains(BookmarkMargin))
             {
                 Editor.TextArea.LeftMargins.Remove(BookmarkMargin);
@@ -587,6 +616,17 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             if (_spacerMargin != null && Editor.TextArea.LeftMargins.Contains(_spacerMargin))
             {
                 Editor.TextArea.LeftMargins.Remove(_spacerMargin);
+            }
+
+            ICSharpCode.AvalonEdit.Folding.FoldingMargin? foldingMargin = null;
+            for (int i = Editor.TextArea.LeftMargins.Count - 1; i >= 0; i--)
+            {
+                if (Editor.TextArea.LeftMargins[i] is ICSharpCode.AvalonEdit.Folding.FoldingMargin fm)
+                {
+                    foldingMargin = fm;
+                    Editor.TextArea.LeftMargins.RemoveAt(i);
+                    break;
+                }
             }
 
             // 3. El margen de marcadores (BookmarkMargin) SIEMPRE debe estar en el extremo izquierdo absoluto (índice 0)
@@ -600,14 +640,21 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             {
                 if (margin is ICSharpCode.AvalonEdit.Editing.LineNumberMargin lnm)
                 {
-                    lnm.Margin = new Thickness(6, 0, 8, 0);
+                    lnm.Margin = new Thickness(6, 0, 6, 0);
                 }
             }
 
-            // 5. Insertar SIEMPRE un espaciador transparente justo antes del área de texto (TextView)
+            // 5. El margen de plegado (FoldingMargin) va a continuación de los números de línea
+            if (foldingMargin != null)
+            {
+                foldingMargin.Margin = new Thickness(2, 0, 4, 0);
+                Editor.TextArea.LeftMargins.Add(foldingMargin);
+            }
+
+            // 6. Insertar espaciador transparente justo antes del área de texto (TextView)
             // Esto asegura que las guías de bloque (BranchLinesRenderer) y el texto tengan espacio suficiente
             // y nunca queden pegados ni tapados por la barra de marcadores ni por los números de línea
-            _spacerMargin ??= new Border { Width = 16, Background = Brushes.Transparent };
+            _spacerMargin ??= new Border { Width = 10, Background = Brushes.Transparent };
             Editor.TextArea.LeftMargins.Add(_spacerMargin);
         }
     }
@@ -882,8 +929,16 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
 
         if (targetLine != -1)
         {
-            var lineObj = Editor.Document.GetLineByNumber(targetLine);
-            Editor.CaretOffset = lineObj.Offset;
+            if (targetLine < Editor.Document.LineCount)
+            {
+                var bodyLine = Editor.Document.GetLineByNumber(targetLine + 1);
+                Editor.CaretOffset = bodyLine.Offset + bodyLine.Length;
+            }
+            else
+            {
+                var lineObj = Editor.Document.GetLineByNumber(targetLine);
+                Editor.CaretOffset = lineObj.Offset + lineObj.Length;
+            }
             Editor.ScrollToLine(targetLine);
         }
         else
@@ -895,6 +950,12 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             Editor.CaretOffset = offset + $"\r\nPrivate Sub {procName}{parameters}\r\n    ".Length;
             Editor.ScrollToLine(Editor.Document.LineCount);
         }
+
+        Dispatcher.BeginInvoke(new Action(() =>
+        {
+            Editor.Focus();
+            Keyboard.Focus(Editor.TextArea);
+        }), System.Windows.Threading.DispatcherPriority.Input);
     }
 
     private void NavigateToFormLoad()
@@ -915,8 +976,16 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
 
         if (targetLine != -1)
         {
-            var lineObj = Editor.Document.GetLineByNumber(targetLine);
-            Editor.CaretOffset = lineObj.Offset;
+            if (targetLine < Editor.Document.LineCount)
+            {
+                var bodyLine = Editor.Document.GetLineByNumber(targetLine + 1);
+                Editor.CaretOffset = bodyLine.Offset + bodyLine.Length;
+            }
+            else
+            {
+                var lineObj = Editor.Document.GetLineByNumber(targetLine);
+                Editor.CaretOffset = lineObj.Offset + lineObj.Length;
+            }
             Editor.ScrollToLine(targetLine);
         }
         else
@@ -927,6 +996,12 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             Editor.CaretOffset = offset + "\r\nPrivate Sub Form_Load()\r\n    ".Length;
             Editor.ScrollToLine(Editor.Document.LineCount);
         }
+
+        Dispatcher.BeginInvoke(new Action(() =>
+        {
+            Editor.Focus();
+            Keyboard.Focus(Editor.TextArea);
+        }), System.Windows.Threading.DispatcherPriority.Input);
     }
 
     /// <summary>

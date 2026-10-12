@@ -26,9 +26,15 @@
 
         <DataTemplate x:Key="ColorEditorTemplate">
             <DockPanel LastChildFill="True">
-                <Button DockPanel.Dock="Right" Content="🎨" Width="20" Height="20" Padding="0"
-                        Background="Transparent" BorderThickness="0" Cursor="Hand"
-                        ToolTip="Elegir color de la paleta" Click="BtnPickColor_Click"/>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="💧" Width="18" Height="20" Padding="0" Margin="0,0,1,0"
+                            Background="Transparent" BorderThickness="0" Cursor="Hand"
+                            ToolTip="Gotero / Cuentagotas (capturar color de cualquier superficie o aplicación externa)"
+                            Click="BtnEyedropper_Click"/>
+                    <Button Content="🎨" Width="18" Height="20" Padding="0"
+                            Background="Transparent" BorderThickness="0" Cursor="Hand"
+                            ToolTip="Elegir color de la paleta" Click="BtnPickColor_Click"/>
+                </StackPanel>
                 <Border DockPanel.Dock="Left" Width="16" Height="16" Margin="4,0,2,0" BorderBrush="#888888" BorderThickness="1"
                         Background="{Binding ColorBrush}"/>
                 <TextBox Text="{Binding CurrentValue, UpdateSourceTrigger=LostFocus}" FontSize="11" Padding="2,2"
@@ -147,7 +153,8 @@
                         </Grid.ColumnDefinitions>
 
                         <!-- Nombre de la propiedad -->
-                        <Border Grid.Column="0" Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="0,0,1,0" Padding="5,2">
+                        <Border Grid.Column="0" Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="0,0,1,0" Padding="5,2"
+                                MouseLeftButtonDown="PropertyName_MouseLeftButtonDown" Cursor="IBeam">
                             <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="11" Foreground="#333333"
                                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
                                        ToolTip="{Binding Description}"/>

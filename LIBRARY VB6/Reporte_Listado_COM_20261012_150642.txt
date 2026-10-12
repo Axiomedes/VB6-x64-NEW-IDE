@@ -1,0 +1,47 @@
+﻿===============================================================================
+           CATÁLOGO RESUMIDO DE COMPONENTES OLE / COM (TEXTO PLANO)           
+===============================================================================
+Categoría        : Vista General Filtrada
+Filtro aplicado  : msvbvm
+Total elementos  : 29
+Fecha y Hora     : 2026-10-12 15:06:42
+Equipo           : AXIOUK-ELITEX2
+-------------------------------------------------------------------------------
+
+GUID / CLSID                           | PROGID / NOMBRE                | HILOS        | RUTA BINARIO / SERVIDOR
+------------------------------------------------------------------------------------------------------------------------
+{ED822010-6D7F-11CF-B949-00AA004455EA} | VbVarType                      |              | C:\Windows\SysWOW64\msvbvm60.dll
+{ED822011-6D7F-11CF-B949-00AA004455EA} | VbMsgBoxStyle                  |              | C:\Windows\SysWOW64\msvbvm60.dll
+{ED822012-6D7F-11CF-B949-00AA004455EA} | VbMsgBoxResult                 |              | C:\Windows\SysWOW64\msvbvm60.dll
+{ED822013-6D7F-11CF-B949-00AA004455EA} | VbFileAttribute                |              | C:\Windows\SysWOW64\msvbvm60.dll
+{ED822014-6D7F-11CF-B949-00AA004455EA} | VbStrConv                      |              | C:\Windows\SysWOW64\msvbvm60.dll
+{ED822015-6D7F-11CF-B949-00AA004455EA} | VbDayOfWeek                    |              | C:\Windows\SysWOW64\msvbvm60.dll
+{ED822016-6D7F-11CF-B949-00AA004455EA} | VbFirstWeekOfYear              |              | C:\Windows\SysWOW64\msvbvm60.dll
+{ED822017-6D7F-11CF-B949-00AA004455EA} | VbIMEStatus                    |              | C:\Windows\SysWOW64\msvbvm60.dll
+{ED822018-6D7F-11CF-B949-00AA004455EA} | VbAppWinStyle                  |              | C:\Windows\SysWOW64\msvbvm60.dll
+{ED822019-6D7F-11CF-B949-00AA004455EA} | VbCompareMethod                |              | C:\Windows\SysWOW64\msvbvm60.dll
+{ED822020-6D7F-11CF-B949-00AA004455EA} | VbCalendar                     |              | C:\Windows\SysWOW64\msvbvm60.dll
+{07D7F561-A08E-11D0-9706-00A0C911004E} | VbDateTimeFormat               |              | C:\Windows\SysWOW64\msvbvm60.dll
+{07D7F562-A08E-11D0-9706-00A0C911004E} | VbTriState                     |              | C:\Windows\SysWOW64\msvbvm60.dll
+{07D7F563-A08E-11D0-9706-00A0C911004E} | VbCallType                     |              | C:\Windows\SysWOW64\msvbvm60.dll
+{343DB180-2BCC-1069-82D4-00DD010EDFAA} | Constants                      |              | C:\Windows\SysWOW64\msvbvm60.dll
+{35BFBDA0-2BCC-1069-82D5-00DD010EDFAA} | Strings                        |              | C:\Windows\SysWOW64\msvbvm60.dll
+{36785F40-2BCC-1069-82D6-00DD010EDFAA} | Conversion                     |              | C:\Windows\SysWOW64\msvbvm60.dll
+{3738A200-2BCC-1069-82D7-00DD010EDFAA} | FileSystem                     |              | C:\Windows\SysWOW64\msvbvm60.dll
+{37D75300-2BCC-1069-82D8-00DD010EDFAA} | DateTime                       |              | C:\Windows\SysWOW64\msvbvm60.dll
+{38885380-2BCC-1069-82D9-00DD010EDFAA} | Information                    |              | C:\Windows\SysWOW64\msvbvm60.dll
+{39302C40-2BCC-1069-82DA-00DD010EDFAA} | Interaction                    |              | C:\Windows\SysWOW64\msvbvm60.dll
+{39D67E60-2BCC-1069-82DB-00DD010EDFAA} | Math                           |              | C:\Windows\SysWOW64\msvbvm60.dll
+{59B600C0-1C02-101B-8D72-00DD010EDFAA} | Financial                      |              | C:\Windows\SysWOW64\msvbvm60.dll
+{CF1C2C60-0D25-1069-9427-00DD0111BF30} | _HiddenModule                  |              | C:\Windows\SysWOW64\msvbvm60.dll
+{1E196B20-1F3C-1069-996B-00DD010EF676} | _HiddenInterface               |              | C:\Windows\SysWOW64\msvbvm60.dll
+{A4C466B8-499F-101B-BB78-00AA00383CBB} | _ErrObject                     |              | C:\Windows\SysWOW64\msvbvm60.dll
+{A4C46654-499F-101B-BB78-00AA00383CBB} | ErrObject                      |              | C:\Windows\SysWOW64\msvbvm60.dll
+{A4C46780-499F-101B-BB78-00AA00383CBB} | _Collection                    |              | C:\Windows\SysWOW64\msvbvm60.dll
+{A4C4671C-499F-101B-BB78-00AA00383CBB} | Collection                     |              | C:\Windows\SysWOW64\msvbvm60.dll
+------------------------------------------------------------------------------------------------------------------------
+Total registrado en este reporte: 29 componentes.
+
+===============================================================================
+                             FIN DEL CATÁLOGO                                  
+===============================================================================

@@ -418,6 +418,79 @@ public partial class PropertyGridPanel : UserControl
         }
     }
 
+    private void BtnEyedropper_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is PropertyItemViewModel prop)
+        {
+            ScreenColorDropper.StartColorPick(color =>
+            {
+                string vbHex = VbColorHelper.ToVbColorHex(color);
+                prop.CurrentValue = vbHex;
+            });
+        }
+    }
+
+    private void PropertyName_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is FrameworkElement fe)
+        {
+            if (fe.DataContext is PropertyItemViewModel prop && PropertiesListView != null)
+            {
+                PropertiesListView.SelectedItem = prop;
+            }
+
+            DependencyObject? parent = VisualTreeHelper.GetParent(fe);
+            while (parent != null && parent is not Grid)
+            {
+                parent = VisualTreeHelper.GetParent(parent);
+            }
+
+            if (parent is Grid grid)
+            {
+                var tb = FindVisualChild<TextBox>(grid);
+                if (tb != null && !tb.IsReadOnly)
+                {
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        tb.Focus();
+                        tb.SelectAll();
+                    }), System.Windows.Threading.DispatcherPriority.Input);
+                    e.Handled = true;
+                    return;
+                }
+
+                var cb = FindVisualChild<ComboBox>(grid);
+                if (cb != null)
+                {
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        cb.Focus();
+                    }), System.Windows.Threading.DispatcherPriority.Input);
+                    e.Handled = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    private static T? FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+    {
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+        {
+            var child = VisualTreeHelper.GetChild(parent, i);
+            if (child is T typedChild)
+            {
+                return typedChild;
+            }
+            var result = FindVisualChild<T>(child);
+            if (result != null)
+            {
+                return result;
+            }
+        }
+        return null;
+    }
+
     private void BtnPickColor_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button btn && btn.DataContext is PropertyItemViewModel prop)

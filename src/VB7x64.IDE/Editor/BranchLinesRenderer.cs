@@ -159,6 +159,12 @@ public class BranchLinesRenderer : IBackgroundRenderer
         var startVLine = textView.GetVisualLine(block.StartLine);
         var endVLine = textView.GetVisualLine(block.EndLine);
 
+        // Si el bloque está colapsado (plegado en la misma línea visual), no dibujar guía vertical
+        if (startVLine != null && startVLine.LastDocumentLine.LineNumber >= block.EndLine)
+        {
+            return;
+        }
+
         // 1. Determinar coordenada X de la palabra clave en pantalla (restando HorizontalOffset para soportar desplazamiento horizontal)
         double keywordX;
         if (startVLine != null)

@@ -270,10 +270,25 @@ public partial class LiveFormWindow : Window
 
         void DispatchEvent(string eventName)
         {
-            _host.InvokeProcedure($"{ctrlName}_{eventName}", modName);
+            if (ctrl.Index.HasValue)
+            {
+                _host.InvokeProcedure($"{ctrlName}_{eventName}", modName, VbValue.FromLong(ctrl.Index.Value));
+            }
+            else
+            {
+                _host.InvokeProcedure($"{ctrlName}_{eventName}", modName);
+            }
+
             if (!string.IsNullOrEmpty(parentControlPrefix))
             {
-                _host.InvokeProcedure($"{parentControlPrefix}_{ctrlName}_{eventName}", _model.Name);
+                if (ctrl.Index.HasValue)
+                {
+                    _host.InvokeProcedure($"{parentControlPrefix}_{ctrlName}_{eventName}", _model.Name, VbValue.FromLong(ctrl.Index.Value));
+                }
+                else
+                {
+                    _host.InvokeProcedure($"{parentControlPrefix}_{ctrlName}_{eventName}", _model.Name);
+                }
             }
         }
 
@@ -495,21 +510,30 @@ public partial class LiveFormWindow : Window
                 return picBorder;
 
             case "TIMER":
-                int intervalMs = 1000;
-                var intervalProp = ctrl.CustomProperties.Find(p => p.Name.Equals("Interval", StringComparison.OrdinalIgnoreCase));
-                if (intervalProp != null && int.TryParse(intervalProp.Value, out int iv) && iv > 0)
+                int intervalMs = ctrl.Interval;
+                if (intervalMs <= 0)
                 {
-                    intervalMs = iv;
+                    var intervalProp = ctrl.CustomProperties.Find(p => p.Name.Equals("Interval", StringComparison.OrdinalIgnoreCase));
+                    if (intervalProp != null && int.TryParse(intervalProp.Value, out int iv) && iv > 0)
+                    {
+                        intervalMs = iv;
+                    }
                 }
 
-                var timer = new DispatcherTimer
+                if (intervalMs > 0)
                 {
-                    Interval = TimeSpan.FromMilliseconds(intervalMs),
-                    IsEnabled = ctrl.Enabled
-                };
-                timer.Tick += (s, e) => DispatchEvent("Timer");
-                _activeTimers.Add(timer);
-                timer.Start();
+                    var timer = new DispatcherTimer
+                    {
+                        Interval = TimeSpan.FromMilliseconds(intervalMs),
+                        IsEnabled = ctrl.Enabled
+                    };
+                    timer.Tick += (s, e) => DispatchEvent("Timer");
+                    _activeTimers.Add(timer);
+                    if (ctrl.Enabled)
+                    {
+                        timer.Start();
+                    }
+                }
 
                 // Un Timer no es visible en tiempo de ejecución en VB6
                 return null;

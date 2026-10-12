@@ -24,6 +24,7 @@ public partial class FormDesignSurface : UserControl
     public event Action<FormDesignerControl>? ControlSelected;
     public event Action<List<FormDesignerControl>>? SelectionChanged;
     public event Action<FormDesignerControl>? ControlDoubleClicked;
+    public event Action? FormDoubleClicked;
     public event Action<FormDesignerControl>? ControlAdded;
     public event Action<FormDesignerControl>? ControlDeleted;
     public event Action? ToolCreationFinished;
@@ -319,6 +320,13 @@ public partial class FormDesignSurface : UserControl
     private void GridCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         GridCanvas.Focus();
+
+        if (e.ClickCount == 2)
+        {
+            FormDoubleClicked?.Invoke();
+            e.Handled = true;
+            return;
+        }
 
         // 1. Si hay una herramienta activa de Toolbox, iniciar creación de control
         if (!string.IsNullOrEmpty(ActiveCreationTool) && ActiveCreationTool != ControlToolboxRegistry.PointerTool)
@@ -829,10 +837,45 @@ public partial class FormDesignSurface : UserControl
                 ctrl.Left += 120; // 8 px
                 ctrl.Top += 120;
 
-                // Generar nombre único
-                string basePrefix = System.Text.RegularExpressions.Regex.Replace(ctrl.Name, @"\d+$", "");
-                if (string.IsNullOrWhiteSpace(basePrefix)) basePrefix = ctrl.DisplayType;
-                ctrl.Name = CurrentModel.GenerateUniqueName(basePrefix);
+                // Verificar si ya existe un control con este nombre (Matriz de controles como en VB6)
+                var existingControls = CurrentModel.GetAllControls()
+                    .Where(c => string.Equals(c.Name, ctrl.Name, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                if (existingControls.Count > 0)
+                {
+                    var msgRes = MessageBox.Show(
+                        $"Ya tiene un control llamado '{ctrl.Name}'. ¿Desea crear una matriz de controles?",
+                        "Microsoft Visual Basic",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+
+                    if (msgRes == MessageBoxResult.Yes)
+                    {
+                        var firstExisting = existingControls[0];
+                        if (!firstExisting.Index.HasValue)
+                        {
+                            firstExisting.Index = 0;
+                        }
+
+                        var usedIndices = existingControls.Select(c => c.Index ?? 0).ToHashSet();
+                        int nextIdx = 0;
+                        while (usedIndices.Contains(nextIdx)) nextIdx++;
+
+                        ctrl.Index = nextIdx;
+                    }
+                    else
+                    {
+                        string basePrefix = System.Text.RegularExpressions.Regex.Replace(ctrl.Name, @"\d+$", "");
+                        if (string.IsNullOrWhiteSpace(basePrefix)) basePrefix = ctrl.DisplayType;
+                        ctrl.Name = CurrentModel.GenerateUniqueName(basePrefix);
+                        ctrl.Index = null;
+                    }
+                }
+                else if (ctrl.Index.HasValue)
+                {
+                    ctrl.Index = null;
+                }
 
                 if (ctrl.IsNonResizable)
                 {

@@ -425,6 +425,9 @@ public static class FormDesignParser
             case "INDEX":
                 if (int.TryParse(cleanVal, out int idx)) ctrl.Index = idx;
                 break;
+            case "INTERVAL":
+                if (int.TryParse(cleanVal, out int iv)) ctrl.Interval = iv;
+                break;
             case "BACKCOLOR":
                 ctrl.BackColorHex = rawVal.Trim();
                 break;

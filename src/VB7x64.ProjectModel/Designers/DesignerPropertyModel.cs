@@ -283,7 +283,13 @@ public static class DesignerPropertyFactory
         return list;
     }
 
-    public static List<DesignerPropertyItem> GetPropertiesForControl(FormDesignerControl ctrl, FormDesignModel form, Action onModelChanged)
+    public static List<DesignerPropertyItem> GetPropertiesForControl(
+        FormDesignerControl ctrl,
+        FormDesignModel form,
+        Action onModelChanged,
+        Action<FormDesignerControl, string, string>? onControlRenamed = null,
+        Func<string, bool>? confirmCreateControlArray = null,
+        Action<string>? showWarning = null)
     {
         var list = new List<DesignerPropertyItem>
         {
@@ -299,10 +305,55 @@ public static class DesignerPropertyFactory
                 {
                     val = val.Trim();
                     if (string.IsNullOrWhiteSpace(val)) return false;
-                    // Evitar nombres repetidos
-                    var existing = form.FindControl(val);
-                    if (existing != null && existing != ctrl) return false;
+                    if (string.Equals(ctrl.Name, val, StringComparison.OrdinalIgnoreCase))
+                    {
+                        ctrl.Name = val;
+                        onModelChanged();
+                        return true;
+                    }
+
+                    // Buscar controles existentes con ese mismo nombre
+                    var existingControls = form.GetAllControls()
+                        .Where(c => c != ctrl && string.Equals(c.Name, val, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+
+                    if (existingControls.Count > 0)
+                    {
+                        if (!ctrl.Index.HasValue)
+                        {
+                            bool shouldCreate = confirmCreateControlArray?.Invoke(val) ?? false;
+                            if (!shouldCreate)
+                            {
+                                return false;
+                            }
+                        }
+
+                        var firstExisting = existingControls[0];
+                        if (!firstExisting.Index.HasValue)
+                        {
+                            firstExisting.Index = 0;
+                        }
+
+                        var usedIndices = existingControls.Where(c => c.Index.HasValue).Select(c => c.Index!.Value).ToHashSet();
+                        if (firstExisting.Index.HasValue) usedIndices.Add(firstExisting.Index.Value);
+
+                        int nextIdx = 0;
+                        while (usedIndices.Contains(nextIdx)) nextIdx++;
+
+                        string oldName = ctrl.Name;
+                        ctrl.Name = val;
+                        if (!ctrl.Index.HasValue || usedIndices.Contains(ctrl.Index.Value))
+                        {
+                            ctrl.Index = nextIdx;
+                        }
+                        onControlRenamed?.Invoke(ctrl, oldName, val);
+                        onModelChanged();
+                        return true;
+                    }
+
+                    string prevName = ctrl.Name;
                     ctrl.Name = val;
+                    onControlRenamed?.Invoke(ctrl, prevName, val);
                     onModelChanged();
                     return true;
                 }
@@ -317,14 +368,36 @@ public static class DesignerPropertyFactory
                 CurrentValue = ctrl.Index?.ToString() ?? "",
                 ValueSetter = val =>
                 {
+                    val = val?.Trim() ?? "";
                     if (string.IsNullOrWhiteSpace(val))
                     {
+                        var siblings = form.GetAllControls()
+                            .Where(c => c != ctrl && string.Equals(c.Name, ctrl.Name, StringComparison.OrdinalIgnoreCase))
+                            .ToList();
+                        if (siblings.Count > 0)
+                        {
+                            showWarning?.Invoke($"El control '{ctrl.Name}' pertenece a una matriz de controles y debe tener un índice válido.");
+                            return false;
+                        }
+
                         ctrl.Index = null;
                         onModelChanged();
                         return true;
                     }
+
                     if (int.TryParse(val, out int idx) && idx >= 0)
                     {
+                        var duplicate = form.GetAllControls()
+                            .FirstOrDefault(c => c != ctrl &&
+                                                 string.Equals(c.Name, ctrl.Name, StringComparison.OrdinalIgnoreCase) &&
+                                                 c.Index == idx);
+
+                        if (duplicate != null)
+                        {
+                            showWarning?.Invoke($"Ya existe un control '{ctrl.Name}' con el índice {idx} en la matriz.");
+                            return false;
+                        }
+
                         ctrl.Index = idx;
                         onModelChanged();
                         return true;
@@ -333,6 +406,101 @@ public static class DesignerPropertyFactory
                 }
             }
         };
+
+        // Si es un Timer, mostrar exclusivamente las propiedades soportadas por VB6 para temporizadores no visibles
+        if (ctrl.IsTimer)
+        {
+            list.Add(new DesignerPropertyItem
+            {
+                Name = "Interval",
+                DisplayName = "Interval",
+                Category = "Behavior",
+                Description = "Devuelve o establece el número de milisegundos entre llamadas a un evento Timer (Tik). 0 desactiva el temporizador.",
+                Type = DesignerPropertyType.IntegerRaw,
+                CurrentValue = ctrl.Interval.ToString(),
+                ValueSetter = val =>
+                {
+                    if (int.TryParse(val, out int iv) && iv >= 0 && iv <= 65535)
+                    {
+                        ctrl.Interval = iv;
+                        onModelChanged();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            list.Add(new DesignerPropertyItem
+            {
+                Name = "Enabled",
+                DisplayName = "Enabled",
+                Category = "Behavior",
+                Description = "Determina si el temporizador se ejecuta y produce eventos Timer periódicamente.",
+                Type = DesignerPropertyType.Boolean,
+                CurrentValue = ctrl.Enabled ? "True" : "False",
+                Choices = BoolChoices,
+                ValueSetter = val =>
+                {
+                    if (bool.TryParse(val, out bool b))
+                    {
+                        ctrl.Enabled = b;
+                        onModelChanged();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            list.Add(new DesignerPropertyItem
+            {
+                Name = "Left",
+                DisplayName = "Left",
+                Category = "Position",
+                Description = "Posición horizontal del icono del temporizador en diseño en Twips.",
+                Type = DesignerPropertyType.IntegerTwips,
+                CurrentValue = ctrl.Left.ToString(),
+                ValueSetter = val =>
+                {
+                    if (int.TryParse(val, out int v)) { ctrl.Left = v; onModelChanged(); return true; }
+                    return false;
+                }
+            });
+
+            list.Add(new DesignerPropertyItem
+            {
+                Name = "Top",
+                DisplayName = "Top",
+                Category = "Position",
+                Description = "Posición vertical del icono del temporizador en diseño en Twips.",
+                Type = DesignerPropertyType.IntegerTwips,
+                CurrentValue = ctrl.Top.ToString(),
+                ValueSetter = val =>
+                {
+                    if (int.TryParse(val, out int v)) { ctrl.Top = v; onModelChanged(); return true; }
+                    return false;
+                }
+            });
+
+            list.Add(new DesignerPropertyItem
+            {
+                Name = "Tag",
+                DisplayName = "Tag",
+                Category = "General",
+                Description = "Almacena cualquier dato adicional necesario para su programa.",
+                Type = DesignerPropertyType.Text,
+                CurrentValue = ctrl.CustomProperties.FirstOrDefault(p => p.Name.Equals("Tag", StringComparison.OrdinalIgnoreCase))?.Value ?? "",
+                ValueSetter = val =>
+                {
+                    var p = ctrl.CustomProperties.FirstOrDefault(cp => cp.Name.Equals("Tag", StringComparison.OrdinalIgnoreCase));
+                    if (p != null) p.Value = val;
+                    else ctrl.CustomProperties.Add(new FormPropertyItem { Name = "Tag", Value = val });
+                    onModelChanged();
+                    return true;
+                }
+            });
+
+            return list;
+        }
 
         // Caption o Text según el tipo de control
         var toolboxInfo = ControlToolboxRegistry.Find(ctrl.TypeName);

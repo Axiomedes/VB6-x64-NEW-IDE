@@ -107,6 +107,27 @@ public class FormDesignModel
     }
 
     /// <summary>
+    /// Busca un control por su nombre y por su índice (para matrices de controles).
+    /// </summary>
+    public FormDesignerControl? FindControl(string name, int? index)
+    {
+        return GetAllControls().FirstOrDefault(c =>
+            string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase) &&
+            c.Index == index);
+    }
+
+    /// <summary>
+    /// Retorna todos los controles que pertenecen a una matriz de controles con el nombre indicado, ordenados por su índice.
+    /// </summary>
+    public List<FormDesignerControl> GetControlArray(string name)
+    {
+        return GetAllControls()
+            .Where(c => string.Equals(c.Name, name, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(c => c.Index ?? 0)
+            .ToList();
+    }
+
+    /// <summary>
     /// Elimina un control de la jerarquía (sea hijo directo del formulario o de un contenedor).
     /// </summary>
     public bool RemoveControl(FormDesignerControl control)

@@ -38,6 +38,11 @@ public class FormDesignerControl
     public bool Enabled { get; set; } = true;
     public bool Visible { get; set; } = true;
 
+    /// <summary>
+    /// Intervalo en milisegundos entre eventos Timer para el control VB.Timer (0 a 65535).
+    /// </summary>
+    public int Interval { get; set; } = 0;
+
     // Propiedades específicas de menú (VB.Menu)
     public bool Checked { get; set; }
     public string Shortcut { get; set; } = string.Empty;
@@ -205,6 +210,10 @@ public class FormDesignerControl
             MultiLine = MultiLine,
             ScrollBars = ScrollBars,
             Font = Font?.Clone(),
+            Interval = Interval,
+            Picture = Picture,
+            PictureData = PictureData != null ? (byte[])PictureData.Clone() : null,
+            PictureAlignment = PictureAlignment,
             ParentControl = newParent,
             CustomProperties = CustomProperties.Select(p => p.Clone()).ToList()
         };

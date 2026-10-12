@@ -279,6 +279,11 @@ public partial class MainWindow : Window
             }
         };
 
+        MainPropertyGridPanel.ControlRenamed += (ctrl, oldName, newName) =>
+        {
+            ActiveTab?.RenameControlInCode(oldName, newName);
+        };
+
         MainPropertyGridPanel.ModelChanged += () =>
         {
             if (ActiveTab?.DesignSurface != null && ActiveTab.DesignModel != null)

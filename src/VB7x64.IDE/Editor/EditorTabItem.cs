@@ -724,6 +724,11 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
                 NavigateToControlEvent(ctrl);
             };
 
+            DesignSurface.FormDoubleClicked += () =>
+            {
+                NavigateToFormLoad();
+            };
+
             DesignSurface.RequestMenuEditor += () =>
             {
                 if (Application.Current.MainWindow is MainWindow mw)
@@ -780,6 +785,20 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             if (lines[i].Contains(pattern, StringComparison.OrdinalIgnoreCase))
             {
                 targetLine = i + 1;
+                // Si el control es parte de una matriz pero el Sub existente no tiene (Index As Integer), actualizar la firma
+                if (ctrl.Index.HasValue && !lines[i].Contains("Index As Integer", StringComparison.OrdinalIgnoreCase))
+                {
+                    string updated = System.Text.RegularExpressions.Regex.Replace(
+                        lines[i],
+                        @"(?i)\bSub\s+" + System.Text.RegularExpressions.Regex.Escape(procName) + @"\s*\(\s*\)",
+                        $"Sub {procName}(Index As Integer)");
+
+                    if (updated != lines[i])
+                    {
+                        var lineObj = Editor.Document.GetLineByNumber(targetLine);
+                        Editor.Document.Replace(lineObj.Offset, lineObj.Length, updated.TrimEnd('\r'));
+                    }
+                }
                 break;
             }
         }
@@ -798,6 +817,80 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             Editor.Document.Insert(offset, codeSnippet);
             Editor.CaretOffset = offset + $"\r\nPrivate Sub {procName}{parameters}\r\n    ".Length;
             Editor.ScrollToLine(Editor.Document.LineCount);
+        }
+    }
+
+    private void NavigateToFormLoad()
+    {
+        SwitchToCodeView();
+
+        string pattern = "Sub Form_Load";
+        int targetLine = -1;
+        var lines = Editor.Text.Split('\n');
+        for (int i = 0; i < lines.Length; i++)
+        {
+            if (lines[i].Contains(pattern, StringComparison.OrdinalIgnoreCase))
+            {
+                targetLine = i + 1;
+                break;
+            }
+        }
+
+        if (targetLine != -1)
+        {
+            var lineObj = Editor.Document.GetLineByNumber(targetLine);
+            Editor.CaretOffset = lineObj.Offset;
+            Editor.ScrollToLine(targetLine);
+        }
+        else
+        {
+            string codeSnippet = "\r\nPrivate Sub Form_Load()\r\n    \r\nEnd Sub\r\n";
+            int offset = Editor.Document.TextLength;
+            Editor.Document.Insert(offset, codeSnippet);
+            Editor.CaretOffset = offset + "\r\nPrivate Sub Form_Load()\r\n    ".Length;
+            Editor.ScrollToLine(Editor.Document.LineCount);
+        }
+    }
+
+    /// <summary>
+    /// Renombra todas las cabeceras de eventos y referencias a un control cuando se renombra en diseño.
+    /// </summary>
+    public void RenameControlInCode(string oldName, string newName)
+    {
+        if (string.IsNullOrWhiteSpace(oldName) || string.IsNullOrWhiteSpace(newName) ||
+            string.Equals(oldName, newName, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        string originalText = Editor.Text;
+        if (string.IsNullOrEmpty(originalText)) return;
+
+        // 1. Renombrar cabeceras de eventos: Private Sub Command1_Click(...) -> Private Sub btnAceptar_Click(...)
+        string patternEvents = @"(?i)\b((?:(?:Private|Public|Friend|Static)\s+)?Sub\s+)" +
+                               System.Text.RegularExpressions.Regex.Escape(oldName) +
+                               @"_([a-zA-Z0-9_]+)";
+
+        string updatedText = System.Text.RegularExpressions.Regex.Replace(
+            originalText,
+            patternEvents,
+            $"$1{newName}_$2");
+
+        // 2. Renombrar referencias al control (Command1. -> btnAceptar., Command1( -> btnAceptar()
+        string patternRefs = @"(?i)\b" + System.Text.RegularExpressions.Regex.Escape(oldName) +
+                             @"(?=\.|\(|\s*=|\s*\)|\s*,|\s*\z|\s*\+)";
+
+        updatedText = System.Text.RegularExpressions.Regex.Replace(
+            updatedText,
+            patternRefs,
+            newName);
+
+        if (updatedText != originalText)
+        {
+            Editor.Text = updatedText;
+            Document.Text = updatedText;
+            Document.IsDirty = true;
+            AppLogger.Info($"Control renombrado en código de '{oldName}' a '{newName}'.");
         }
     }
 

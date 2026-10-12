@@ -112,6 +112,7 @@ public partial class PropertyGridPanel : UserControl
 
     public event Action<FormDesignerControl?>? ObjectSelected;
     public event Action? ModelChanged;
+    public event Action<FormDesignerControl, string, string>? ControlRenamed;
 
     public string? CurrentFormFilePath { get; set; }
 
@@ -183,11 +184,11 @@ public partial class PropertyGridPanel : UserControl
             }
         };
 
-        foreach (var ctrl in _model.GetAllControls().OrderBy(c => c.Name))
+        foreach (var ctrl in _model.GetAllControls().OrderBy(c => c.Name).ThenBy(c => c.Index ?? 0))
         {
             items.Add(new ObjectSelectorItem
             {
-                DisplayName = $"{ctrl.Name} ({ctrl.DisplayType})",
+                DisplayName = $"{ctrl.DisplayNameWithIndex} ({ctrl.DisplayType})",
                 Target = ctrl
             });
         }
@@ -275,7 +276,25 @@ public partial class PropertyGridPanel : UserControl
         }
         else if (target is FormDesignerControl ctrl)
         {
-            var raw = DesignerPropertyFactory.GetPropertiesForControl(ctrl, _model, OnInnerModelChanged);
+            var raw = DesignerPropertyFactory.GetPropertiesForControl(
+                ctrl,
+                _model,
+                OnInnerModelChanged,
+                (c, oldName, newName) => ControlRenamed?.Invoke(c, oldName, newName),
+                name =>
+                {
+                    var res = MessageBox.Show(
+                        $"Ya tiene un control llamado '{name}'. ¿Desea crear una matriz de controles?",
+                        "Microsoft Visual Basic",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Question);
+                    return res == MessageBoxResult.Yes;
+                },
+                msg =>
+                {
+                    MessageBox.Show(msg, "Microsoft Visual Basic", MessageBoxButton.OK, MessageBoxImage.Warning);
+                });
+
             foreach (var p in raw)
             {
                 _allProperties.Add(new PropertyItemViewModel(p, OnInnerModelChanged));

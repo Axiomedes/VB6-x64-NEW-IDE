@@ -185,6 +185,7 @@ public static class FormDesignSerializer
 
         // Propiedades canónicas
         if (ctrl.Index.HasValue) WriteProp("Index", ctrl.Index.Value.ToString(CultureInfo.InvariantCulture));
+        if (ctrl.IsTimer || ctrl.Interval > 0) WriteProp("Interval", ctrl.Interval.ToString(CultureInfo.InvariantCulture));
         if (!string.IsNullOrEmpty(ctrl.Caption)) WriteProp("Caption", $"\"{ctrl.Caption}\"");
         if (!string.IsNullOrEmpty(ctrl.Text)) WriteProp("Text", $"\"{ctrl.Text}\"");
 

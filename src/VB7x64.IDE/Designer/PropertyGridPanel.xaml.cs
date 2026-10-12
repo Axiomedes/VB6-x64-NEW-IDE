@@ -6,8 +6,10 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.IO;
 using System.Windows.Media;
 using VB7x64.ProjectModel.Designers;
+using VB7x64.ProjectModel.Resources;
 
 namespace VB7x64.IDE.Designer;
 
@@ -16,11 +18,14 @@ public class PropertyTemplateSelector : DataTemplateSelector
     public DataTemplate? TextTemplate { get; set; }
     public DataTemplate? ChoiceTemplate { get; set; }
     public DataTemplate? ColorTemplate { get; set; }
+    public DataTemplate? PictureTemplate { get; set; }
 
     public override DataTemplate? SelectTemplate(object item, DependencyObject container)
     {
         if (item is PropertyItemViewModel prop)
         {
+            if (prop.Type == DesignerPropertyType.Picture)
+                return PictureTemplate;
             if (prop.Type == DesignerPropertyType.ColorHex)
                 return ColorTemplate;
             if (prop.Choices.Count > 0)
@@ -36,6 +41,7 @@ public class PropertyItemViewModel : INotifyPropertyChanged
     private readonly DesignerPropertyItem _model;
     private readonly Action _onModelChanged;
 
+    public DesignerPropertyItem Model => _model;
     public string Name => _model.Name;
     public string DisplayName => _model.DisplayName;
     public string Category => _model.Category;
@@ -107,14 +113,17 @@ public partial class PropertyGridPanel : UserControl
     public event Action<FormDesignerControl?>? ObjectSelected;
     public event Action? ModelChanged;
 
+    public string? CurrentFormFilePath { get; set; }
+
     public PropertyGridPanel()
     {
         InitializeComponent();
     }
 
-    public void BindModel(FormDesignModel model, FormDesignerControl? selectedControl = null)
+    public void BindModel(FormDesignModel model, FormDesignerControl? selectedControl = null, string? formFilePath = null)
     {
         _model = model;
+        CurrentFormFilePath = formFilePath;
         RefreshObjectList();
 
         if (selectedControl != null)
@@ -446,5 +455,119 @@ public partial class PropertyGridPanel : UserControl
 
         menu.PlacementTarget = anchor;
         menu.IsOpen = true;
+    }
+
+    private void BtnBrowsePicture_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is PropertyItemViewModel prop)
+        {
+            var ofd = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Cargar Imagen (PictureBox / CommandButton / Form)",
+                Filter = "Todos los formatos de imagen (*.png;*.webp;*.jpg;*.jpeg;*.bmp;*.ico;*.gif)|*.png;*.webp;*.jpg;*.jpeg;*.bmp;*.ico;*.gif|PNG (*.png)|*.png|WebP (*.webp)|*.webp|JPEG (*.jpg;*.jpeg)|*.jpg;*.jpeg|Mapas de bits (*.bmp)|*.bmp|Iconos (*.ico)|*.ico|Todos los archivos (*.*)|*.*"
+            };
+
+            if (ofd.ShowDialog() == true)
+            {
+                try
+                {
+                    byte[] imageBytes = File.ReadAllBytes(ofd.FileName);
+
+                    // Determinar archivo .frx correspondiente
+                    string frxPath;
+                    string? formPath = CurrentFormFilePath;
+                    if (string.IsNullOrWhiteSpace(formPath) && Application.Current?.MainWindow is MainWindow mw)
+                    {
+                        formPath = mw.ActiveTab?.Document?.FilePath;
+                    }
+
+                    if (!string.IsNullOrEmpty(formPath))
+                    {
+                        string fullFormPath = Path.GetFullPath(formPath);
+                        frxPath = Path.ChangeExtension(fullFormPath, ".frx");
+                    }
+                    else
+                    {
+                        string dir = Directory.GetCurrentDirectory();
+                        frxPath = Path.Combine(dir, $"{_model?.Name ?? "Form1"}.frx");
+                    }
+
+                    int offset = FrxResourceFile.AppendResource(frxPath, imageBytes);
+                    string frxFileName = Path.GetFileName(frxPath);
+                    string reference = FrxResourceFile.FormatReference(frxFileName, offset);
+
+                    if (_currentSelectedTarget is FormDesignerControl ctrl)
+                    {
+                        ctrl.Picture = reference;
+                        ctrl.PictureData = imageBytes;
+
+                        // Si es CommandButton, activar estilo Graphical
+                        if (ctrl.TypeName.EndsWith("Button", StringComparison.OrdinalIgnoreCase))
+                        {
+                            ctrl.Style = 1;
+                        }
+
+                        // Si es PictureBox con AutoSize, ajustar tamaño
+                        if (ctrl.AutoSize)
+                        {
+                            var bmp = VbImageHelper.LoadBitmapFromBytes(imageBytes);
+                            if (bmp != null)
+                            {
+                                ctrl.Width = (int)(bmp.PixelWidth * FormDesignerControl.TwipsPerPixel);
+                                ctrl.Height = (int)(bmp.PixelHeight * FormDesignerControl.TwipsPerPixel);
+                            }
+                        }
+                    }
+                    else if (_currentSelectedTarget is FormDesignModel formModel)
+                    {
+                        formModel.Picture = reference;
+                        formModel.PictureData = imageBytes;
+                    }
+
+                    prop.Model.CurrentValue = FrxResourceFile.GetFormatDescription(imageBytes, reference);
+                    OnInnerModelChanged();
+                    prop.Refresh();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al cargar la imagen: {ex.Message}", "Error de Imagen", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+    }
+
+    private void BtnClearPicture_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.DataContext is PropertyItemViewModel prop)
+        {
+            ClearPictureProperty(prop);
+        }
+    }
+
+    private void PropertyPicture_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Delete && sender is TextBox tb && tb.DataContext is PropertyItemViewModel prop)
+        {
+            ClearPictureProperty(prop);
+            e.Handled = true;
+        }
+    }
+
+    private void ClearPictureProperty(PropertyItemViewModel prop)
+    {
+        if (_currentSelectedTarget is FormDesignerControl ctrl)
+        {
+            ctrl.Picture = null;
+            ctrl.PictureData = null;
+        }
+        else if (_currentSelectedTarget is FormDesignModel formModel)
+        {
+            formModel.Picture = null;
+            formModel.PictureData = null;
+        }
+
+        prop.Model.CurrentValue = "(None)";
+        OnInnerModelChanged();
+        prop.Refresh();
     }
 }

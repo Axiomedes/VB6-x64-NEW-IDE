@@ -131,6 +131,7 @@ public static class FormDesignSerializer
 
         if (!string.IsNullOrEmpty(model.BackColorHex)) WriteProp("BackColor", model.BackColorHex);
         if (!string.IsNullOrEmpty(model.ForeColorHex)) WriteProp("ForeColor", model.ForeColorHex);
+        if (!string.IsNullOrEmpty(model.Picture)) WriteProp("Picture", model.Picture.StartsWith('"') ? model.Picture : $"\"{model.Picture}\"");
 
         // Bloque Font
         if (model.Font != null)
@@ -204,6 +205,18 @@ public static class FormDesignSerializer
         if (ctrl.Alignment.HasValue) WriteProp("Alignment", ctrl.Alignment.Value.ToString(CultureInfo.InvariantCulture));
         if (ctrl.MultiLine.HasValue && ctrl.MultiLine.Value) WriteProp("MultiLine", "-1  'True");
         if (ctrl.ScrollBars.HasValue && ctrl.ScrollBars.Value > 0) WriteProp("ScrollBars", ctrl.ScrollBars.Value.ToString(CultureInfo.InvariantCulture));
+
+        // Propiedades de imagen (PictureBox, CommandButton, etc.)
+        if (!string.IsNullOrEmpty(ctrl.Picture)) WriteProp("Picture", ctrl.Picture.StartsWith('"') ? ctrl.Picture : $"\"{ctrl.Picture}\"");
+        if (ctrl.Style != 0) WriteProp("Style", $"{ctrl.Style}  'Graphical");
+        if (ctrl.AutoSize) WriteProp("AutoSize", "-1  'True");
+        if (!string.IsNullOrEmpty(ctrl.DownPicture)) WriteProp("DownPicture", ctrl.DownPicture.StartsWith('"') ? ctrl.DownPicture : $"\"{ctrl.DownPicture}\"");
+        if (!string.IsNullOrEmpty(ctrl.DisabledPicture)) WriteProp("DisabledPicture", ctrl.DisabledPicture.StartsWith('"') ? ctrl.DisabledPicture : $"\"{ctrl.DisabledPicture}\"");
+
+        if (ctrl.PictureAlignment != PictureAlignment.Top)
+        {
+            sb.AppendLine($"{propIndent}' [VB7] PictureAlignment = {(int)ctrl.PictureAlignment}");
+        }
 
         // Font si aplica
         if (ctrl.Font != null)

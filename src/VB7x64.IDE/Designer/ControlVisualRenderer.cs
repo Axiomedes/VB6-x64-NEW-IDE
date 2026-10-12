@@ -115,9 +115,101 @@ public static class ControlVisualRenderer
         textBlock.VerticalAlignment = VerticalAlignment.Center;
         textBlock.HorizontalAlignment = HorizontalAlignment.Center;
 
-        innerBorder.Child = textBlock;
-        border.Child = innerBorder;
+        var bmp = VbImageHelper.LoadBitmapFromBytes(ctrl.PictureData);
+        if (bmp != null && (ctrl.Style == 1 || !string.IsNullOrEmpty(ctrl.Picture) || ctrl.PictureData != null))
+        {
+            var image = new System.Windows.Controls.Image
+            {
+                Source = bmp,
+                Stretch = Stretch.None,
+                Width = bmp.PixelWidth,
+                Height = bmp.PixelHeight,
+                SnapsToDevicePixels = true,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
 
+            bool hasCaption = !string.IsNullOrEmpty(ctrl.Caption);
+            if (!hasCaption)
+            {
+                innerBorder.Child = image;
+            }
+            else
+            {
+                switch (ctrl.PictureAlignment)
+                {
+                    case PictureAlignment.Bottom:
+                        var spBottom = new StackPanel
+                        {
+                            Orientation = Orientation.Vertical,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            VerticalAlignment = VerticalAlignment.Center
+                        };
+                        spBottom.Children.Add(textBlock);
+                        image.Margin = new Thickness(0, 2, 0, 0);
+                        spBottom.Children.Add(image);
+                        innerBorder.Child = spBottom;
+                        break;
+
+                    case PictureAlignment.Left:
+                        var spLeft = new StackPanel
+                        {
+                            Orientation = Orientation.Horizontal,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            VerticalAlignment = VerticalAlignment.Center
+                        };
+                        image.Margin = new Thickness(0, 0, 4, 0);
+                        spLeft.Children.Add(image);
+                        spLeft.Children.Add(textBlock);
+                        innerBorder.Child = spLeft;
+                        break;
+
+                    case PictureAlignment.Right:
+                        var spRight = new StackPanel
+                        {
+                            Orientation = Orientation.Horizontal,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            VerticalAlignment = VerticalAlignment.Center
+                        };
+                        spRight.Children.Add(textBlock);
+                        image.Margin = new Thickness(4, 0, 0, 0);
+                        spRight.Children.Add(image);
+                        innerBorder.Child = spRight;
+                        break;
+
+                    case PictureAlignment.Center:
+                        var gridCenter = new Grid
+                        {
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            VerticalAlignment = VerticalAlignment.Center
+                        };
+                        gridCenter.Children.Add(image);
+                        gridCenter.Children.Add(textBlock);
+                        innerBorder.Child = gridCenter;
+                        break;
+
+                    case PictureAlignment.Top:
+                    default:
+                        var spTop = new StackPanel
+                        {
+                            Orientation = Orientation.Vertical,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            VerticalAlignment = VerticalAlignment.Center
+                        };
+                        image.Margin = new Thickness(0, 0, 0, 2);
+                        spTop.Children.Add(image);
+                        spTop.Children.Add(textBlock);
+                        innerBorder.Child = spTop;
+                        break;
+                }
+            }
+        }
+        else
+        {
+            innerBorder.Child = textBlock;
+        }
+
+        border.Child = innerBorder;
         return border;
     }
 
@@ -387,10 +479,32 @@ public static class ControlVisualRenderer
         {
             Background = VbColorHelper.ToBrush(ctrl.BackColorHex, Brushes.White),
             BorderBrush = new SolidColorBrush(Color.FromRgb(128, 128, 128)),
-            BorderThickness = new Thickness(1)
+            BorderThickness = new Thickness(ctrl.BorderStyle == 0 ? 0 : 1)
         };
 
         var canvas = new Canvas { ClipToBounds = true };
+
+        var bmp = VbImageHelper.LoadBitmapFromBytes(ctrl.PictureData);
+        if (bmp != null)
+        {
+            if (ctrl.AutoSize)
+            {
+                ctrl.Width = (int)(bmp.PixelWidth * FormDesignerControl.TwipsPerPixel);
+                ctrl.Height = (int)(bmp.PixelHeight * FormDesignerControl.TwipsPerPixel);
+            }
+
+            var image = new System.Windows.Controls.Image
+            {
+                Source = bmp,
+                Stretch = Stretch.None,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top
+            };
+            Canvas.SetLeft(image, 0);
+            Canvas.SetTop(image, 0);
+            canvas.Children.Add(image);
+        }
+
         foreach (var child in ctrl.Children)
         {
             var childVisual = CreateVisual(child, onChildCreated);

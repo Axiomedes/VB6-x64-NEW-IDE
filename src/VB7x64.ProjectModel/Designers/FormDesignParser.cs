@@ -228,6 +228,29 @@ public static class FormDesignParser
                 continue;
             }
 
+            // Comentarios dentro del bloque del control (ej. [VB7] PictureAlignment = ...)
+            if (trimmed.StartsWith('\''))
+            {
+                if (controlStack.Count > 0)
+                {
+                    var activeCtrl = controlStack.Peek();
+                    var matchAlign = Regex.Match(trimmed, @"PictureAlignment\s*=\s*([0-4]|Top|Bottom|Left|Right|Center)", RegexOptions.IgnoreCase);
+                    if (matchAlign.Success)
+                    {
+                        string aVal = matchAlign.Groups[1].Value;
+                        if (int.TryParse(aVal, out int aNum))
+                        {
+                            activeCtrl.PictureAlignment = (PictureAlignment)Math.Clamp(aNum, 0, 4);
+                        }
+                        else if (Enum.TryParse<PictureAlignment>(aVal, true, out var paEnum))
+                        {
+                            activeCtrl.PictureAlignment = paEnum;
+                        }
+                    }
+                }
+                continue;
+            }
+
             // Asignación de propiedad: Property = Value ['Comment]
             var propMatch = PropertyAssignmentRegex.Match(trimmed);
             if (propMatch.Success)
@@ -325,6 +348,9 @@ public static class FormDesignParser
             case "FORECOLOR":
                 model.ForeColorHex = rawVal.Trim();
                 break;
+            case "PICTURE":
+                model.Picture = cleanVal;
+                break;
         }
     }
 
@@ -419,6 +445,34 @@ public static class FormDesignParser
             case "SCROLLBARS":
                 if (int.TryParse(cleanVal, out int sb)) ctrl.ScrollBars = sb;
                 break;
+            case "PICTURE":
+                ctrl.Picture = cleanVal;
+                break;
+            case "DOWNPICTURE":
+                ctrl.DownPicture = cleanVal;
+                break;
+            case "DISABLEDPICTURE":
+                ctrl.DisabledPicture = cleanVal;
+                break;
+            case "STYLE":
+                if (int.TryParse(cleanVal, out int st)) ctrl.Style = st;
+                break;
+            case "AUTOSIZE":
+                ctrl.AutoSize = cleanVal.Equals("-1", StringComparison.OrdinalIgnoreCase) ||
+                                cleanVal.Equals("1", StringComparison.OrdinalIgnoreCase) ||
+                                cleanVal.Equals("True", StringComparison.OrdinalIgnoreCase);
+                break;
+            case "PICTUREALIGNMENT":
+            case "PICTUREPOSITION":
+                if (int.TryParse(cleanVal, out int pa))
+                {
+                    ctrl.PictureAlignment = (PictureAlignment)Math.Clamp(pa, 0, 4);
+                }
+                else if (Enum.TryParse<PictureAlignment>(cleanVal, true, out var paEnum))
+                {
+                    ctrl.PictureAlignment = paEnum;
+                }
+                break;
         }
     }
 
@@ -501,5 +555,75 @@ public static class FormDesignParser
             return str.Substring(1, str.Length - 2);
         }
         return str;
+    }
+
+    /// <summary>
+    /// Resuelve y carga en memoria las imágenes binarias (.frx o rutas relativas) asociadas a los controles del formulario.
+    /// </summary>
+    public static void ResolveControlPictures(FormDesignModel model, string basePath)
+    {
+        if (model == null || string.IsNullOrWhiteSpace(basePath)) return;
+
+        // 1. Imagen del formulario
+        if (!string.IsNullOrEmpty(model.Picture) && model.PictureData == null)
+        {
+            if (Resources.FrxResourceFile.ParseReference(model.Picture, out string formFrxName, out int formOffset))
+            {
+                string targetFrx = string.IsNullOrEmpty(formFrxName) ? $"{model.Name}.frx" : formFrxName;
+                string frxPath = Path.Combine(basePath, targetFrx);
+                if (File.Exists(frxPath))
+                {
+                    model.PictureData = Resources.FrxResourceFile.ReadResource(frxPath, formOffset);
+                }
+            }
+            else
+            {
+                string localPath = Path.IsPathRooted(model.Picture)
+                    ? model.Picture
+                    : Path.Combine(basePath, model.Picture);
+
+                if (File.Exists(localPath))
+                {
+                    try { model.PictureData = File.ReadAllBytes(localPath); } catch { }
+                }
+            }
+        }
+
+        // 2. Imágenes de los controles
+        foreach (var ctrl in model.GetAllControls())
+        {
+            if (string.IsNullOrEmpty(ctrl.Picture) || ctrl.PictureData != null)
+            {
+                continue;
+            }
+
+            if (Resources.FrxResourceFile.ParseReference(ctrl.Picture, out string frxFileName, out int offset))
+            {
+                string targetFrx = string.IsNullOrEmpty(frxFileName) ? $"{model.Name}.frx" : frxFileName;
+                string frxPath = Path.Combine(basePath, targetFrx);
+                if (File.Exists(frxPath))
+                {
+                    ctrl.PictureData = Resources.FrxResourceFile.ReadResource(frxPath, offset);
+                }
+            }
+            else
+            {
+                string localPath = Path.IsPathRooted(ctrl.Picture)
+                    ? ctrl.Picture
+                    : Path.Combine(basePath, ctrl.Picture);
+
+                if (File.Exists(localPath))
+                {
+                    try
+                    {
+                        ctrl.PictureData = File.ReadAllBytes(localPath);
+                    }
+                    catch
+                    {
+                        // Fallback silencioso
+                    }
+                }
+            }
+        }
     }
 }

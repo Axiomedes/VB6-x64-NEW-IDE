@@ -296,7 +296,7 @@ public partial class MainWindow : Window
             var surface = ActiveTab.DesignSurface;
             var model = ActiveTab.DesignModel;
 
-            MainPropertyGridPanel.BindModel(model, surface.SelectedControl);
+            MainPropertyGridPanel.BindModel(model, surface.SelectedControl, ActiveTab?.Document?.FilePath);
 
             // Suscribir eventos del diseñador de esta pestaña
             surface.SelectionChanged += selList =>
@@ -3466,6 +3466,11 @@ public partial class MainWindow : Window
                     {
                         targetFormModel = tab.DesignModel;
                         targetFormCode = tab.Document.Text;
+                        string? tabDir = Path.GetDirectoryName(tab.Document.FilePath);
+                        if (!string.IsNullOrEmpty(tabDir))
+                        {
+                            FormDesignParser.ResolveControlPictures(targetFormModel, tabDir);
+                        }
                         break;
                     }
                 }
@@ -3485,6 +3490,11 @@ public partial class MainWindow : Window
                     if (!string.IsNullOrEmpty(doc.Header))
                     {
                         targetFormModel = FormDesignParser.Parse(doc.Header);
+                        string? basePath = Path.GetDirectoryName(formItem.AbsolutePath);
+                        if (!string.IsNullOrEmpty(basePath))
+                        {
+                            FormDesignParser.ResolveControlPictures(targetFormModel, basePath);
+                        }
                     }
                     targetFormCode = doc.Text;
                 }

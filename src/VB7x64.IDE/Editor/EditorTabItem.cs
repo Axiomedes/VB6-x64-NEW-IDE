@@ -395,6 +395,15 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
 
     public SaveResult Save(bool createBackup)
     {
+        if (DesignModel != null)
+        {
+            if (!string.IsNullOrWhiteSpace(Document.FilePath))
+            {
+                VB7x64.ProjectModel.Resources.FrxResourceFile.EnsureFrxResourcesSaved(DesignModel, Document.FilePath);
+            }
+            Document.Header = FormDesignSerializer.Serialize(DesignModel);
+            Document.IsDirty = true;
+        }
         Document.Text = Editor.Text;
         var result = SafeFileStorage.SaveDocument(Document, createBackup);
         if (result.Status == SaveStatus.Success || result.Status == SaveStatus.NotModified)
@@ -688,6 +697,13 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             }
 
             DesignModel = FormDesignParser.Parse(headerText);
+            string? basePath = !string.IsNullOrWhiteSpace(Document.FilePath)
+                ? System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(Document.FilePath))
+                : System.IO.Directory.GetCurrentDirectory();
+            if (!string.IsNullOrEmpty(basePath))
+            {
+                FormDesignParser.ResolveControlPictures(DesignModel, basePath);
+            }
             DesignSurface = new FormDesignSurface();
             DesignSurface.LoadModel(DesignModel);
 

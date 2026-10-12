@@ -72,6 +72,13 @@ public class DesignerSelectionFrame : Canvas
         Visibility = Visibility.Collapsed;
     }
 
+    private double _dragStartLeft;
+    private double _dragStartTop;
+    private double _dragStartWidth;
+    private double _dragStartHeight;
+    private double _dragAccumulatedDeltaX;
+    private double _dragAccumulatedDeltaY;
+
     private Thumb CreateThumb(Cursor cursor, DragDeltaEventHandler onDelta)
     {
         var thumb = new Thumb
@@ -89,6 +96,19 @@ public class DesignerSelectionFrame : Canvas
         thumb.Template = new ControlTemplate(typeof(Thumb))
         {
             VisualTree = factory
+        };
+
+        thumb.DragStarted += (s, e) =>
+        {
+            if (BoundControl != null)
+            {
+                _dragStartLeft = BoundControl.LeftPixels;
+                _dragStartTop = BoundControl.TopPixels;
+                _dragStartWidth = BoundControl.WidthPixels;
+                _dragStartHeight = BoundControl.HeightPixels;
+                _dragAccumulatedDeltaX = 0;
+                _dragAccumulatedDeltaY = 0;
+            }
         };
 
         thumb.DragDelta += onDelta;
@@ -227,8 +247,9 @@ public class DesignerSelectionFrame : Canvas
     {
         if (BoundControl == null || BoundVisual == null) return;
 
-        double newWidth = Math.Max(15, BoundControl.WidthPixels + e.HorizontalChange);
-        newWidth = Snap(newWidth);
+        _dragAccumulatedDeltaX += e.HorizontalChange;
+        double rawWidth = _dragStartWidth + _dragAccumulatedDeltaX;
+        double newWidth = Math.Max(15, Snap(rawWidth));
 
         BoundControl.WidthPixels = newWidth;
         BoundVisual.Width = newWidth;
@@ -241,8 +262,9 @@ public class DesignerSelectionFrame : Canvas
     {
         if (BoundControl == null || BoundVisual == null) return;
 
-        double newHeight = Math.Max(15, BoundControl.HeightPixels + e.VerticalChange);
-        newHeight = Snap(newHeight);
+        _dragAccumulatedDeltaY += e.VerticalChange;
+        double rawHeight = _dragStartHeight + _dragAccumulatedDeltaY;
+        double newHeight = Math.Max(15, Snap(rawHeight));
 
         BoundControl.HeightPixels = newHeight;
         BoundVisual.Height = newHeight;
@@ -255,8 +277,12 @@ public class DesignerSelectionFrame : Canvas
     {
         if (BoundControl == null || BoundVisual == null) return;
 
-        double newWidth = Math.Max(15, Snap(BoundControl.WidthPixels + e.HorizontalChange));
-        double newHeight = Math.Max(15, Snap(BoundControl.HeightPixels + e.VerticalChange));
+        _dragAccumulatedDeltaX += e.HorizontalChange;
+        _dragAccumulatedDeltaY += e.VerticalChange;
+        double rawWidth = _dragStartWidth + _dragAccumulatedDeltaX;
+        double rawHeight = _dragStartHeight + _dragAccumulatedDeltaY;
+        double newWidth = Math.Max(15, Snap(rawWidth));
+        double newHeight = Math.Max(15, Snap(rawHeight));
 
         BoundControl.WidthPixels = newWidth;
         BoundControl.HeightPixels = newHeight;
@@ -271,9 +297,15 @@ public class DesignerSelectionFrame : Canvas
     {
         if (BoundControl == null || BoundVisual == null) return;
 
-        double newLeft = Snap(BoundControl.LeftPixels + e.HorizontalChange);
-        double delta = BoundControl.LeftPixels - newLeft;
-        double newWidth = Math.Max(15, BoundControl.WidthPixels + delta);
+        _dragAccumulatedDeltaX += e.HorizontalChange;
+        double rawLeft = _dragStartLeft + _dragAccumulatedDeltaX;
+        double newLeft = Snap(rawLeft);
+        double delta = newLeft - _dragStartLeft;
+        double newWidth = Math.Max(15, _dragStartWidth - delta);
+        if (_dragStartWidth - delta < 15)
+        {
+            newLeft = _dragStartLeft + _dragStartWidth - 15;
+        }
 
         BoundControl.LeftPixels = newLeft;
         BoundControl.WidthPixels = newWidth;
@@ -289,9 +321,15 @@ public class DesignerSelectionFrame : Canvas
     {
         if (BoundControl == null || BoundVisual == null) return;
 
-        double newTop = Snap(BoundControl.TopPixels + e.VerticalChange);
-        double delta = BoundControl.TopPixels - newTop;
-        double newHeight = Math.Max(15, BoundControl.HeightPixels + delta);
+        _dragAccumulatedDeltaY += e.VerticalChange;
+        double rawTop = _dragStartTop + _dragAccumulatedDeltaY;
+        double newTop = Snap(rawTop);
+        double delta = newTop - _dragStartTop;
+        double newHeight = Math.Max(15, _dragStartHeight - delta);
+        if (_dragStartHeight - delta < 15)
+        {
+            newTop = _dragStartTop + _dragStartHeight - 15;
+        }
 
         BoundControl.TopPixels = newTop;
         BoundControl.HeightPixels = newHeight;

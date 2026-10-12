@@ -14,7 +14,8 @@ public enum DesignerPropertyType
     ColorHex,
     EnumChoice,
     FontDescription,
-    ReadOnlyText
+    ReadOnlyText,
+    Picture
 }
 
 public record DesignerPropertyChoice(string DisplayText, string RawValue);
@@ -82,6 +83,21 @@ public static class DesignerPropertyFactory
         new DesignerPropertyChoice("2 - Center", "2")
     };
 
+    private static readonly List<DesignerPropertyChoice> PictureAlignmentChoices = new()
+    {
+        new DesignerPropertyChoice("0 - Superior (Top)", "0"),
+        new DesignerPropertyChoice("1 - Inferior (Bottom)", "1"),
+        new DesignerPropertyChoice("2 - Izquierda (Left)", "2"),
+        new DesignerPropertyChoice("3 - Derecha (Right)", "3"),
+        new DesignerPropertyChoice("4 - Centro (Center)", "4")
+    };
+
+    private static readonly List<DesignerPropertyChoice> ButtonStyleChoices = new()
+    {
+        new DesignerPropertyChoice("0 - Standard", "0"),
+        new DesignerPropertyChoice("1 - Graphical", "1")
+    };
+
     public static List<DesignerPropertyItem> GetPropertiesForForm(FormDesignModel form, Action onModelChanged)
     {
         var list = new List<DesignerPropertyItem>
@@ -144,6 +160,32 @@ public static class DesignerPropertyFactory
                 ValueSetter = val =>
                 {
                     form.ForeColorHex = val;
+                    onModelChanged();
+                    return true;
+                }
+            },
+            new DesignerPropertyItem
+            {
+                Name = "Picture",
+                DisplayName = "Picture",
+                Category = "Appearance",
+                Description = "Devuelve o establece el gráfico que se va a mostrar como fondo del formulario.",
+                Type = DesignerPropertyType.Picture,
+                CurrentValue = Resources.FrxResourceFile.GetFormatDescription(form.PictureData, form.Picture),
+                ValueSetter = val =>
+                {
+                    if (string.IsNullOrWhiteSpace(val) || val.Equals("(None)", StringComparison.OrdinalIgnoreCase))
+                    {
+                        form.Picture = null;
+                        form.PictureData = null;
+                        onModelChanged();
+                        return true;
+                    }
+                    if (val.StartsWith('(') && val.EndsWith(')'))
+                    {
+                        return true;
+                    }
+                    form.Picture = val;
                     onModelChanged();
                     return true;
                 }
@@ -586,6 +628,110 @@ public static class DesignerPropertyFactory
                     if (bool.TryParse(val, out bool b))
                     {
                         ctrl.MultiLine = b;
+                        onModelChanged();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
+
+        // Soporte de imágenes para PictureBox, Image, CommandButton, etc.
+        bool isPictureBox = ctrl.TypeName.EndsWith("PictureBox", StringComparison.OrdinalIgnoreCase);
+        bool isImageControl = ctrl.TypeName.EndsWith("Image", StringComparison.OrdinalIgnoreCase);
+        bool isButton = ctrl.TypeName.EndsWith("Button", StringComparison.OrdinalIgnoreCase);
+
+        if (isPictureBox || isImageControl || isButton || !string.IsNullOrEmpty(ctrl.Picture) || ctrl.PictureData != null)
+        {
+            list.Add(new DesignerPropertyItem
+            {
+                Name = "Picture",
+                DisplayName = "Picture",
+                Category = "Appearance",
+                Description = "Devuelve o establece el gráfico que se va a mostrar en el control.",
+                Type = DesignerPropertyType.Picture,
+                CurrentValue = Resources.FrxResourceFile.GetFormatDescription(ctrl.PictureData, ctrl.Picture),
+                ValueSetter = val =>
+                {
+                    if (string.IsNullOrWhiteSpace(val) || val.Equals("(None)", StringComparison.OrdinalIgnoreCase))
+                    {
+                        ctrl.Picture = null;
+                        ctrl.PictureData = null;
+                        onModelChanged();
+                        return true;
+                    }
+                    if (val.StartsWith('(') && val.EndsWith(')'))
+                    {
+                        return true;
+                    }
+                    ctrl.Picture = val;
+                    onModelChanged();
+                    return true;
+                }
+            });
+        }
+
+        if (isPictureBox)
+        {
+            list.Add(new DesignerPropertyItem
+            {
+                Name = "AutoSize",
+                DisplayName = "AutoSize",
+                Category = "Behavior",
+                Description = "Determina si el control PictureBox se redimensiona automáticamente para ajustarse al tamaño de la imagen cargada.",
+                Type = DesignerPropertyType.Boolean,
+                CurrentValue = ctrl.AutoSize ? "True" : "False",
+                Choices = BoolChoices,
+                ValueSetter = val =>
+                {
+                    if (bool.TryParse(val, out bool b))
+                    {
+                        ctrl.AutoSize = b;
+                        onModelChanged();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
+
+        if (isButton)
+        {
+            list.Add(new DesignerPropertyItem
+            {
+                Name = "Style",
+                DisplayName = "Style",
+                Category = "Appearance",
+                Description = "Devuelve o establece si el botón se muestra en estilo estándar (0) o gráfico (1) para soportar iconos e imágenes.",
+                Type = DesignerPropertyType.EnumChoice,
+                CurrentValue = ctrl.Style.ToString(),
+                Choices = ButtonStyleChoices,
+                ValueSetter = val =>
+                {
+                    if (int.TryParse(val, out int s))
+                    {
+                        ctrl.Style = s;
+                        onModelChanged();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            list.Add(new DesignerPropertyItem
+            {
+                Name = "PictureAlignment",
+                DisplayName = "PictureAlignment",
+                Category = "Appearance",
+                Description = "Determina la alineación de la imagen en relación al texto del botón (0-Superior, 1-Inferior, 2-Izquierda, 3-Derecha, 4-Centro).",
+                Type = DesignerPropertyType.EnumChoice,
+                CurrentValue = ((int)ctrl.PictureAlignment).ToString(),
+                Choices = PictureAlignmentChoices,
+                ValueSetter = val =>
+                {
+                    if (int.TryParse(val, out int pa))
+                    {
+                        ctrl.PictureAlignment = (PictureAlignment)Math.Clamp(pa, 0, 4);
                         onModelChanged();
                         return true;
                     }

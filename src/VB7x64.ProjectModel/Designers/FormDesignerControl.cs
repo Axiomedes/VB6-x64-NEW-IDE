@@ -4,6 +4,15 @@ using System.Linq;
 
 namespace VB7x64.ProjectModel.Designers;
 
+public enum PictureAlignment
+{
+    Top = 0,     // 0 - Superior (arriba del texto)
+    Bottom = 1,  // 1 - Inferior (abajo del texto)
+    Left = 2,    // 2 - Izquierda (a la izquierda del texto)
+    Right = 3,   // 3 - Derecha (a la derecha del texto)
+    Center = 4   // 4 - Centro (centrado)
+}
+
 /// <summary>
 /// Representa un control individual o contenedor dentro del formulario VB6 en modo diseño.
 /// </summary>
@@ -44,6 +53,17 @@ public class FormDesignerControl
     public bool? MultiLine { get; set; }
     public int? ScrollBars { get; set; }
     public FormFontDescription? Font { get; set; }
+
+    // Soporte de imágenes y alineación (PictureBox, CommandButton, etc.)
+    public string? Picture { get; set; }
+    public byte[]? PictureData { get; set; }
+    public PictureAlignment PictureAlignment { get; set; } = PictureAlignment.Top;
+    public int Style { get; set; } = 0; // 0 = Standard, 1 = Graphical
+    public bool AutoSize { get; set; }
+    public string? DownPicture { get; set; }
+    public string? DisabledPicture { get; set; }
+
+    public bool HasPicture => !string.IsNullOrEmpty(Picture) || (PictureData != null && PictureData.Length > 0);
 
     // Jerarquía de contenedores (para Frame, PictureBox, etc.)
     public FormDesignerControl? ParentControl { get; set; }

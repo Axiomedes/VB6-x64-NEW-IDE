@@ -71,6 +71,7 @@ public partial class FormDesignSurface : UserControl
             ModelModified?.Invoke();
         };
 
+        FormWindowBorder.SizeChanged += (s, e) => UpdateResizeThumbs();
         SetupCanvasContextMenu();
     }
 
@@ -1025,37 +1026,63 @@ public partial class FormDesignSurface : UserControl
         TxtFormDimensions.Text = $"{CurrentModel.ClientWidth} × {CurrentModel.ClientHeight} twips ({CurrentModel.ClientWidthPixels:F0} × {CurrentModel.ClientHeightPixels:F0} px)";
     }
 
+    private double _formDragStartWidth;
+    private double _formDragStartHeight;
+    private double _formAccumulatedDeltaX;
+    private double _formAccumulatedDeltaY;
+
     private void UpdateResizeThumbs()
     {
         double titleH = (CurrentModel?.HasTitleBar == false) ? 0.0 : TitleBarHeight;
         double menuH = (BorderMenuBar.Visibility == Visibility.Visible) ? (BorderMenuBar.ActualHeight > 0 ? BorderMenuBar.ActualHeight : 24.0) : 0.0;
         double borderThick = (CurrentModel?.HasTitleBar == false) ? 1.0 : WindowBorderThickness;
-        double formW = GridCanvas.Width + (borderThick * 2);
-        double formH = GridCanvas.Height + titleH + menuH + (borderThick * 2);
+        double formW = GridCanvas.Width > 0 ? (GridCanvas.Width + (borderThick * 2)) : (FormWindowBorder.ActualWidth > 0 ? FormWindowBorder.ActualWidth : 318.0);
+        double formH = GridCanvas.Height > 0 ? (GridCanvas.Height + titleH + menuH + (borderThick * 2)) : (FormWindowBorder.ActualHeight > 0 ? FormWindowBorder.ActualHeight : 245.0);
 
-        Canvas.SetLeft(ThumbResizeCorner, formW);
-        Canvas.SetTop(ThumbResizeCorner, formH);
+        double thumbSize = 10.0;
+        double thumbHalf = thumbSize / 2.0;
 
-        Canvas.SetLeft(ThumbResizeRight, formW);
-        Canvas.SetTop(ThumbResizeRight, formH / 2);
+        ThumbResizeCorner.Width = thumbSize;
+        ThumbResizeCorner.Height = thumbSize;
+        ThumbResizeCorner.Margin = new Thickness(formW - thumbHalf, formH - thumbHalf, 0, 0);
 
-        Canvas.SetLeft(ThumbResizeBottom, formW / 2);
-        Canvas.SetTop(ThumbResizeBottom, formH);
+        ThumbResizeRight.Width = thumbSize;
+        ThumbResizeRight.Height = thumbSize;
+        ThumbResizeRight.Margin = new Thickness(formW - thumbHalf, (formH / 2.0) - thumbHalf, 0, 0);
+
+        ThumbResizeBottom.Width = thumbSize;
+        ThumbResizeBottom.Height = thumbSize;
+        ThumbResizeBottom.Margin = new Thickness((formW / 2.0) - thumbHalf, formH - thumbHalf, 0, 0);
+
+        // Tiras de arrastre en los bordes derecho e inferior
+        ThumbResizeBorderRight.Height = Math.Max(20, formH - titleH - 12);
+        ThumbResizeBorderRight.Margin = new Thickness(formW - 4, titleH, 0, 0);
+
+        ThumbResizeBorderBottom.Width = Math.Max(20, formW - 12);
+        ThumbResizeBorderBottom.Margin = new Thickness(0, formH - 4, 0, 0);
     }
 
     #region Redimensión del Formulario con Tiradores
+    private void ThumbResize_DragStarted(object sender, DragStartedEventArgs e)
+    {
+        _formDragStartWidth = GridCanvas.Width;
+        _formDragStartHeight = GridCanvas.Height;
+        _formAccumulatedDeltaX = 0;
+        _formAccumulatedDeltaY = 0;
+    }
+
     private void ThumbResizeCorner_DragDelta(object sender, DragDeltaEventArgs e)
     {
         if (CurrentModel == null) return;
 
-        double newWidth = Math.Max(120, GridCanvas.Width + e.HorizontalChange);
-        double newHeight = Math.Max(60, GridCanvas.Height + e.VerticalChange);
+        _formAccumulatedDeltaX += e.HorizontalChange;
+        _formAccumulatedDeltaY += e.VerticalChange;
 
-        if (GridCanvas.SnapToGrid)
-        {
-            newWidth = GridCanvas.SnapValue(newWidth);
-            newHeight = GridCanvas.SnapValue(newHeight);
-        }
+        double rawWidth = _formDragStartWidth + _formAccumulatedDeltaX;
+        double rawHeight = _formDragStartHeight + _formAccumulatedDeltaY;
+
+        double newWidth = Math.Max(120, GridCanvas.SnapToGrid ? GridCanvas.SnapValue(rawWidth) : rawWidth);
+        double newHeight = Math.Max(60, GridCanvas.SnapToGrid ? GridCanvas.SnapValue(rawHeight) : rawHeight);
 
         GridCanvas.Width = newWidth;
         GridCanvas.Height = newHeight;
@@ -1072,11 +1099,9 @@ public partial class FormDesignSurface : UserControl
     {
         if (CurrentModel == null) return;
 
-        double newWidth = Math.Max(120, GridCanvas.Width + e.HorizontalChange);
-        if (GridCanvas.SnapToGrid)
-        {
-            newWidth = GridCanvas.SnapValue(newWidth);
-        }
+        _formAccumulatedDeltaX += e.HorizontalChange;
+        double rawWidth = _formDragStartWidth + _formAccumulatedDeltaX;
+        double newWidth = Math.Max(120, GridCanvas.SnapToGrid ? GridCanvas.SnapValue(rawWidth) : rawWidth);
 
         GridCanvas.Width = newWidth;
         CurrentModel.ClientWidthPixels = newWidth;
@@ -1090,11 +1115,9 @@ public partial class FormDesignSurface : UserControl
     {
         if (CurrentModel == null) return;
 
-        double newHeight = Math.Max(60, GridCanvas.Height + e.VerticalChange);
-        if (GridCanvas.SnapToGrid)
-        {
-            newHeight = GridCanvas.SnapValue(newHeight);
-        }
+        _formAccumulatedDeltaY += e.VerticalChange;
+        double rawHeight = _formDragStartHeight + _formAccumulatedDeltaY;
+        double newHeight = Math.Max(60, GridCanvas.SnapToGrid ? GridCanvas.SnapValue(rawHeight) : rawHeight);
 
         GridCanvas.Height = newHeight;
         CurrentModel.ClientHeightPixels = newHeight;

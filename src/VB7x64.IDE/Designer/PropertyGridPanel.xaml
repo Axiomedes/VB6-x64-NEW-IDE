@@ -38,10 +38,28 @@
             </DockPanel>
         </DataTemplate>
 
+        <DataTemplate x:Key="PictureEditorTemplate">
+            <DockPanel LastChildFill="True">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="✖" Width="18" Height="20" Padding="0" Margin="1,0,1,0"
+                            Background="Transparent" BorderThickness="0" Cursor="Hand" Foreground="#888888"
+                            ToolTip="Quitar imagen ((None))" Click="BtnClearPicture_Click"/>
+                    <Button Content="..." Width="20" Height="20" Padding="0" Margin="1,0,2,0"
+                            Background="#ECECEC" BorderBrush="#C0CAD4" BorderThickness="1" Cursor="Hand"
+                            ToolTip="Seleccionar imagen desde archivo..." Click="BtnBrowsePicture_Click"/>
+                </StackPanel>
+                <TextBox Text="{Binding CurrentValue, Mode=OneWay}" FontSize="11" Padding="4,2"
+                         BorderThickness="0" VerticalContentAlignment="Center"
+                         IsReadOnly="True" Background="Transparent"
+                         KeyDown="PropertyPicture_KeyDown"/>
+            </DockPanel>
+        </DataTemplate>
+
         <local:PropertyTemplateSelector x:Key="PropValueTemplateSelector"
             TextTemplate="{StaticResource TextEditorTemplate}"
             ChoiceTemplate="{StaticResource ChoiceEditorTemplate}"
-            ColorTemplate="{StaticResource ColorEditorTemplate}"/>
+            ColorTemplate="{StaticResource ColorEditorTemplate}"
+            PictureTemplate="{StaticResource PictureEditorTemplate}"/>
     </UserControl.Resources>
 
     <Grid>

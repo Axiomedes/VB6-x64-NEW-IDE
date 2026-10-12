@@ -282,12 +282,85 @@ public partial class LiveFormWindow : Window
             case "COMMANDBUTTON":
                 var btn = new Button
                 {
-                    Content = string.IsNullOrEmpty(ctrl.Caption) ? ctrl.Name : ctrl.Caption,
                     IsEnabled = ctrl.Enabled,
                     Visibility = ctrl.Visible ? Visibility.Visible : Visibility.Hidden,
                     Background = VbColorHelper.ToBrush(ctrl.BackColorHex, SystemColors.ControlBrush),
                     Foreground = VbColorHelper.ToBrush(ctrl.ForeColorHex, SystemColors.ControlTextBrush)
                 };
+
+                var liveBmp = VbImageHelper.LoadBitmapFromBytes(ctrl.PictureData);
+                if (liveBmp != null && (ctrl.Style == 1 || !string.IsNullOrEmpty(ctrl.Picture) || ctrl.PictureData != null))
+                {
+                    var liveImg = new System.Windows.Controls.Image
+                    {
+                        Source = liveBmp,
+                        Stretch = Stretch.None,
+                        Width = liveBmp.PixelWidth,
+                        Height = liveBmp.PixelHeight,
+                        SnapsToDevicePixels = true,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    };
+
+                    string cap = string.IsNullOrEmpty(ctrl.Caption) ? ctrl.Name : ctrl.Caption;
+                    var txtBlock = new TextBlock
+                    {
+                        Text = cap,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    };
+
+                    if (string.IsNullOrEmpty(ctrl.Caption))
+                    {
+                        btn.Content = liveImg;
+                    }
+                    else
+                    {
+                        switch (ctrl.PictureAlignment)
+                        {
+                            case PictureAlignment.Bottom:
+                                var spBottom = new StackPanel { Orientation = Orientation.Vertical, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                                spBottom.Children.Add(txtBlock);
+                                liveImg.Margin = new Thickness(0, 2, 0, 0);
+                                spBottom.Children.Add(liveImg);
+                                btn.Content = spBottom;
+                                break;
+                            case PictureAlignment.Left:
+                                var spLeft = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                                liveImg.Margin = new Thickness(0, 0, 4, 0);
+                                spLeft.Children.Add(liveImg);
+                                spLeft.Children.Add(txtBlock);
+                                btn.Content = spLeft;
+                                break;
+                            case PictureAlignment.Right:
+                                var spRight = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                                spRight.Children.Add(txtBlock);
+                                liveImg.Margin = new Thickness(4, 0, 0, 0);
+                                spRight.Children.Add(liveImg);
+                                btn.Content = spRight;
+                                break;
+                            case PictureAlignment.Center:
+                                var gridCenter = new Grid { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                                gridCenter.Children.Add(liveImg);
+                                gridCenter.Children.Add(txtBlock);
+                                btn.Content = gridCenter;
+                                break;
+                            case PictureAlignment.Top:
+                            default:
+                                var spTop = new StackPanel { Orientation = Orientation.Vertical, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                                liveImg.Margin = new Thickness(0, 0, 0, 2);
+                                spTop.Children.Add(liveImg);
+                                spTop.Children.Add(txtBlock);
+                                btn.Content = spTop;
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    btn.Content = string.IsNullOrEmpty(ctrl.Caption) ? ctrl.Name : ctrl.Caption;
+                }
+
                 btn.Click += (s, e) => DispatchEvent("Click");
                 return btn;
 
@@ -395,6 +468,28 @@ public partial class LiveFormWindow : Window
                     ClipToBounds = true,
                     Background = Brushes.Transparent
                 };
+
+                var livePicBmp = VbImageHelper.LoadBitmapFromBytes(ctrl.PictureData);
+                if (livePicBmp != null)
+                {
+                    if (ctrl.AutoSize)
+                    {
+                        ctrl.Width = (int)(livePicBmp.PixelWidth * FormDesignerControl.TwipsPerPixel);
+                        ctrl.Height = (int)(livePicBmp.PixelHeight * FormDesignerControl.TwipsPerPixel);
+                    }
+
+                    var imgElem = new System.Windows.Controls.Image
+                    {
+                        Source = livePicBmp,
+                        Stretch = Stretch.None,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        VerticalAlignment = VerticalAlignment.Top
+                    };
+                    Canvas.SetLeft(imgElem, 0);
+                    Canvas.SetTop(imgElem, 0);
+                    picCanvas.Children.Add(imgElem);
+                }
+
                 picBorder.Child = picCanvas;
                 picBorder.MouseDown += (s, e) => DispatchEvent("Click");
                 return picBorder;

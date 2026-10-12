@@ -151,42 +151,92 @@
 
                 <!-- Tirador de redimensión del Formulario (esquina inferior derecha) -->
                 <Thumb x:Name="ThumbResizeCorner" 
-                       Width="8" Height="8" 
+                       Width="10" Height="10" 
                        Cursor="SizeNWSE" 
                        HorizontalAlignment="Left" 
                        VerticalAlignment="Top" 
+                       Panel.ZIndex="1001"
+                       DragStarted="ThumbResize_DragStarted"
                        DragDelta="ThumbResizeCorner_DragDelta">
                     <Thumb.Template>
-                        <ControlTemplate>
-                            <Rectangle Fill="#FFFFFF" Stroke="#000000" StrokeThickness="1"/>
+                        <ControlTemplate TargetType="Thumb">
+                            <Border Background="#0A246A" BorderBrush="#FFFFFF" BorderThickness="1.5" SnapsToDevicePixels="True" Cursor="{TemplateBinding Cursor}">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="3" ShadowDepth="1" Direction="315" Opacity="0.5"/>
+                                </Border.Effect>
+                            </Border>
                         </ControlTemplate>
                     </Thumb.Template>
                 </Thumb>
 
                 <!-- Tirador de redimensión derecho (ancho) -->
                 <Thumb x:Name="ThumbResizeRight" 
-                       Width="8" Height="8" 
+                       Width="10" Height="10" 
                        Cursor="SizeWE" 
                        HorizontalAlignment="Left" 
                        VerticalAlignment="Top" 
+                       Panel.ZIndex="1001"
+                       DragStarted="ThumbResize_DragStarted"
                        DragDelta="ThumbResizeRight_DragDelta">
                     <Thumb.Template>
-                        <ControlTemplate>
-                            <Rectangle Fill="#FFFFFF" Stroke="#000000" StrokeThickness="1"/>
+                        <ControlTemplate TargetType="Thumb">
+                            <Border Background="#0A246A" BorderBrush="#FFFFFF" BorderThickness="1.5" SnapsToDevicePixels="True" Cursor="{TemplateBinding Cursor}">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="3" ShadowDepth="1" Direction="315" Opacity="0.5"/>
+                                </Border.Effect>
+                            </Border>
                         </ControlTemplate>
                     </Thumb.Template>
                 </Thumb>
 
                 <!-- Tirador de redimensión inferior (alto) -->
                 <Thumb x:Name="ThumbResizeBottom" 
-                       Width="8" Height="8" 
+                       Width="10" Height="10" 
                        Cursor="SizeNS" 
                        HorizontalAlignment="Left" 
                        VerticalAlignment="Top" 
+                       Panel.ZIndex="1001"
+                       DragStarted="ThumbResize_DragStarted"
                        DragDelta="ThumbResizeBottom_DragDelta">
                     <Thumb.Template>
-                        <ControlTemplate>
-                            <Rectangle Fill="#FFFFFF" Stroke="#000000" StrokeThickness="1"/>
+                        <ControlTemplate TargetType="Thumb">
+                            <Border Background="#0A246A" BorderBrush="#FFFFFF" BorderThickness="1.5" SnapsToDevicePixels="True" Cursor="{TemplateBinding Cursor}">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="3" ShadowDepth="1" Direction="315" Opacity="0.5"/>
+                                </Border.Effect>
+                            </Border>
+                        </ControlTemplate>
+                    </Thumb.Template>
+                </Thumb>
+
+                <!-- Borde derecho interactivo para redimensión horizontal directa del Form -->
+                <Thumb x:Name="ThumbResizeBorderRight"
+                       Width="6"
+                       Cursor="SizeWE"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       Panel.ZIndex="1000"
+                       DragStarted="ThumbResize_DragStarted"
+                       DragDelta="ThumbResizeRight_DragDelta">
+                    <Thumb.Template>
+                        <ControlTemplate TargetType="Thumb">
+                            <Rectangle Fill="Transparent" Cursor="{TemplateBinding Cursor}"/>
+                        </ControlTemplate>
+                    </Thumb.Template>
+                </Thumb>
+
+                <!-- Borde inferior interactivo para redimensión vertical directa del Form -->
+                <Thumb x:Name="ThumbResizeBorderBottom"
+                       Height="6"
+                       Cursor="SizeNS"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       Panel.ZIndex="1000"
+                       DragStarted="ThumbResize_DragStarted"
+                       DragDelta="ThumbResizeBottom_DragDelta">
+                    <Thumb.Template>
+                        <ControlTemplate TargetType="Thumb">
+                            <Rectangle Fill="Transparent" Cursor="{TemplateBinding Cursor}"/>
                         </ControlTemplate>
                     </Thumb.Template>
                 </Thumb>

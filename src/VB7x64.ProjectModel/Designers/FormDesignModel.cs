@@ -43,6 +43,10 @@ public class FormDesignModel
     public string? ForeColorHex { get; set; } = "&H80000012&"; // ButtonText
     public FormFontDescription? Font { get; set; }
 
+    // Imagen de fondo del formulario
+    public string? Picture { get; set; }
+    public byte[]? PictureData { get; set; }
+
     // Controles hijos de primer nivel
     public List<FormDesignerControl> Children { get; set; } = new();
 

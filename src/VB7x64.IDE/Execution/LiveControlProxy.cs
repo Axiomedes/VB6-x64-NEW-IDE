@@ -45,6 +45,9 @@ public class LiveControlProxy : ILiveControl
                 case "NAME":
                     return VbValue.FromString(_designerControl.Name);
 
+                case "INDEX":
+                    return VbValue.FromLong(_designerControl.Index ?? 0);
+
                 case "TEXT":
                 case "CAPTION":
                 case "VALUE":

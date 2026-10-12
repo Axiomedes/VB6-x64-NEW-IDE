@@ -863,11 +863,11 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
             {
                 targetLine = i + 1;
                 // Si el control es parte de una matriz pero el Sub existente no tiene (Index As Integer), actualizar la firma
-                if (ctrl.Index.HasValue && !lines[i].Contains("Index As Integer", StringComparison.OrdinalIgnoreCase))
+                if (ctrl.Index.HasValue && !lines[i].Contains("Index", StringComparison.OrdinalIgnoreCase))
                 {
                     string updated = System.Text.RegularExpressions.Regex.Replace(
                         lines[i],
-                        @"(?i)\bSub\s+" + System.Text.RegularExpressions.Regex.Escape(procName) + @"\s*\(\s*\)",
+                        @"(?i)\bSub\s+" + System.Text.RegularExpressions.Regex.Escape(procName) + @"(?:\s*\(\s*\))?",
                         $"Sub {procName}(Index As Integer)");
 
                     if (updated != lines[i])

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using VB7x64.ProjectModel.Designers;
+using VB7x64.ProjectModel.Execution;
 using Xunit;
 
 namespace VB7x64.Tests;
@@ -238,4 +239,205 @@ End Sub
         Assert.Equal(0, btn1.Index);
         Assert.Equal(1, btn2.Index);
     }
+
+    [Fact]
+    public void ControlArray_ClickEvent_ReceivesCorrectIndex()
+    {
+        var ctx = new VbExecutionContext();
+        var host = new LiveExecutionHost(ctx);
+
+        string msgReceived = "";
+        ctx.MsgBoxHandler = (prompt, buttons, title) =>
+        {
+            msgReceived = prompt;
+            return 1;
+        };
+
+        string code = @"
+Private Sub Command1_Click(Index As Integer)
+    MsgBox ""Pulsado: "" & Index
+End Sub
+";
+        host.LoadSourceCode(code, "Form1");
+
+        // Clic en índice 0
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(0));
+        Assert.Equal("Pulsado: 0", msgReceived);
+
+        // Clic en índice 2
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(2));
+        Assert.Equal("Pulsado: 2", msgReceived);
+    }
+
+    [Fact]
+    public void ControlArray_ClickEvent_SelectCaseIndex_ExecutesCorrectBranch()
+    {
+        var ctx = new VbExecutionContext();
+        var host = new LiveExecutionHost(ctx);
+
+        string branchResult = "";
+        ctx.MsgBoxHandler = (prompt, buttons, title) =>
+        {
+            branchResult = prompt;
+            return 1;
+        };
+
+        string code = @"
+Private Sub Command1_Click(Index As Integer)
+    Select Case Index
+        Case 0
+            MsgBox ""Boton Cero""
+        Case 1
+            MsgBox ""Boton Uno""
+        Case 2
+            MsgBox ""Boton Dos""
+    End Select
+End Sub
+";
+        host.LoadSourceCode(code, "Form1");
+
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(0));
+        Assert.Equal("Boton Cero", branchResult);
+
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(1));
+        Assert.Equal("Boton Uno", branchResult);
+
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(2));
+        Assert.Equal("Boton Dos", branchResult);
+    }
+
+    [Fact]
+    public void ControlArray_ClickEvent_ElseIfBranch_ExecutesCorrectBranch()
+    {
+        var ctx = new VbExecutionContext();
+        var host = new LiveExecutionHost(ctx);
+
+        string branchResult = "";
+        ctx.MsgBoxHandler = (prompt, buttons, title) =>
+        {
+            branchResult = prompt;
+            return 1;
+        };
+
+        string code = @"
+Private Sub Command1_Click(Index As Integer)
+    If Index = 0 Then
+        MsgBox ""Primer Boton""
+    ElseIf Index = 1 Then
+        MsgBox ""Segundo Boton""
+    ElseIf Index = 2 Then
+        MsgBox ""Tercer Boton""
+    Else
+        MsgBox ""Otro""
+    End If
+End Sub
+";
+        host.LoadSourceCode(code, "Form1");
+
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(0));
+        Assert.Equal("Primer Boton", branchResult);
+
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(1));
+        Assert.Equal("Segundo Boton", branchResult);
+
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(2));
+        Assert.Equal("Tercer Boton", branchResult);
+
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(99));
+        Assert.Equal("Otro", branchResult);
+    }
+
+    [Fact]
+    public void ControlArray_IndexedPropertyAssignment_ModifiesTargetElement()
+    {
+        var ctx = new VbExecutionContext();
+        var host = new LiveExecutionHost(ctx);
+
+        var btn0 = new MockElementControl("Command1");
+        btn0.SetProperty("Caption", VbValue.FromString("Original 0"));
+        var btn1 = new MockElementControl("Command1");
+        btn1.SetProperty("Caption", VbValue.FromString("Original 1"));
+        var btn2 = new MockElementControl("Command1");
+        btn2.SetProperty("Caption", VbValue.FromString("Original 2"));
+
+        var arr = new LiveControlArray("Command1");
+        arr.Add(0, btn0);
+        arr.Add(1, btn1);
+        arr.Add(2, btn2);
+
+        ctx.SetVariable("Command1", VbValue.FromObject(arr));
+
+        string code = @"
+Private Sub Command1_Click(Index As Integer)
+    Command1(Index).Caption = ""Pulsado: "" & Index
+End Sub
+";
+        host.LoadSourceCode(code, "Form1");
+
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(1));
+        Assert.Equal("Original 0", btn0.GetProperty("Caption").AsString());
+        Assert.Equal("Pulsado: 1", btn1.GetProperty("Caption").AsString());
+        Assert.Equal("Original 2", btn2.GetProperty("Caption").AsString());
+
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(2));
+        Assert.Equal("Pulsado: 2", btn2.GetProperty("Caption").AsString());
+    }
+
+    [Fact]
+    public void ControlArray_SelectCase_RangesAndIsComparisons()
+    {
+        var ctx = new VbExecutionContext();
+        var host = new LiveExecutionHost(ctx);
+
+        string result = "";
+        ctx.MsgBoxHandler = (prompt, buttons, title) =>
+        {
+            result = prompt;
+            return 1;
+        };
+
+        string code = @"
+Private Sub Command1_Click(Index As Integer)
+    Select Case Index
+        Case 0 To 1
+            MsgBox ""Rango 0 a 1""
+        Case Is >= 2
+            MsgBox ""Mayor o igual a 2""
+        Case Else
+            MsgBox ""Otro""
+    End Select
+End Sub
+";
+        host.LoadSourceCode(code, "Form1");
+
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(0));
+        Assert.Equal("Rango 0 a 1", result);
+
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(1));
+        Assert.Equal("Rango 0 a 1", result);
+
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(5));
+        Assert.Equal("Mayor o igual a 2", result);
+
+        host.InvokeProcedure("Command1_Click", "Form1", VbValue.FromLong(-1));
+        Assert.Equal("Otro", result);
+    }
+
+    private class MockElementControl : ILiveControl
+    {
+        public string Name { get; }
+        public string TypeName => "CommandButton";
+        private readonly System.Collections.Generic.Dictionary<string, VbValue> _props = new(StringComparer.OrdinalIgnoreCase);
+
+        public MockElementControl(string name) => Name = name;
+
+        public VbValue GetProperty(string propertyName) =>
+            _props.TryGetValue(propertyName, out var v) ? v : VbValue.Empty;
+
+        public void SetProperty(string propertyName, VbValue value) =>
+            _props[propertyName] = value;
+
+        public VbValue InvokeMethod(string methodName, VbValue[] args) => VbValue.Empty;
+    }
 }
+

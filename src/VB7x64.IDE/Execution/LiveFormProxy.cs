@@ -26,14 +26,46 @@ public class LiveFormProxy : ILiveForm
         _window = window ?? throw new ArgumentNullException(nameof(window));
     }
 
-    public void RegisterControl(ILiveControl control)
+    public void RegisterControl(ILiveControl control, int? index = null)
     {
-        _controls[control.Name] = control;
+        if (index.HasValue)
+        {
+            if (!_controls.TryGetValue(control.Name, out var existing) || existing is not LiveControlArray arr)
+            {
+                arr = new LiveControlArray(control.Name);
+                if (existing != null && existing is not LiveControlArray)
+                {
+                    arr.Add(0, existing);
+                }
+                _controls[control.Name] = arr;
+            }
+            arr.Add(index.Value, control);
+            _controls[$"{control.Name}({index.Value})"] = control;
+        }
+        else
+        {
+            _controls[control.Name] = control;
+        }
     }
 
     public ILiveControl? FindControl(string name)
     {
-        return _controls.TryGetValue(name, out var ctrl) ? ctrl : null;
+        if (_controls.TryGetValue(name, out var ctrl)) return ctrl;
+
+        int paren = name.IndexOf('(');
+        if (paren > 0 && name.EndsWith(')'))
+        {
+            string baseName = name[..paren].Trim();
+            string idxStr = name[(paren + 1)..^1].Trim();
+            if (int.TryParse(idxStr, out int idx) &&
+                _controls.TryGetValue(baseName, out var baseCtrl) &&
+                baseCtrl is ILiveControlArray arr)
+            {
+                return arr.GetItem(idx);
+            }
+        }
+
+        return null;
     }
 
     public VbValue GetProperty(string propertyName)

@@ -19,7 +19,7 @@ public static class AppVersion
     /// <summary>
     /// Correcciones y compilaciones realizadas acumuladas desde el inicio (4 dígitos).
     /// </summary>
-    public const string Revision = "0564";
+    public const string Revision = "0565";
 
     /// <summary>
     /// Número de versión completo formateado (ej. 00.001.0561).

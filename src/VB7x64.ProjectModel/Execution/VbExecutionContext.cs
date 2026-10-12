@@ -54,6 +54,75 @@ public interface ILiveControl
     VbValue InvokeMethod(string methodName, VbValue[] args);
 }
 
+public interface ILiveControlArray : ILiveControl
+{
+    int Count { get; }
+    int LBound { get; }
+    int UBound { get; }
+    ILiveControl? GetItem(int index);
+    IReadOnlyCollection<ILiveControl> Items { get; }
+}
+
+public class LiveControlArray : ILiveControlArray
+{
+    private readonly string _name;
+    private readonly SortedDictionary<int, ILiveControl> _items = new();
+
+    public string Name => _name;
+    public string TypeName => "ControlArray";
+    public int Count => _items.Count;
+    public int LBound => _items.Count > 0 ? _items.Keys.First() : 0;
+    public int UBound => _items.Count > 0 ? _items.Keys.Last() : 0;
+    public IReadOnlyCollection<ILiveControl> Items => _items.Values;
+
+    public LiveControlArray(string name)
+    {
+        _name = name;
+    }
+
+    public void Add(int index, ILiveControl control)
+    {
+        _items[index] = control;
+    }
+
+    public ILiveControl? GetItem(int index)
+    {
+        return _items.TryGetValue(index, out var ctrl) ? ctrl : null;
+    }
+
+    public VbValue GetProperty(string propertyName)
+    {
+        switch (propertyName.ToUpperInvariant())
+        {
+            case "COUNT":
+                return VbValue.FromLong(Count);
+            case "LBOUND":
+                return VbValue.FromLong(LBound);
+            case "UBOUND":
+                return VbValue.FromLong(UBound);
+            case "NAME":
+                return VbValue.FromString(_name);
+            default:
+                return VbValue.Empty;
+        }
+    }
+
+    public void SetProperty(string propertyName, VbValue value)
+    {
+    }
+
+    public VbValue InvokeMethod(string methodName, VbValue[] args)
+    {
+        if ((string.IsNullOrEmpty(methodName) || methodName.Equals("Item", StringComparison.OrdinalIgnoreCase)) && args.Length > 0)
+        {
+            int idx = (int)args[0].AsLong();
+            var item = GetItem(idx);
+            return item != null ? VbValue.FromObject(item) : VbValue.Empty;
+        }
+        return VbValue.Empty;
+    }
+}
+
 public interface ILiveForm : ILiveControl
 {
     IReadOnlyDictionary<string, ILiveControl> Controls { get; }

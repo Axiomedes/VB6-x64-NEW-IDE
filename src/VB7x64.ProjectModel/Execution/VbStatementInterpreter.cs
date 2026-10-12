@@ -211,7 +211,13 @@ public class VbStatementInterpreter
             return ExecuteIf(line, enclosingLines, ref nextLineIndex, sourceFile, baseLineNumber);
         }
 
-        // 11. Invocación Call ...
+        // 11. Estructura Select Case ... End Select
+        if (line.StartsWith("Select Case", StringComparison.OrdinalIgnoreCase) && enclosingLines != null)
+        {
+            return ExecuteSelectCase(line, enclosingLines, ref nextLineIndex, sourceFile, baseLineNumber);
+        }
+
+        // 12. Invocación Call ...
         if (line.StartsWith("Call ", StringComparison.OrdinalIgnoreCase))
         {
             string callExpr = line[5..].Trim();
@@ -349,7 +355,11 @@ public class VbStatementInterpreter
             string objName = target[..dot].Trim();
             string propName = target[(dot + 1)..].Trim();
 
-            var obj = _context.GetVariable(objName);
+            // Si objName contiene un índice, ej. `Command1(Index)` o `Command1(0)`
+            var obj = objName.Contains('(')
+                ? VbExpressionEvaluator.Evaluate(objName, _context)
+                : _context.GetVariable(objName);
+
             if (obj.RawValue is ILiveControl ctrl)
             {
                 ctrl.SetProperty(propName, value);
@@ -493,53 +503,215 @@ public class VbStatementInterpreter
         // 2. If en Bloque multilínea: If cond Then ... [ElseIf ...] [Else ...] End If
         if (lines == null) return FlowSignal.Normal;
 
-        var thenLines = new List<string>();
-        var elseLines = new List<string>();
-        bool inElse = false;
-        int depth = 1;
+        var branches = new List<(string? ConditionExpr, List<string> Body)>();
+        var currentBody = new List<string>();
+        branches.Add((condExpr, currentBody));
 
+        int depth = 1;
         while (nextLineIndex < lines.Count)
         {
-            string curLine = lines[nextLineIndex++].Trim();
-            string upper = curLine.ToUpperInvariant();
+            string curLine = lines[nextLineIndex++];
+            string trimmed = curLine.Trim();
+            string upper = trimmed.ToUpperInvariant();
 
             if (upper.StartsWith("IF ") && IndexOfKeyword(curLine, "THEN") >= 0 && string.IsNullOrWhiteSpace(curLine[(IndexOfKeyword(curLine, "THEN") + 4)..].Trim()))
             {
                 depth++;
-            }
-            else if (upper.StartsWith("END IF") || upper == "ENDIF")
-            {
-                depth--;
-                if (depth == 0) break;
-            }
-            else if (depth == 1 && upper.StartsWith("ELSE") && !upper.StartsWith("ELSEIF"))
-            {
-                inElse = true;
+                currentBody.Add(curLine);
                 continue;
             }
 
-            if (inElse)
+            if (upper.StartsWith("END IF") || upper == "ENDIF")
             {
-                elseLines.Add(curLine);
+                depth--;
+                if (depth == 0) break;
+                currentBody.Add(curLine);
+                continue;
             }
-            else
+
+            if (depth == 1 && upper.StartsWith("ELSEIF "))
             {
-                thenLines.Add(curLine);
+                int eiThen = IndexOfKeyword(trimmed, "Then");
+                string eiCond = eiThen > 0 ? trimmed["ElseIf".Length..eiThen].Trim() : trimmed["ElseIf".Length..].Trim();
+                currentBody = new List<string>();
+                branches.Add((eiCond, currentBody));
+                continue;
             }
+
+            if (depth == 1 && (upper == "ELSE" || (upper.StartsWith("ELSE ") && !upper.StartsWith("ELSEIF"))))
+            {
+                currentBody = new List<string>();
+                branches.Add((null, currentBody));
+                continue;
+            }
+
+            currentBody.Add(curLine);
         }
 
-        if (condResult)
+        foreach (var branch in branches)
         {
-            int tIdx = 0;
-            return ExecuteBlockInternal(thenLines, ref tIdx, sourceFile, baseLineNumber);
-        }
-        else if (elseLines.Count > 0)
-        {
-            int eIdx = 0;
-            return ExecuteBlockInternal(elseLines, ref eIdx, sourceFile, baseLineNumber);
+            bool isMatch = branch.ConditionExpr == null || VbExpressionEvaluator.Evaluate(branch.ConditionExpr, _context).AsBoolean();
+            if (isMatch)
+            {
+                if (branch.Body.Count > 0)
+                {
+                    int bIdx = 0;
+                    return ExecuteBlockInternal(branch.Body, ref bIdx, sourceFile, baseLineNumber);
+                }
+                return FlowSignal.Normal;
+            }
         }
 
         return FlowSignal.Normal;
+    }
+
+    private FlowSignal ExecuteSelectCase(
+        string line,
+        IReadOnlyList<string> lines,
+        ref int nextLineIndex,
+        string? sourceFile,
+        int baseLineNumber)
+    {
+        string testExpr = line["Select Case".Length..].Trim();
+        var testVal = VbExpressionEvaluator.Evaluate(testExpr, _context);
+
+        var cases = new List<(List<string> Conds, List<string> Body, bool IsElse)>();
+        List<string>? currentBody = null;
+        int depth = 1;
+
+        while (nextLineIndex < lines.Count)
+        {
+            string curLine = lines[nextLineIndex++];
+            string trimmed = curLine.Trim();
+            string upper = trimmed.ToUpperInvariant();
+
+            if (upper.StartsWith("SELECT CASE ", StringComparison.Ordinal) || upper == "SELECT CASE")
+            {
+                depth++;
+                currentBody?.Add(curLine);
+                continue;
+            }
+
+            if (upper.StartsWith("END SELECT", StringComparison.Ordinal) || upper == "ENDSELECT")
+            {
+                depth--;
+                if (depth == 0) break;
+                currentBody?.Add(curLine);
+                continue;
+            }
+
+            if (depth == 1 && (upper.StartsWith("CASE ") || upper == "CASE"))
+            {
+                string caseClause = trimmed["Case".Length..].Trim();
+                if (caseClause.StartsWith("Else", StringComparison.OrdinalIgnoreCase))
+                {
+                    currentBody = new List<string>();
+                    cases.Add((new List<string>(), currentBody, true));
+                }
+                else
+                {
+                    var conds = SplitCommaArguments(caseClause);
+                    currentBody = new List<string>();
+                    cases.Add((conds, currentBody, false));
+                }
+                continue;
+            }
+
+            currentBody?.Add(curLine);
+        }
+
+        List<string>? matchingBody = null;
+        foreach (var c in cases)
+        {
+            if (c.IsElse)
+            {
+                matchingBody ??= c.Body;
+                continue;
+            }
+
+            bool matched = false;
+            foreach (var cond in c.Conds)
+            {
+                string condTrim = cond.Trim();
+                if (string.IsNullOrEmpty(condTrim)) continue;
+
+                if (condTrim.StartsWith("Is ", StringComparison.OrdinalIgnoreCase))
+                {
+                    string rest = condTrim[3..].Trim();
+                    string op = "";
+                    string opExpr = "";
+                    if (rest.StartsWith("<=") || rest.StartsWith(">=") || rest.StartsWith("<>"))
+                    {
+                        op = rest[..2];
+                        opExpr = rest[2..].Trim();
+                    }
+                    else if (rest.StartsWith("<") || rest.StartsWith(">") || rest.StartsWith("="))
+                    {
+                        op = rest[..1];
+                        opExpr = rest[1..].Trim();
+                    }
+
+                    if (!string.IsNullOrEmpty(op))
+                    {
+                        var rightVal = VbExpressionEvaluator.Evaluate(opExpr, _context);
+                        matched = EvaluateComparison(testVal, op, rightVal);
+                        if (matched) break;
+                    }
+                }
+                else if (Regex.IsMatch(condTrim, @"\s+To\s+", RegexOptions.IgnoreCase))
+                {
+                    var m = Regex.Match(condTrim, @"^(.*?)\s+To\s+(.*)$", RegexOptions.IgnoreCase);
+                    if (m.Success)
+                    {
+                        var lowVal = VbExpressionEvaluator.Evaluate(m.Groups[1].Value.Trim(), _context);
+                        var highVal = VbExpressionEvaluator.Evaluate(m.Groups[2].Value.Trim(), _context);
+                        if (VbValue.CompareGreaterOrEqual(testVal, lowVal).AsBoolean() &&
+                            VbValue.CompareLessOrEqual(testVal, highVal).AsBoolean())
+                        {
+                            matched = true;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    var val = VbExpressionEvaluator.Evaluate(condTrim, _context);
+                    if (VbValue.CompareEqual(testVal, val).AsBoolean())
+                    {
+                        matched = true;
+                        break;
+                    }
+                }
+            }
+
+            if (matched)
+            {
+                matchingBody = c.Body;
+                break;
+            }
+        }
+
+        if (matchingBody != null && matchingBody.Count > 0)
+        {
+            int bIdx = 0;
+            return ExecuteBlockInternal(matchingBody, ref bIdx, sourceFile, baseLineNumber);
+        }
+
+        return FlowSignal.Normal;
+    }
+
+    private static bool EvaluateComparison(VbValue left, string op, VbValue right)
+    {
+        return op switch
+        {
+            "=" => VbValue.CompareEqual(left, right).AsBoolean(),
+            "<>" => VbValue.CompareNotEqual(left, right).AsBoolean(),
+            "<" => VbValue.CompareLessThan(left, right).AsBoolean(),
+            ">" => VbValue.CompareGreaterThan(left, right).AsBoolean(),
+            "<=" => VbValue.CompareLessOrEqual(left, right).AsBoolean(),
+            ">=" => VbValue.CompareGreaterOrEqual(left, right).AsBoolean(),
+            _ => false
+        };
     }
 
     private FlowSignal ExecuteForLoop(

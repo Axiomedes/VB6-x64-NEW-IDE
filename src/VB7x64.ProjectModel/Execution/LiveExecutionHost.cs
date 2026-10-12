@@ -44,7 +44,7 @@ public class LiveExecutionHost
         string[] allLines = code.Replace("\r\n", "\n").Split('\n');
 
         var procRegex = new System.Text.RegularExpressions.Regex(
-            @"^\s*(?:(?:Public|Private|Friend|Static)\s+)?(?:Sub|Function|Property\s+(?:Get|Let|Set))\s+([a-zA-Z0-9_]+)(?:\((.*?)\))?",
+            @"^\s*(?:(?:Public|Private|Friend|Static)\s+)?(?:Sub|Function|Property\s+(?:Get|Let|Set))\s+([a-zA-Z0-9_]+)\s*(?:\((.*?)\))?",
             System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.Compiled);
 
         foreach (var block in blocks)
@@ -64,8 +64,8 @@ public class LiveExecutionHost
                     {
                         string pTrim = p.Trim();
                         pTrim = System.Text.RegularExpressions.Regex.Replace(pTrim, @"^(?:ByVal|ByRef|Optional)\s+", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                        int asIdx = pTrim.IndexOf(" As ", StringComparison.OrdinalIgnoreCase);
-                        string pName = asIdx > 0 ? pTrim[..asIdx].Trim() : pTrim;
+                        var asMatch = System.Text.RegularExpressions.Regex.Match(pTrim, @"\s+As\s+", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                        string pName = asMatch.Success ? pTrim[..asMatch.Index].Trim() : pTrim;
                         if (!string.IsNullOrEmpty(pName)) paramNames.Add(pName);
                     }
                 }
@@ -199,12 +199,19 @@ public class LiveExecutionHost
 
         try
         {
-            // Asignar argumentos a los parámetros del procedimiento
+            // Asignar argumentos a los parámetros del procedimiento directamente en el marco local
             for (int i = 0; i < proc.Parameters.Count; i++)
             {
                 string paramName = proc.Parameters[i];
                 var val = i < args.Length ? args[i] : VbValue.Empty;
-                _context.SetVariable(paramName, val);
+                if (_context.CurrentFrame != null)
+                {
+                    _context.CurrentFrame.LocalVariables[paramName] = val;
+                }
+                else
+                {
+                    _context.SetVariable(paramName, val);
+                }
             }
 
             return _interpreter.ExecuteBlock(proc.BodyLines, containerName, proc.StartLine);

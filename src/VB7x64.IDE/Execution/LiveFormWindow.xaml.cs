@@ -156,8 +156,7 @@ public partial class LiveFormWindow : Window
             parentCanvas.Children.Add(visual);
 
             var proxy = new LiveControlProxy(ctrl, visual);
-            _formProxy.RegisterControl(proxy);
-            _host.Context.SetVariable(ctrl.Name, VbValue.FromObject(proxy));
+            RegisterControlWithContext(ctrl, proxy);
 
             // Si es un contenedor, obtener su lienzo interno para añadir sus hijos
             Canvas? innerCanvas = GetContainerInnerCanvas(visual);
@@ -180,6 +179,34 @@ public partial class LiveFormWindow : Window
             var dummyVisual = new FrameworkElement { Name = ctrl.Name };
             _controlTimers.TryGetValue(ctrl.Name, out var timer);
             var proxy = new LiveControlProxy(ctrl, dummyVisual, timer);
+            RegisterControlWithContext(ctrl, proxy);
+        }
+    }
+
+    private void RegisterControlWithContext(FormDesignerControl ctrl, LiveControlProxy proxy)
+    {
+        if (ctrl.Index.HasValue)
+        {
+            _formProxy.RegisterControl(proxy, ctrl.Index.Value);
+            var existingVar = _host.Context.GetVariable(ctrl.Name);
+            if (existingVar.RawValue is LiveControlArray arrProxy)
+            {
+                arrProxy.Add(ctrl.Index.Value, proxy);
+            }
+            else
+            {
+                var newArr = new LiveControlArray(ctrl.Name);
+                if (existingVar.RawValue is ILiveControl prevCtrl && existingVar.RawValue is not LiveControlArray)
+                {
+                    newArr.Add(0, prevCtrl);
+                }
+                newArr.Add(ctrl.Index.Value, proxy);
+                _host.Context.SetVariable(ctrl.Name, VbValue.FromObject(newArr));
+            }
+            _host.Context.SetVariable($"{ctrl.Name}({ctrl.Index.Value})", VbValue.FromObject(proxy));
+        }
+        else
+        {
             _formProxy.RegisterControl(proxy);
             _host.Context.SetVariable(ctrl.Name, VbValue.FromObject(proxy));
         }

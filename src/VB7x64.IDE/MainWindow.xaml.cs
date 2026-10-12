@@ -55,6 +55,7 @@ public partial class MainWindow : Window
         // Suscribirse al stream de log en tiempo real
         AppLogger.LogMessageReceived += OnLogMessageReceived;
 
+        Title = $"{AppVersion.AppTitle} v{AppVersion.VersionString} - Entorno de Desarrollo VB6 Clásico";
         UpdateDocumentsVisibility();
     }
 
@@ -488,7 +489,7 @@ public partial class MainWindow : Window
         MainToolboxPanel.ReloadTools();
         MainToolboxPanel.ResetToPointer();
 
-        Title = "VB7-x64 IDE - Entorno de Desarrollo VB6 Clásico";
+        Title = $"{AppVersion.AppTitle} v{AppVersion.VersionString} - Entorno de Desarrollo VB6 Clásico";
         SetStatusMessage("Proyecto y documentos cerrados.");
         AppLogger.Info("Proyecto y todos los documentos cerrados.");
     }
@@ -528,7 +529,7 @@ public partial class MainWindow : Window
 
             RefreshProjectTree();
             SetStatusMessage($"Grupo de proyectos '{group.Name}' cargado con {group.Projects.Count} proyectos.");
-            Title = $"VB7-x64 IDE - [Grupo] {group.Name} ({Path.GetFileName(group.GroupFilePath)})";
+            Title = $"{AppVersion.AppTitle} v{AppVersion.VersionString} - [Grupo] {group.Name} ({Path.GetFileName(group.GroupFilePath)})";
 
             _settings.AddRecentProject(group.GroupFilePath);
             UpdateRecentMenus();
@@ -556,7 +557,7 @@ public partial class MainWindow : Window
 
             RefreshProjectTree();
             SetStatusMessage($"Proyecto '{project.Name}' cargado exitosamente.");
-            Title = $"VB7-x64 IDE - {project.Name} ({Path.GetFileName(project.ProjectFilePath)})";
+            Title = $"{AppVersion.AppTitle} v{AppVersion.VersionString} - {project.Name} ({Path.GetFileName(project.ProjectFilePath)})";
 
             _settings.AddRecentProject(project.ProjectFilePath);
             UpdateRecentMenus();

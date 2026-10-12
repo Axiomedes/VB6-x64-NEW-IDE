@@ -21,6 +21,7 @@ public partial class LiveFormWindow : Window
     private readonly LiveExecutionHost _host;
     private readonly LiveFormProxy _formProxy;
     private readonly List<DispatcherTimer> _activeTimers = new();
+    private readonly Dictionary<string, DispatcherTimer> _controlTimers = new(StringComparer.OrdinalIgnoreCase);
     private readonly Func<string, FormDesignModel?>? _userControlResolver;
 
     public LiveFormProxy FormProxy => _formProxy;
@@ -177,7 +178,8 @@ public partial class LiveFormWindow : Window
         {
             // Para controles sin representación visual en runtime (ej. Timer)
             var dummyVisual = new FrameworkElement { Name = ctrl.Name };
-            var proxy = new LiveControlProxy(ctrl, dummyVisual);
+            _controlTimers.TryGetValue(ctrl.Name, out var timer);
+            var proxy = new LiveControlProxy(ctrl, dummyVisual, timer);
             _formProxy.RegisterControl(proxy);
             _host.Context.SetVariable(ctrl.Name, VbValue.FromObject(proxy));
         }
@@ -270,25 +272,32 @@ public partial class LiveFormWindow : Window
 
         void DispatchEvent(string eventName)
         {
-            if (ctrl.Index.HasValue)
-            {
-                _host.InvokeProcedure($"{ctrlName}_{eventName}", modName, VbValue.FromLong(ctrl.Index.Value));
-            }
-            else
-            {
-                _host.InvokeProcedure($"{ctrlName}_{eventName}", modName);
-            }
-
-            if (!string.IsNullOrEmpty(parentControlPrefix))
+            try
             {
                 if (ctrl.Index.HasValue)
                 {
-                    _host.InvokeProcedure($"{parentControlPrefix}_{ctrlName}_{eventName}", _model.Name, VbValue.FromLong(ctrl.Index.Value));
+                    _host.InvokeProcedure($"{ctrlName}_{eventName}", modName, VbValue.FromLong(ctrl.Index.Value));
                 }
                 else
                 {
-                    _host.InvokeProcedure($"{parentControlPrefix}_{ctrlName}_{eventName}", _model.Name);
+                    _host.InvokeProcedure($"{ctrlName}_{eventName}", modName);
                 }
+
+                if (!string.IsNullOrEmpty(parentControlPrefix))
+                {
+                    if (ctrl.Index.HasValue)
+                    {
+                        _host.InvokeProcedure($"{parentControlPrefix}_{ctrlName}_{eventName}", _model.Name, VbValue.FromLong(ctrl.Index.Value));
+                    }
+                    else
+                    {
+                        _host.InvokeProcedure($"{parentControlPrefix}_{ctrlName}_{eventName}", _model.Name);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _host.Context.WriteDebugPrint($"[Error al ejecutar {ctrlName}_{eventName}]: {ex.Message}");
             }
         }
 
@@ -520,19 +529,23 @@ public partial class LiveFormWindow : Window
                     }
                 }
 
-                if (intervalMs > 0)
+                var timer = new DispatcherTimer
                 {
-                    var timer = new DispatcherTimer
+                    Interval = TimeSpan.FromMilliseconds(Math.Max(1, intervalMs > 0 ? intervalMs : 1)),
+                    IsEnabled = ctrl.Enabled && intervalMs > 0
+                };
+                timer.Tick += (s, e) =>
+                {
+                    if (ctrl.Enabled && ctrl.Interval > 0)
                     {
-                        Interval = TimeSpan.FromMilliseconds(intervalMs),
-                        IsEnabled = ctrl.Enabled
-                    };
-                    timer.Tick += (s, e) => DispatchEvent("Timer");
-                    _activeTimers.Add(timer);
-                    if (ctrl.Enabled)
-                    {
-                        timer.Start();
+                        DispatchEvent("Timer");
                     }
+                };
+                _activeTimers.Add(timer);
+                _controlTimers[ctrl.Name] = timer;
+                if (ctrl.Enabled && intervalMs > 0)
+                {
+                    timer.Start();
                 }
 
                 // Un Timer no es visible en tiempo de ejecución en VB6

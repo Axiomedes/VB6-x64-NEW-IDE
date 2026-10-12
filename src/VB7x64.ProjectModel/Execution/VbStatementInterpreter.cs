@@ -238,7 +238,14 @@ public class VbStatementInterpreter
             return FlowSignal.Normal;
         }
 
-        // 13. Invocación directa de método o subrutina sin Call: ej. `MsgBox "Hola"` o `MiSub 1, 2`
+        // 13. DoEvents
+        if (line.Equals("DoEvents", StringComparison.OrdinalIgnoreCase))
+        {
+            _context.DoEvents();
+            return FlowSignal.Normal;
+        }
+
+        // 14. Invocación directa de método o subrutina sin Call: ej. `MsgBox "Hola"` o `MiSub 1, 2`
         ExecuteSubInvocation(line);
 
         return FlowSignal.Normal;
@@ -300,6 +307,7 @@ public class VbStatementInterpreter
 
     private void ExecuteDim(string line)
     {
+        bool isStatic = line.StartsWith("Static ", StringComparison.OrdinalIgnoreCase);
         int spaceIdx = line.IndexOf(' ');
         string decls = line[(spaceIdx + 1)..].Trim();
 
@@ -309,7 +317,18 @@ public class VbStatementInterpreter
             int asIdx = d.IndexOf(" As ", StringComparison.OrdinalIgnoreCase);
             string varName = asIdx > 0 ? d[..asIdx].Trim() : d;
 
-            _context.SetVariable(varName, VbValue.Empty);
+            if (isStatic && _context.CurrentFrame != null)
+            {
+                string staticKey = VbExecutionContext.GetStaticVarKey(_context.CurrentFrame.ProcedureName, varName);
+                if (!_context.StaticVariables.ContainsKey(staticKey))
+                {
+                    _context.StaticVariables[staticKey] = VbValue.Empty;
+                }
+            }
+            else
+            {
+                _context.SetVariable(varName, VbValue.Empty);
+            }
         }
     }
 
@@ -351,9 +370,29 @@ public class VbStatementInterpreter
 
     private void ExecuteSubInvocation(string line)
     {
+        string subName;
+        string argsStr;
+
         int space = line.IndexOf(' ');
-        string subName = space > 0 ? line[..space].Trim() : line;
-        string argsStr = space > 0 ? line[(space + 1)..].Trim() : string.Empty;
+        int paren = line.IndexOf('(');
+
+        if (paren > 0 && (space < 0 || paren < space))
+        {
+            subName = line[..paren].Trim();
+            string inside = line[(paren + 1)..].Trim();
+            if (inside.EndsWith(')')) inside = inside[..^1].Trim();
+            argsStr = inside;
+        }
+        else if (space > 0)
+        {
+            subName = line[..space].Trim();
+            argsStr = line[(space + 1)..].Trim();
+        }
+        else
+        {
+            subName = line;
+            argsStr = string.Empty;
+        }
 
         var args = new List<VbValue>();
         if (!string.IsNullOrWhiteSpace(argsStr))
@@ -368,8 +407,8 @@ public class VbStatementInterpreter
         if (subName.Equals("MsgBox", StringComparison.OrdinalIgnoreCase) && args.Count > 0)
         {
             string prompt = args[0].AsString();
-            int buttons = args.Count > 1 ? args[1].AsLong() : 0;
-            string title = args.Count > 2 ? args[2].AsString() : "VB7-x64";
+            int buttons = args.Count > 1 ? (int)args[1].AsLong() : 0;
+            string title = args.Count > 2 ? args[2].AsString() : string.Empty;
 
             if (_context.MsgBoxHandler != null)
             {

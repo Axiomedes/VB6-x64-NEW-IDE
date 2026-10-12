@@ -95,6 +95,82 @@ public class LiveExecutionHost
                 _procedures[procName] = proc;
             }
         }
+
+        // 2. Indexar e inicializar variables y constantes a nivel de módulo (sección Declaraciones)
+        var procedureLines = new HashSet<int>();
+        foreach (var block in blocks)
+        {
+            if (block.BlockType is "Sub" or "Function" or "Property")
+            {
+                for (int l = Math.Max(0, block.StartLine - 1); l <= Math.Min(allLines.Length - 1, block.EndLine - 1); l++)
+                {
+                    procedureLines.Add(l);
+                }
+            }
+        }
+
+        ParseDeclarationsSection(allLines, procedureLines, containerName);
+    }
+
+    private void ParseDeclarationsSection(string[] allLines, HashSet<int> procedureLines, string? containerName)
+    {
+        for (int l = 0; l < allLines.Length; l++)
+        {
+            if (procedureLines.Contains(l)) continue;
+
+            string line = allLines[l].Trim();
+            if (string.IsNullOrWhiteSpace(line) || line.StartsWith('\'') || line.StartsWith("Rem ", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            if (line.StartsWith("Attribute ", StringComparison.OrdinalIgnoreCase) ||
+                line.StartsWith("Option ", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            // Constantes a nivel de módulo: [Public|Private] Const NOMBRE = VALOR
+            var constMatch = System.Text.RegularExpressions.Regex.Match(
+                line,
+                @"^(?:(?:Public|Private|Global)\s+)?Const\s+([a-zA-Z0-9_]+)\s*(?:As\s+[a-zA-Z0-9_]+)?\s*=\s*(.+)$",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+            if (constMatch.Success)
+            {
+                string constName = constMatch.Groups[1].Value.Trim();
+                string constExpr = constMatch.Groups[2].Value.Trim();
+                var val = VbExpressionEvaluator.Evaluate(constExpr, _context);
+
+                _context.ModuleVariables[constName] = val;
+                if (!string.IsNullOrEmpty(containerName))
+                {
+                    _context.ModuleVariables[$"{containerName}.{constName}"] = val;
+                }
+                continue;
+            }
+
+            // Variables a nivel de módulo: (Dim|Private|Public|Global) Var1 [As Type], Var2 ...
+            var varDeclMatch = System.Text.RegularExpressions.Regex.Match(
+                line,
+                @"^(?:Dim|Private|Public|Global)\s+(?!Sub\b|Function\b|Property\b|Type\b|Enum\b|Declare\b|Event\b)(.+)$",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+            if (varDeclMatch.Success)
+            {
+                string decls = varDeclMatch.Groups[1].Value.Trim();
+                foreach (var d in decls.Split(','))
+                {
+                    string dTrim = d.Trim();
+                    int asIdx = dTrim.IndexOf(" As ", StringComparison.OrdinalIgnoreCase);
+                    string vName = asIdx > 0 ? dTrim[..asIdx].Trim() : dTrim;
+                    vName = vName.TrimEnd('(', ')');
+                    if (string.IsNullOrEmpty(vName)) continue;
+
+                    _context.ModuleVariables[vName] = VbValue.Empty;
+                    if (!string.IsNullOrEmpty(containerName))
+                    {
+                        _context.ModuleVariables[$"{containerName}.{vName}"] = VbValue.Empty;
+                    }
+                }
+            }
+        }
     }
 
     /// <summary>

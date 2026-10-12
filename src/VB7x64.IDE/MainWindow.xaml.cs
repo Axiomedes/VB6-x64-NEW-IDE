@@ -3557,28 +3557,48 @@ public partial class MainWindow : Window
                 _liveExecutionHost.LoadSourceCode(targetFormCode, targetFormModel.Name);
             }
 
-            // 5. Configurar manejador de MsgBox del host para integrarlo con WPF
+            // 5. Configurar manejador de MsgBox y DoEvents del host para integrarlo con WPF
             _liveExecutionHost.Context.MsgBoxHandler = (prompt, buttons, title) =>
             {
-                var icon = MessageBoxImage.Information;
-                if ((buttons & 16) != 0) icon = MessageBoxImage.Error;
-                else if ((buttons & 32) != 0) icon = MessageBoxImage.Question;
-                else if ((buttons & 48) != 0) icon = MessageBoxImage.Warning;
+                int buttonStyle = buttons & 0x07;
+                int iconStyle = buttons & 0x70;
 
-                var btn = MessageBoxButton.OK;
-                if ((buttons & 1) != 0) btn = MessageBoxButton.OKCancel;
-                else if ((buttons & 4) != 0) btn = MessageBoxButton.YesNo;
-                else if ((buttons & 3) != 0) btn = MessageBoxButton.YesNoCancel;
+                MessageBoxImage icon = iconStyle switch
+                {
+                    16 => MessageBoxImage.Error,       // vbCritical
+                    32 => MessageBoxImage.Question,    // vbQuestion
+                    48 => MessageBoxImage.Warning,     // vbExclamation
+                    64 => MessageBoxImage.Information, // vbInformation
+                    _ => MessageBoxImage.None          // Sin icono en VB6 por defecto
+                };
 
-                var mbr = MessageBox.Show(prompt, string.IsNullOrEmpty(title) ? targetFormModel.Caption : title, btn, icon);
+                MessageBoxButton btn = buttonStyle switch
+                {
+                    0 => MessageBoxButton.OK,          // vbOKOnly
+                    1 => MessageBoxButton.OKCancel,    // vbOKCancel
+                    2 => MessageBoxButton.OKCancel,    // vbAbortRetryIgnore (fallback estándar en WPF)
+                    3 => MessageBoxButton.YesNoCancel, // vbYesNoCancel
+                    4 => MessageBoxButton.YesNo,       // vbYesNo
+                    5 => MessageBoxButton.OKCancel,    // vbRetryCancel (fallback estándar en WPF)
+                    _ => MessageBoxButton.OK
+                };
+
+                string dialogTitle = !string.IsNullOrEmpty(title) ? title : targetFormModel.Caption;
+
+                var mbr = MessageBox.Show(prompt, dialogTitle, btn, icon);
                 return mbr switch
                 {
-                    MessageBoxResult.OK => 1,
-                    MessageBoxResult.Cancel => 2,
-                    MessageBoxResult.Yes => 6,
-                    MessageBoxResult.No => 7,
+                    MessageBoxResult.OK => 1,     // vbOK
+                    MessageBoxResult.Cancel => 2, // vbCancel
+                    MessageBoxResult.Yes => 6,    // vbYes
+                    MessageBoxResult.No => 7,     // vbNo
                     _ => 1
                 };
+            };
+
+            _liveExecutionHost.Context.DoEventsHandler = () =>
+            {
+                Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() => { }));
             };
 
             // 6. Instanciar la ventana en vivo (LiveFormWindow)

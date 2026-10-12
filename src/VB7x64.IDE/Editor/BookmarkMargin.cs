@@ -9,16 +9,26 @@ using VB7x64.ProjectModel.Navigation;
 
 namespace VB7x64.IDE.Editor;
 
+/// <summary>
+/// Margen interactivo de marcadores (Bookmark Margin / Glyph Gutter) ubicado
+/// en el extremo izquierdo del editor de código.
+/// Sincronizado en tiempo real con el desplazamiento vertical (scroll) y redibujado
+/// dinámico de líneas visuales de AvalonEdit.
+/// </summary>
 public class BookmarkMargin : AbstractMargin
 {
     private readonly TextEditor _editor;
     private readonly string _filePath;
 
+    private static readonly Brush GutterBackground = new SolidColorBrush(Color.FromRgb(246, 246, 246));
+    private static readonly Pen GutterSeparator = new Pen(new SolidColorBrush(Color.FromRgb(226, 226, 226)), 1);
     private static readonly Brush BookmarkBrush = new SolidColorBrush(Color.FromRgb(0, 122, 204));
     private static readonly Pen BookmarkPen = new Pen(new SolidColorBrush(Color.FromRgb(0, 90, 160)), 1);
 
     static BookmarkMargin()
     {
+        GutterBackground.Freeze();
+        GutterSeparator.Freeze();
         BookmarkBrush.Freeze();
         BookmarkPen.Freeze();
     }
@@ -39,18 +49,45 @@ public class BookmarkMargin : AbstractMargin
         Dispatcher.InvokeAsync(InvalidateVisual);
     }
 
+    protected override void OnTextViewChanged(TextView oldTextView, TextView newTextView)
+    {
+        if (oldTextView != null)
+        {
+            oldTextView.VisualLinesChanged -= TextView_Updated;
+            oldTextView.ScrollOffsetChanged -= TextView_Updated;
+        }
+        base.OnTextViewChanged(oldTextView, newTextView);
+        if (newTextView != null)
+        {
+            newTextView.VisualLinesChanged += TextView_Updated;
+            newTextView.ScrollOffsetChanged += TextView_Updated;
+        }
+        InvalidateVisual();
+    }
+
+    private void TextView_Updated(object? sender, EventArgs e)
+    {
+        InvalidateVisual();
+    }
+
     protected override Size MeasureOverride(Size availableSize)
     {
-        return new Size(18, 0);
+        return new Size(20, 0);
     }
 
     protected override void OnRender(DrawingContext drawingContext)
     {
-        // Fondo sutil del margen
+        // 1. Fondo sutil del margen de marcadores (Gutter)
         drawingContext.DrawRectangle(
-            new SolidColorBrush(Color.FromRgb(245, 245, 245)),
+            GutterBackground,
             null,
             new Rect(0, 0, RenderSize.Width, RenderSize.Height));
+
+        // 2. Línea sutil separadora derecha
+        drawingContext.DrawLine(
+            GutterSeparator,
+            new Point(RenderSize.Width - 0.5, 0),
+            new Point(RenderSize.Width - 0.5, RenderSize.Height));
 
         var textView = TextView;
         if (textView == null || !textView.VisualLinesValid)
@@ -60,16 +97,16 @@ public class BookmarkMargin : AbstractMargin
         if (bookmarks.Count == 0)
             return;
 
+        // 3. Dibujar marcadores alineados con cada línea visible y su desplazamiento vertical actual
         foreach (var visualLine in textView.VisualLines)
         {
             int lineNumber = visualLine.FirstDocumentLine.LineNumber;
             if (BookmarkManager.Instance.HasBookmark(_filePath, lineNumber))
             {
                 double y = visualLine.VisualTop - textView.VerticalOffset;
-                double height = Math.Min(visualLine.Height, 16);
                 double size = 12;
-                double x = (RenderSize.Width - size) / 2;
-                double yOffset = y + (visualLine.Height - size) / 2;
+                double x = Math.Round((RenderSize.Width - size) / 2.0);
+                double yOffset = Math.Round(y + (visualLine.Height - size) / 2.0);
 
                 // Dibujar forma de cinta de marcador (Bookmark ribbon badge)
                 var pathGeom = new PathGeometry();
@@ -82,7 +119,7 @@ public class BookmarkMargin : AbstractMargin
 
                 figure.Segments.Add(new LineSegment(new Point(x + size, yOffset), false));
                 figure.Segments.Add(new LineSegment(new Point(x + size, yOffset + size), false));
-                figure.Segments.Add(new LineSegment(new Point(x + size / 2, yOffset + size - 3), false));
+                figure.Segments.Add(new LineSegment(new Point(x + size / 2.0, yOffset + size - 3), false));
                 figure.Segments.Add(new LineSegment(new Point(x, yOffset + size), false));
                 pathGeom.Figures.Add(figure);
 

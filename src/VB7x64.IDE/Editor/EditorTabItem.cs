@@ -493,14 +493,7 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
         {
             Editor.TextArea.TextView.ClipToBounds = false;
 
-            // Asegurar el margen de marcadores interactivo en el extremo izquierdo
-            if (BookmarkMargin != null && !Editor.TextArea.LeftMargins.Contains(BookmarkMargin))
-            {
-                Editor.TextArea.LeftMargins.Insert(0, BookmarkMargin);
-            }
-
-            // Eliminar la línea separadora punteada/continua que AvalonEdit inserta por defecto (DottedLineMargin / Line)
-            // para que no quede superpuesta con las líneas guía de bloques
+            // 1. Eliminar la línea separadora punteada/continua que AvalonEdit inserta por defecto (DottedLineMargin / Line)
             for (int i = Editor.TextArea.LeftMargins.Count - 1; i >= 0; i--)
             {
                 var m = Editor.TextArea.LeftMargins[i];
@@ -510,28 +503,36 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
                 }
             }
 
-            bool hasLineNumbers = false;
+            // 2. Extraer BookmarkMargin y _spacerMargin para reubicarlos en el orden canónico
+            if (BookmarkMargin != null && Editor.TextArea.LeftMargins.Contains(BookmarkMargin))
+            {
+                Editor.TextArea.LeftMargins.Remove(BookmarkMargin);
+            }
+            if (_spacerMargin != null && Editor.TextArea.LeftMargins.Contains(_spacerMargin))
+            {
+                Editor.TextArea.LeftMargins.Remove(_spacerMargin);
+            }
+
+            // 3. El margen de marcadores (BookmarkMargin) SIEMPRE debe estar en el extremo izquierdo absoluto (índice 0)
+            if (BookmarkMargin != null)
+            {
+                Editor.TextArea.LeftMargins.Insert(0, BookmarkMargin);
+            }
+
+            // 4. Si hay números de línea, darles un margen equilibrado
             foreach (var margin in Editor.TextArea.LeftMargins)
             {
                 if (margin is ICSharpCode.AvalonEdit.Editing.LineNumberMargin lnm)
                 {
-                    lnm.Margin = new Thickness(0, 0, 16, 0);
-                    hasLineNumbers = true;
+                    lnm.Margin = new Thickness(6, 0, 8, 0);
                 }
             }
 
-            if (!hasLineNumbers)
-            {
-                _spacerMargin ??= new Border { Width = 16 };
-                if (!Editor.TextArea.LeftMargins.Contains(_spacerMargin))
-                {
-                    Editor.TextArea.LeftMargins.Add(_spacerMargin);
-                }
-            }
-            else if (_spacerMargin != null && Editor.TextArea.LeftMargins.Contains(_spacerMargin))
-            {
-                Editor.TextArea.LeftMargins.Remove(_spacerMargin);
-            }
+            // 5. Insertar SIEMPRE un espaciador transparente justo antes del área de texto (TextView)
+            // Esto asegura que las guías de bloque (BranchLinesRenderer) y el texto tengan espacio suficiente
+            // y nunca queden pegados ni tapados por la barra de marcadores ni por los números de línea
+            _spacerMargin ??= new Border { Width = 16, Background = Brushes.Transparent };
+            Editor.TextArea.LeftMargins.Add(_spacerMargin);
         }
     }
 

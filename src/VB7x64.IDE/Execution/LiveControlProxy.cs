@@ -6,6 +6,8 @@ using System.Windows.Media;
 using VB7x64.ProjectModel.Designers;
 using VB7x64.ProjectModel.Execution;
 
+using System.Windows.Threading;
+
 namespace VB7x64.IDE.Execution;
 
 /// <summary>
@@ -17,6 +19,7 @@ public class LiveControlProxy : ILiveControl
 {
     private readonly FormDesignerControl _designerControl;
     private readonly FrameworkElement _visual;
+    private readonly DispatcherTimer? _timer;
     private readonly Dictionary<string, VbValue> _dynamicProperties = new(StringComparer.OrdinalIgnoreCase);
 
     public string Name => _designerControl.Name;
@@ -24,10 +27,11 @@ public class LiveControlProxy : ILiveControl
     public FrameworkElement Visual => _visual;
     public FormDesignerControl DesignerControl => _designerControl;
 
-    public LiveControlProxy(FormDesignerControl designerControl, FrameworkElement visual)
+    public LiveControlProxy(FormDesignerControl designerControl, FrameworkElement visual, DispatcherTimer? timer = null)
     {
         _designerControl = designerControl ?? throw new ArgumentNullException(nameof(designerControl));
         _visual = visual ?? throw new ArgumentNullException(nameof(visual));
+        _timer = timer;
     }
 
     public VbValue GetProperty(string propertyName)
@@ -47,7 +51,10 @@ public class LiveControlProxy : ILiveControl
                     return GetControlTextOrValue();
 
                 case "ENABLED":
-                    return VbValue.FromBoolean(_visual.IsEnabled);
+                    return VbValue.FromBoolean(_timer != null ? _timer.IsEnabled : _visual.IsEnabled);
+
+                case "INTERVAL":
+                    return VbValue.FromLong(_designerControl.Interval);
 
                 case "VISIBLE":
                     return VbValue.FromBoolean(_visual.Visibility == Visibility.Visible);
@@ -106,8 +113,41 @@ public class LiveControlProxy : ILiveControl
                     break;
 
                 case "ENABLED":
-                    _visual.IsEnabled = value.AsBoolean();
-                    _designerControl.Enabled = value.AsBoolean();
+                    bool en = value.AsBoolean();
+                    _visual.IsEnabled = en;
+                    _designerControl.Enabled = en;
+                    if (_timer != null)
+                    {
+                        _timer.IsEnabled = en;
+                        if (en && _designerControl.Interval > 0)
+                        {
+                            if (!_timer.IsEnabled) _timer.Start();
+                        }
+                        else
+                        {
+                            _timer.Stop();
+                        }
+                    }
+                    break;
+
+                case "INTERVAL":
+                    int ms = Math.Max(0, Math.Min(65535, (int)value.AsLong()));
+                    _designerControl.Interval = ms;
+                    if (_timer != null)
+                    {
+                        if (ms > 0)
+                        {
+                            _timer.Interval = TimeSpan.FromMilliseconds(ms);
+                            if (_designerControl.Enabled)
+                            {
+                                _timer.Start();
+                            }
+                        }
+                        else
+                        {
+                            _timer.Stop();
+                        }
+                    }
                     break;
 
                 case "VISIBLE":

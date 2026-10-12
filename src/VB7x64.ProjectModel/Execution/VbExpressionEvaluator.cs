@@ -453,6 +453,33 @@ public static class VbExpressionEvaluator
                 index++; // consumir '('
                 var args = ParseArguments(tokens, ref index, ctx);
 
+                // Función MsgBox con retorno numérico (vbOK, vbYes, vbNo, etc.)
+                if (name.Equals("MsgBox", StringComparison.OrdinalIgnoreCase) && args.Count > 0)
+                {
+                    string prompt = args[0].AsString();
+                    int buttons = args.Count > 1 ? (int)args[1].AsLong() : 0;
+                    string title = args.Count > 2 ? args[2].AsString() : string.Empty;
+                    int ret = ctx.MsgBoxHandler?.Invoke(prompt, buttons, title) ?? 1;
+                    return ParseMemberAccess(VbValue.FromLong(ret), tokens, ref index, ctx);
+                }
+
+                // Función InputBox con retorno de texto
+                if (name.Equals("InputBox", StringComparison.OrdinalIgnoreCase) && args.Count > 0)
+                {
+                    string prompt = args[0].AsString();
+                    string title = args.Count > 1 ? args[1].AsString() : string.Empty;
+                    string def = args.Count > 2 ? args[2].AsString() : string.Empty;
+                    string ret = ctx.InputBoxHandler?.Invoke(prompt, title, def) ?? string.Empty;
+                    return ParseMemberAccess(VbValue.FromString(ret), tokens, ref index, ctx);
+                }
+
+                // Función DoEvents
+                if (name.Equals("DoEvents", StringComparison.OrdinalIgnoreCase))
+                {
+                    ctx.DoEvents();
+                    return ParseMemberAccess(VbValue.FromLong(0), tokens, ref index, ctx);
+                }
+
                 // 1. Probar funciones intrínsecas del runtime
                 if (VbRuntimeFunctions.TryInvoke(name, args.ToArray(), out var fnResult))
                 {
@@ -466,6 +493,12 @@ public static class VbExpressionEvaluator
                     var res = ctrl.InvokeMethod(string.Empty, args.ToArray());
                     return ParseMemberAccess(res, tokens, ref index, ctx);
                 }
+            }
+
+            // Constantes intrínsecas estándar de VB6 (vbCritical, vbInformation, vbYesNo, vbCrLf, etc.)
+            if (VbConstants.TryGetConstant(name, out var constVal))
+            {
+                return ParseMemberAccess(constVal, tokens, ref index, ctx);
             }
 
             // Variable o referencia a control/formulario

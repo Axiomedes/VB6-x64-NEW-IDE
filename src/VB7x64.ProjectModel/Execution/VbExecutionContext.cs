@@ -89,6 +89,7 @@ public class VbExecutionContext
 
     public Stack<StackFrame> CallStack { get; } = new();
     public Dictionary<string, VbValue> ModuleVariables { get; } = new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, VbValue> StaticVariables { get; } = new(StringComparer.OrdinalIgnoreCase);
     public Dictionary<string, ILiveForm> ActiveForms { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     public VbErrObject Err { get; } = new();
@@ -102,6 +103,15 @@ public class VbExecutionContext
 
     public Func<string, int, string, int>? MsgBoxHandler { get; set; }
     public Func<string, string, string, string>? InputBoxHandler { get; set; }
+    public Action? DoEventsHandler { get; set; }
+
+    public void DoEvents()
+    {
+        DoEventsHandler?.Invoke();
+    }
+
+    public static string GetStaticVarKey(string? procedureName, string varName)
+        => $"{procedureName ?? ""}.{varName}";
 
     public StackFrame? CurrentFrame => CallStack.Count > 0 ? CallStack.Peek() : null;
 
@@ -131,7 +141,13 @@ public class VbExecutionContext
             return localVal;
         }
 
-        // 2. Control en el formulario activo del marco actual
+        // 2. Variable estática del procedimiento actual
+        if (CurrentFrame != null && StaticVariables.TryGetValue(GetStaticVarKey(CurrentFrame.ProcedureName, name), out var staticVal))
+        {
+            return staticVal;
+        }
+
+        // 3. Control en el formulario activo del marco actual
         if (CurrentFrame?.ModuleOrFormName != null &&
             ActiveForms.TryGetValue(CurrentFrame.ModuleOrFormName, out var currentForm))
         {
@@ -139,16 +155,22 @@ public class VbExecutionContext
             if (ctrl != null) return VbValue.FromObject(ctrl);
         }
 
-        // 3. Formulario activo con ese nombre
+        // 4. Formulario activo con ese nombre
         if (ActiveForms.TryGetValue(name, out var form))
         {
             return VbValue.FromObject(form);
         }
 
-        // 4. Variable a nivel de módulo o global
+        // 5. Variable a nivel de módulo o global
         if (ModuleVariables.TryGetValue(name, out var modVal))
         {
             return modVal;
+        }
+
+        // 6. Constantes intrínsecas de VB6 (vbInformation, vbOKOnly, vbCrLf, etc.)
+        if (VbConstants.TryGetConstant(name, out var constVal))
+        {
+            return constVal;
         }
 
         return VbValue.Empty;
@@ -161,6 +183,17 @@ public class VbExecutionContext
         {
             CurrentFrame.LocalVariables[name] = value;
             return;
+        }
+
+        // Si ya existe como variable estática del procedimiento actual
+        if (CurrentFrame != null)
+        {
+            string staticKey = GetStaticVarKey(CurrentFrame.ProcedureName, name);
+            if (StaticVariables.ContainsKey(staticKey))
+            {
+                StaticVariables[staticKey] = value;
+                return;
+            }
         }
 
         // Si ya existe como variable de módulo
@@ -197,6 +230,7 @@ public class VbExecutionContext
     {
         CallStack.Clear();
         ModuleVariables.Clear();
+        StaticVariables.Clear();
         ActiveForms.Clear();
         Err.Clear();
         State = ExecutionState.Stopped;

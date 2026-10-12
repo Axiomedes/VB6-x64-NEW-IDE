@@ -35,4 +35,9 @@ public static class AppVersion
     /// Autoría oficial del proyecto.
     /// </summary>
     public static string Author => "David Rojas [Axio.UK]";
+
+    /// <summary>
+    /// Licencia oficial del proyecto.
+    /// </summary>
+    public const string License = "GNU General Public License v3.0 (GPL-3.0)";
 }

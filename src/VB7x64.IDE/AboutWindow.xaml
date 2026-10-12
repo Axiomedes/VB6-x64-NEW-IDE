@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Acerca de Visual Basic x64 IDE"
-        Height="420" Width="500"
+        Height="430" Width="510"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
@@ -17,7 +17,11 @@
         <StackPanel Grid.Row="0" Margin="0,0,0,14">
             <TextBlock Text="Visual Basic x64 IDE" FontSize="20" FontWeight="Bold" Foreground="#003399"/>
             <TextBlock x:Name="TxtAuthor" Text="Author: David Rojas [Axio.UK]" FontSize="12.5" FontWeight="SemiBold" Foreground="#222222" Margin="0,4,0,0"/>
-            <TextBlock x:Name="TxtVersion" Text="Versión: 00.001.0561" FontSize="12" FontWeight="Bold" Foreground="#0055AA" Margin="0,2,0,0"/>
+            <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                <TextBlock x:Name="TxtVersion" Text="Versión: 00.001.0561" FontSize="12" FontWeight="Bold" Foreground="#0055AA"/>
+                <TextBlock Text="  •  " FontSize="12" Foreground="#888888"/>
+                <TextBlock x:Name="TxtLicenseHeader" Text="Licencia: GPL-3.0" FontSize="12" FontWeight="SemiBold" Foreground="#107C41"/>
+            </StackPanel>
             <TextBlock Text="Entorno de Desarrollo y Compilación para Proyectos VB6 en Windows x64" FontSize="11" Foreground="#555555" Margin="0,4,0,0"/>
         </StackPanel>
 
@@ -29,6 +33,11 @@
                     <TextBlock x:Name="TxtRuntime" Text="• Runtime: .NET 10 LTS" Margin="4,2"/>
                     <TextBlock x:Name="TxtEditor" Text="• Motor de Edición: AvalonEdit" Margin="4,2"/>
                     
+                    <Separator Margin="0,10,0,10" Background="#E5E7EB"/>
+                    <TextBlock Text="Licencia y Términos Legales:" FontWeight="SemiBold" Foreground="#333333" Margin="0,0,0,4"/>
+                    <TextBlock x:Name="TxtLicenseDetail" Text="• Licencia: GNU General Public License v3.0 (GPL-3.0)" FontWeight="Medium" Foreground="#107C41" Margin="4,2"/>
+                    <TextBlock Text="• Software Libre: Libertad de uso, estudio, modificación y redistribución bajo los términos de la GPLv3." FontSize="11" Foreground="#666666" Margin="4,1"/>
+
                     <Separator Margin="0,10,0,10" Background="#E5E7EB"/>
                     <TextBlock Text="Capacidades y Subsistemas:" FontWeight="SemiBold" Foreground="#333333" Margin="0,0,0,4"/>
                     <TextBlock Text="• Diseñador Visual WYSIWYG de Formularios y Controles (.frm)" Margin="4,2"/>

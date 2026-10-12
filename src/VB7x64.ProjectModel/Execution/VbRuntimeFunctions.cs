@@ -170,6 +170,9 @@ public static class VbRuntimeFunctions
     public static VbValue Minute(VbValue date) => VbValue.FromInteger((short)date.AsDate().Minute);
     public static VbValue Second(VbValue date) => VbValue.FromInteger((short)date.AsDate().Second);
 
+    public static VbValue IIf(VbValue expression, VbValue truePart, VbValue falsePart) =>
+        expression.AsBoolean() ? truePart : falsePart;
+
     #endregion
 
     public static bool TryInvoke(string functionName, VbValue[] args, out VbValue result)
@@ -179,6 +182,9 @@ public static class VbRuntimeFunctions
 
         switch (fn)
         {
+            case "IIF":
+                if (args.Length >= 3) { result = IIf(args[0], args[1], args[2]); return true; }
+                break;
             case "LEN":
                 if (args.Length >= 1) { result = Len(args[0]); return true; }
                 break;

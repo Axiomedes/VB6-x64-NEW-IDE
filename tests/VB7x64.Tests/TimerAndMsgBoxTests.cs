@@ -145,4 +145,87 @@ End Sub
         host.InvokeProcedure("Timer1_Timer", "Form1");
         Assert.Equal(3, host.Context.StaticVariables[staticKey].AsLong());
     }
+
+    [Fact]
+    public void MsgBox_WithSpaceBeforeParentheses_Statement_PassesOptions()
+    {
+        var ctx = new VbExecutionContext();
+        string receivedPrompt = "";
+        int receivedButtons = -1;
+        string receivedTitle = "";
+
+        ctx.MsgBoxHandler = (p, b, t) =>
+        {
+            receivedPrompt = p;
+            receivedButtons = b;
+            receivedTitle = t;
+            return 1;
+        };
+
+        var interp = new VbStatementInterpreter(ctx);
+        // "MsgBox ("Hola", vbCritical, "Alerta")" con espacio antes del paréntesis
+        interp.ExecuteSingleStatement("MsgBox (\"Hola\", vbCritical, \"Alerta\")");
+
+        Assert.Equal("Hola", receivedPrompt);
+        Assert.Equal(16, receivedButtons);
+        Assert.Equal("Alerta", receivedTitle);
+    }
+
+    [Fact]
+    public void MsgBox_UppercaseStatement_And_UppercaseFunctionAssignment()
+    {
+        var ctx = new VbExecutionContext();
+        string receivedPrompt = "";
+        int receivedButtons = -1;
+        string receivedTitle = "";
+
+        ctx.MsgBoxHandler = (p, b, t) =>
+        {
+            receivedPrompt = p;
+            receivedButtons = b;
+            receivedTitle = t;
+            return 6; // vbYes
+        };
+
+        var interp = new VbStatementInterpreter(ctx);
+
+        // Caso 1: MSGBOX opcion1, opcion2, opcion3 (sin paréntesis, sin retorno)
+        interp.ExecuteSingleStatement("MSGBOX \"Guardar archivo\", vbInformation, \"IDE\"");
+        Assert.Equal("Guardar archivo", receivedPrompt);
+        Assert.Equal(64, receivedButtons);
+        Assert.Equal("IDE", receivedTitle);
+
+        // Caso 2: val = MSGBOX(opcion1, opcion2, opcion3) (con paréntesis, con retorno)
+        interp.ExecuteSingleStatement("Dim val As Long");
+        interp.ExecuteSingleStatement("val = MSGBOX(\"¿Confirmar?\", vbYesNo, \"Confirmación\")");
+        Assert.Equal("¿Confirmar?", receivedPrompt);
+        Assert.Equal(4, receivedButtons);
+        Assert.Equal("Confirmación", receivedTitle);
+        Assert.Equal(6, ctx.GetVariable("val").AsLong());
+    }
+
+    [Fact]
+    public void IIf_Function_EvaluatesConditionsCorrectly()
+    {
+        var ctx = new VbExecutionContext();
+        ctx.SetVariable("a", VbValue.FromLong(10));
+
+        var res1 = VbExpressionEvaluator.Evaluate("IIf(a > 5, \"Mayor\", \"Menor\")", ctx);
+        Assert.Equal("Mayor", res1.AsString());
+
+        var res2 = VbExpressionEvaluator.Evaluate("IIf(a = 0, 100, 200)", ctx);
+        Assert.Equal(200, res2.AsLong());
+    }
+
+    [Fact]
+    public void IntelliSense_ProvidesEnumConstants_ForMsgBoxButtonsParameter()
+    {
+        var constants = VB7x64.ProjectModel.IntelliSense.VbRuntimeCatalog.GetConstantsForType("VbMsgBoxStyle");
+        Assert.NotEmpty(constants);
+        Assert.Contains(constants, c => c.Name.Equals("vbOKOnly", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(constants, c => c.Name.Equals("vbCritical", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(constants, c => c.Name.Equals("vbInformation", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(constants, c => c.Name.Equals("vbYesNo", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(constants, c => c.Name.Equals("vbYesNoCancel", StringComparison.OrdinalIgnoreCase));
+    }
 }

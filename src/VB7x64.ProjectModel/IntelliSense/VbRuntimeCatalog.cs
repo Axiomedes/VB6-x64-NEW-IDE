@@ -50,6 +50,13 @@ public static class VbRuntimeCatalog
     public static IReadOnlyCollection<VbSymbolItem> GetAllKeywords() => _keywords.Values;
     public static IReadOnlyList<VbSymbolItem> GetAllGlobalSymbols() => _allGlobalSymbols;
 
+    public static List<VbSymbolItem> GetConstantsForType(string typeName)
+    {
+        return _constants.Values
+            .Where(c => c.ReturnType != null && c.ReturnType.Equals(typeName, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
     private static void AddFunc(string name, string returnType, string description, params (string Name, string Type, bool Opt, string? Def, string Desc)[] parameters)
     {
         var paramList = parameters.Select(p => new VbParameterInfo
@@ -319,6 +326,11 @@ public static class VbRuntimeCatalog
             ("Time", "Date", false, null, "Expresión de hora válida."));
 
         // 5. Interacción y Sistema
+        AddFunc("IIf", "Variant", "Devuelve una de dos expresiones según se evalúe una expresión condicional como True o False.",
+            ("Expression", "Variant", false, null, "Expresión condicional que se evaluará."),
+            ("TruePart", "Variant", false, null, "Valor devuelto si Expression es True."),
+            ("FalsePart", "Variant", false, null, "Valor devuelto si Expression es False."));
+
         AddFunc("MsgBox", "VbMsgBoxResult", "Muestra un mensaje en un cuadro de diálogo y espera que el usuario presione un botón.",
             ("Prompt", "String", false, null, "Expresión de cadena que se muestra como mensaje."),
             ("Buttons", "VbMsgBoxStyle", true, "vbOKOnly", "Suma de valores numéricos que especifican los botones e icono a mostrar."),
@@ -395,6 +407,9 @@ public static class VbRuntimeCatalog
         AddConst("vbDefaultButton1", "VbMsgBoxStyle", "El primer botón es el predeterminado (0).");
         AddConst("vbDefaultButton2", "VbMsgBoxStyle", "El segundo botón es el predeterminado (256).");
         AddConst("vbDefaultButton3", "VbMsgBoxStyle", "El tercer botón es el predeterminado (512).");
+        AddConst("vbDefaultButton4", "VbMsgBoxStyle", "El cuarto botón es el predeterminado (768).");
+        AddConst("vbApplicationModal", "VbMsgBoxStyle", "El cuadro de diálogo es modal para la aplicación (0).");
+        AddConst("vbSystemModal", "VbMsgBoxStyle", "El cuadro de diálogo es modal para todo el sistema (4096).");
 
         AddConst("vbOK", "VbMsgBoxResult", "Se presionó el botón Aceptar (1).");
         AddConst("vbCancel", "VbMsgBoxResult", "Se presionó el botón Cancelar (2).");

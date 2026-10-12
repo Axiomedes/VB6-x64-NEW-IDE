@@ -46,6 +46,30 @@ public class IntelliSenseController
         {
             // Disparar o actualizar Parameter Info
             ShowParameterInsight(explicitTrigger: false);
+
+            if (_tabItem.Settings?.EnableIntelliSense != false && _tabItem.Settings?.AutoListMembers != false)
+            {
+                int offset = _editor.CaretOffset;
+                string docText = _editor.Text;
+                var ctx = IntelliSenseContextDetector.DetectContext(docText, offset, _tabItem.DesignModel, explicitTrigger: false, isParameterInfoTrigger: false);
+                if (ctx.Candidates.Count > 0)
+                {
+                    ShowCompletionWindow(explicitTrigger: false);
+                }
+            }
+        }
+        else if (c == ' ')
+        {
+            if (_completionWindow == null && _tabItem.Settings?.EnableIntelliSense != false && _tabItem.Settings?.AutoListMembers != false)
+            {
+                int offset = _editor.CaretOffset;
+                string docText = _editor.Text;
+                var ctx = IntelliSenseContextDetector.DetectContext(docText, offset, _tabItem.DesignModel, explicitTrigger: false, isParameterInfoTrigger: false);
+                if (ctx.Candidates.Count > 0)
+                {
+                    ShowCompletionWindow(explicitTrigger: false);
+                }
+            }
         }
         else if (c == ')')
         {
@@ -55,11 +79,11 @@ public class IntelliSenseController
         else if (char.IsLetter(c) && _completionWindow == null && _tabItem.Settings?.EnableIntelliSense != false && _tabItem.Settings?.AutoListMembers != false)
         {
             // Si el usuario escribe palabras y no hay ventana abierta, podemos verificar si está escribiendo un miembro
-            // tras un punto reciente en la misma línea
+            // tras un punto reciente en la misma línea o un Enum dentro de parámetros
             int offset = _editor.CaretOffset;
             string docText = _editor.Text;
             var ctx = IntelliSenseContextDetector.DetectContext(docText, offset, _tabItem.DesignModel, explicitTrigger: false);
-            if (ctx.Kind == IntelliSenseContextKind.MemberAccess && ctx.Candidates.Count > 0)
+            if ((ctx.Kind == IntelliSenseContextKind.MemberAccess || ctx.Candidates.Count > 0) && ctx.Candidates.Count > 0)
             {
                 ShowCompletionWindow(explicitTrigger: false);
             }

@@ -12,7 +12,8 @@ public enum IntelliSenseContextKind
     None,
     MemberAccess,
     ParameterInfo,
-    GlobalSymbols
+    GlobalSymbols,
+    EnumValues
 }
 
 /// <summary>
@@ -135,6 +136,27 @@ public static class IntelliSenseContextDetector
         {
             if (paramContext != null && paramContext.InvokedSymbol != null)
             {
+                // Si el parámetro activo requiere un tipo de enumeración (e.g. VbMsgBoxStyle),
+                // poblar la lista de candidatos para autocompletado manteniendo ParameterInfo
+                string? paramType = null;
+                if (paramContext.ParameterIndex >= 0 && paramContext.ParameterIndex < paramContext.InvokedSymbol.Parameters.Count)
+                {
+                    paramType = paramContext.InvokedSymbol.Parameters[paramContext.ParameterIndex].Type;
+                }
+
+                if (IsEnumType(paramType))
+                {
+                    var enumConsts = VbRuntimeCatalog.GetConstantsForType(paramType!);
+                    if (enumConsts.Count > 0)
+                    {
+                        string wordAtCaret = ExtractWordAtCaret(lineUpToCaret);
+                        paramContext.Prefix = wordAtCaret;
+                        paramContext.ReplaceStartPosition = caretOffset - wordAtCaret.Length;
+                        paramContext.ReplaceLength = wordAtCaret.Length;
+                        paramContext.Candidates.AddRange(enumConsts);
+                    }
+                }
+
                 return paramContext;
             }
         }
@@ -603,6 +625,23 @@ public static class IntelliSenseContextDetector
         }
 
         return CountArguments(argsPart);
+    }
+
+    private static bool IsEnumType(string? typeName)
+    {
+        if (string.IsNullOrWhiteSpace(typeName)) return false;
+        return !typeName.Equals("Long", StringComparison.OrdinalIgnoreCase) &&
+               !typeName.Equals("Integer", StringComparison.OrdinalIgnoreCase) &&
+               !typeName.Equals("String", StringComparison.OrdinalIgnoreCase) &&
+               !typeName.Equals("Variant", StringComparison.OrdinalIgnoreCase) &&
+               !typeName.Equals("Boolean", StringComparison.OrdinalIgnoreCase) &&
+               !typeName.Equals("Double", StringComparison.OrdinalIgnoreCase) &&
+               !typeName.Equals("Single", StringComparison.OrdinalIgnoreCase) &&
+               !typeName.Equals("Byte", StringComparison.OrdinalIgnoreCase) &&
+               !typeName.Equals("Date", StringComparison.OrdinalIgnoreCase) &&
+               !typeName.Equals("Object", StringComparison.OrdinalIgnoreCase) &&
+               !typeName.Equals("Any", StringComparison.OrdinalIgnoreCase) &&
+               !typeName.Equals("Void", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool IsInsideCommentOrString(string lineUpToCaret, out bool isInsideString)

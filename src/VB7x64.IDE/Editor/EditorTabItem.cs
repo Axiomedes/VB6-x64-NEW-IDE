@@ -223,6 +223,11 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
 
     private void TextArea_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.None)
+        {
+            FormatCurrentLine();
+        }
+
         if (e.Key == Key.Tab && Keyboard.Modifiers == ModifierKeys.None)
         {
             if (Editor.SelectionLength == 0 && Editor.Document != null)
@@ -379,12 +384,83 @@ public class EditorTabItem : TabItem, INotifyPropertyChanged
     }
 
     private int _lastNavLine = 1;
+    private int _lastEditLine = 1;
+    private bool _isFormattingLine = false;
+
+    public void FormatCurrentLine()
+    {
+        if (Editor.Document == null || _isFormattingLine) return;
+
+        try
+        {
+            _isFormattingLine = true;
+            int caretOffset = Editor.CaretOffset;
+            var docLine = Editor.Document.GetLineByOffset(caretOffset);
+            string originalText = Editor.Document.GetText(docLine.Offset, docLine.Length);
+
+            string formattedText = VB6LineFormatter.FormatLine(originalText);
+            if (formattedText != originalText)
+            {
+                using (Editor.Document.RunUpdate())
+                {
+                    Editor.Document.Replace(docLine.Offset, docLine.Length, formattedText);
+                }
+                if (caretOffset >= docLine.Offset + originalText.Length)
+                {
+                    Editor.CaretOffset = docLine.Offset + formattedText.Length;
+                }
+            }
+        }
+        catch
+        {
+        }
+        finally
+        {
+            _isFormattingLine = false;
+        }
+    }
+
+    public void FormatLineNumber(int lineNumber)
+    {
+        if (Editor.Document == null || _isFormattingLine) return;
+        if (lineNumber < 1 || lineNumber > Editor.Document.LineCount) return;
+
+        try
+        {
+            _isFormattingLine = true;
+            var docLine = Editor.Document.GetLineByNumber(lineNumber);
+            string originalText = Editor.Document.GetText(docLine.Offset, docLine.Length);
+
+            string formattedText = VB6LineFormatter.FormatLine(originalText);
+            if (formattedText != originalText)
+            {
+                using (Editor.Document.RunUpdate())
+                {
+                    Editor.Document.Replace(docLine.Offset, docLine.Length, formattedText);
+                }
+            }
+        }
+        catch
+        {
+        }
+        finally
+        {
+            _isFormattingLine = false;
+        }
+    }
 
     private void Caret_PositionChanged(object? sender, EventArgs e)
     {
         int line = Editor.TextArea.Caret.Line;
         int col = Editor.TextArea.Caret.Column;
         CaretPositionChanged?.Invoke(line, col);
+
+        if (_lastEditLine != line && !_isFormattingLine)
+        {
+            int prevLine = _lastEditLine;
+            _lastEditLine = line;
+            FormatLineNumber(prevLine);
+        }
 
         if (Math.Abs(line - _lastNavLine) >= 10)
         {

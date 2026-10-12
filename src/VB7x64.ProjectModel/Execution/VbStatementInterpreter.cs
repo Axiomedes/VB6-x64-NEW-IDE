@@ -394,6 +394,8 @@ public class VbStatementInterpreter
             argsStr = string.Empty;
         }
 
+        argsStr = StripOutermostParentheses(argsStr);
+
         var args = new List<VbValue>();
         if (!string.IsNullOrWhiteSpace(argsStr))
         {
@@ -788,6 +790,39 @@ public class VbStatementInterpreter
         }
 
         return list;
+    }
+
+    private static string StripOutermostParentheses(string text)
+    {
+        string trimmed = text.Trim();
+        if (trimmed.StartsWith('(') && trimmed.EndsWith(')'))
+        {
+            int depth = 0;
+            bool wrapsAll = true;
+            bool inQuotes = false;
+            for (int i = 0; i < trimmed.Length - 1; i++)
+            {
+                if (trimmed[i] == '"') inQuotes = !inQuotes;
+                else if (!inQuotes)
+                {
+                    if (trimmed[i] == '(') depth++;
+                    else if (trimmed[i] == ')')
+                    {
+                        depth--;
+                        if (depth <= 0)
+                        {
+                            wrapsAll = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (wrapsAll && depth == 1)
+            {
+                return trimmed[1..^1].Trim();
+            }
+        }
+        return trimmed;
     }
 
     private static List<string> SplitCommaArguments(string expr)

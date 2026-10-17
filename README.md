@@ -132,7 +132,7 @@ El IDE desacopla por completo la interfaz del proceso de generación de código 
   * Historial Atrás / Adelante (<kbd>Alt+←</kbd> / <kbd>Alt+→</kbd>).
   * Marcadores visuales en el margen (`🔖`) con navegación cíclica (<kbd>F2</kbd> / <kbd>Shift+F2</kbd>) y alternancia rápida (<kbd>Ctrl+F2</kbd>).
 * **Explorador de Tareas (*Task List*)**: Detección automática de directivas `' TODO:`, `' BUG:`, `' FIXME:`, `' NOTE:` y `' HACK:`.
-<img width="595" height="623" alt="{01E95DF5-CE1C-4676-8CEE-780BDEB583FD}" src="https://github.com/user-attachments/assets/181ee42f-efca-4972-8148-de8abc8a08ac" />
+<img width="300" height="312" alt="{01E95DF5-CE1C-4676-8CEE-780BDEB583FD}" src="https://github.com/user-attachments/assets/181ee42f-efca-4972-8148-de8abc8a08ac" />
 
 ---
 

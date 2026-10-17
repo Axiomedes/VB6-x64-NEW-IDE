@@ -1,189 +1,235 @@
-# VB7-x64 IDE
+# ViBa7 IDE (ViBa7-x86)
 
 [![Build & Test](https://img.shields.io/badge/.NET-10.0%20LTS-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20x64-0078D6?logo=windows)](https://microsoft.com)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20x86%20(WOW64)-0078D6?logo=windows)](https://microsoft.com)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-175%20Passing-success.svg)](tests/VB7x64.Tests)
+[![Tests](https://img.shields.io/badge/Tests-282%20Passing-success.svg)](tests/ViBa7.Tests)
+[![Version](https://img.shields.io/badge/Version-00.001.0576-informational.svg)](src/ViBa7.IDE/AppVersion.cs)
+[![Architecture](https://img.shields.io/badge/Architecture-Dual%20Toolchain%20(x32%20%7C%20x64)-orange.svg)](docs/TOOLCHAIN_SPEC.md)
 
-Un entorno de desarrollo integrado (IDE) moderno para **Windows x64** inspirado en **Microsoft Visual Basic 6.0**, diseñado para abrir, explorar, editar, diseñar y refactorizar proyectos clásicos de VB6 (`.vbp`, `.vbg`, `.bas`, `.cls`, `.frm`, `.ctl`, `.pag`) de forma nativa en sistemas de 64 bits, con total seguridad y sin corromper sus formatos ni recursos binarios.
-
-<img width="800" height="600" alt="{B3C140AD-5074-4806-9E99-97C02727499A}" src="https://github.com/user-attachments/assets/c0e8be77-11b8-4247-b2a9-55ed0bca5943" />
+<p align="center">
+  <img width="800" height="600" alt="ViBa7-x86 IDE" src="https://github.com/user-attachments/assets/c0e8be77-11b8-4247-b2a9-55ed0bca5943" />
+</p>
 
 ---
 
-## 🌟 Características Implementadas
+## 1. Visión y Propósito del Proyecto
 
-### 1. Diseñador Visual de Formularios (Form Designer WYSIWYG)
-* **Superficie de Diseño Bidireccional**: Renderizado fiel del formulario visual a partir de la cabecera `Begin VB.Form...End` de archivos `.frm`.
-* **Soporte de Contenedores y Jerarquías**: Capacidad para dibujar controles directamente sobre o dentro de contenedores (e.g. botones o cajas de texto dentro de un `Frame` o `PictureBox`), manteniendo su pertenencia en la jerarquía visual.
-* **Portapapeles en el Diseñador**: Operaciones completas de **Copiar**, **Cortar** y **Pegar** (<kbd>Ctrl+C</kbd>, <kbd>Ctrl+X</kbd>, <kbd>Ctrl+V</kbd>) que permiten duplicar controles con nombres únicos autogenerados, mover controles entre contenedores o pegarlos en otros formularios.
-* **Diferenciación entre Form y UserControl**: Detección del tipo de raíz; los formularios disponen de barra de título y borde estándar de Windows, mientras que los `UserControl` se presentan como lienzos puros sin barra superior.
-* **Controles No Visibles en Ejecución**: Controles como `Timer` mantienen un tamaño fijo (32×32 px / 480×480 twips) no redimensionable en diseño.
-* **Rejilla y Ajuste (Grid & Snap to Grid)**: Rejilla de puntos visual personalizable con paso ajustable y alineación magnética automática.
-* **Alternancia Rápida Código ↔ Objeto**: Botones dedicados en la barra de herramientas y atajos estándar (<kbd>F7</kbd> para Código, <kbd>Shift+F7</kbd> para Diseñador visual).
-  <img width="600" height="510" alt="{79B68E45-75E7-44B6-8E14-6BA66121F5E1}" src="https://github.com/user-attachments/assets/55b15372-5360-405d-8ef9-a94e40fea98f" />
+**ViBa7 IDE** es un entorno de desarrollo integrado (IDE) y diseñador visual moderno desarrollado en **C# y WPF sobre .NET 10 LTS**, ejecutándose como un proceso nativo en **32 bits (Win-x86)** con soporte de **4 GB de memoria virtual (`LARGEADDRESSAWARE`)**. 
 
-### 2. Editor de Menús Clásico de VB6 (<kbd>Ctrl+E</kbd>)
-* **Diálogo de Edición Jerárquica de Menús**: Réplica moderna del editor de menús de VB6 accesible con <kbd>Ctrl+E</kbd> o desde el menú de herramientas.
-* **Estructura en Árbol con Puntos de Nivel**: Visualización de niveles de profundidad mediante puntos guía (`....Menú`) al utilizar los botones de sangría (**►** / **◄**).
-* **Propiedades de Menú**: Configuración de `Caption`, `Name`, `Index`, `Shortcut` (atajos de teclado estándar como <kbd>Ctrl+O</kbd>, <kbd>F1</kbd>, etc.), `Checked`, `Enabled` y `Visible`.
-* **Reordenación Dinámica**: Botones de navegación (Subir **▲**, Bajar **▼**, Insertar, Eliminar, Siguiente).
-* **Sincronización Automática**: Serialización y deserialización transparente de las estructuras `Begin VB.Menu...End` en el archivo `.frm`.
-<img width="590" height="370" alt="{BB9529BE-444A-4D98-8047-FA142D1CC46C}" src="https://github.com/user-attachments/assets/7f7ff856-be5b-47a5-9062-19128916caef" />
+Su misión central es proporcionar **100% de retrocompatibilidad en diseño y codificación con Microsoft Visual Basic 6.0 SP6**, permitiendo abrir, diseñar, editar, depurar y compilar proyectos clásicos (`.vbp`, `.vbg`, `.frm`, `.ctl`, `.pag`, `.bas`, `.cls`) sin alterar formatos, saltos de línea ni páginas de códigos ANSI.
 
-### 3. Servicios de Lenguaje e IntelliSense
-* **Auto List Members (<kbd>Ctrl+J</kbd> / `.`)**: Despliegue automático de listas de miembros con iconos descriptivos para propiedades, métodos y eventos al escribir el punto (`.`) o de forma manual.
-* **Auto Parameter Info (<kbd>Ctrl+I</kbd>)**: Tooltip interactivo con firmas completas de argumentos para funciones del runtime y métodos de objetos, con resaltado dinámico en negrita del parámetro actualmente activo.
-* **Auto Complete Word (<kbd>Ctrl+Espacio</kbd>)**: Autocompletado inteligente de palabras clave, nombres de controles y variables locales/globales con filtrado incremental.
-* **Catálogo Exhaustivo de VB6**: Biblioteca preconfigurada con todas las funciones intrínsecas (`Mid`, `MsgBox`, `InStr`, etc.), constantes de sistema (`vbCrLf`, `vbInformation`, `vbNormal`, etc.), tipos de datos y miembros de todos los controles estándar.
-<img width="1741" height="520" alt="{48815C18-517A-4B98-B869-3923965FB4BE}" src="https://github.com/user-attachments/assets/050198c3-ea1c-491c-bd68-390b7abf3557" />
+### Estrategia de Compilación Bifurcada (Dual Toolchain)
+El IDE desacopla por completo la interfaz del proceso de generación de código máquina, adoptando el estándar formal [TOOLCHAIN_SPEC.md](docs/TOOLCHAIN_SPEC.md):
+1. **Compilador x32 (`vbc32.exe`)**: Desarrollo independiente para generar binarios PE32 nativos 100% compatibles con VB6 SP6 enlazados directamente a `msvbvm60.dll`.
+2. **Compilador x64 (`vbc64.exe`)**: Desarrollo independiente para compilar proyectos nuevos creados desde cero en ViBa7 a ejecutables nativos de 64 bits (PE64), con soporte para tipos extendidos (`LongPtr`, `LongLong`, `PtrSafe`, `#If Win64`).
 
-### 4. Soporte para Componentes ActiveX / OCX en Tiempo de Diseño
-* **Lector Nativo TypeLib COM x64**: Motor P/Invoke a `oleaut32.dll!LoadTypeLibEx` con modo `REGKIND_NONE` que lee metadatos COM directamente desde archivos `.ocx`, `.dll` o `.tlb` en procesos x64 **sin requerir registro en Windows ni permisos de administrador**.
-* **Diálogo de Componentes (<kbd>Ctrl+T</kbd>)**:
-  * Accesible desde `Proyecto ➔ Componentes...` o con el atajo clásico <kbd>Ctrl+T</kbd>.
-  * Exploración de disco mediante el botón **Examinar...** para cargar cualquier archivo `.ocx` o `.tlb`.
-  * Visualización de ruta, biblioteca, GUID, versión y controles expuestos.
-  * Persistencia automática de directivas `Object={GUID}#Ver#0; Archivo.ocx` en el archivo de proyecto `.vbp`.
-  * Carga y registro automático de componentes al abrir cualquier `.vbp` o `.vbg`.
-* **Integración en la Caja de Herramientas (*Toolbox*)**: Los controles del OCX se incorporan dinámicamente como herramientas seleccionables para dibujarse en el formulario.
-* **Expansión Dinámica de IntelliSense**: Al instanciar un control OCX o declarar una variable tipada (e.g. `Dim c As axJColCombo`), IntelliSense ofrece todas sus propiedades, métodos, firmas y eventos en tiempo real.
-* **Renderizado Adaptativo en Diseñador**: Los controles OCX se representan gráficamente en el formulario según su categoría (controles de lista/combo se visualizan interactivos y controles generales muestran el distintivo `🧩`).
+---
 
-### 5. Editor de Código y Productividad Visual
-* **Editor AvalonEdit Optimizado**: Resaltado sintáctico fiel para VB6 (keywords, tipos, literales de fecha `#mm/dd/yyyy#`, cadenas escapadas, comentarios con apóstrofe y `Rem`).
-* **Resaltado de Línea Activa**: Resaltado sutil y configurable de la línea donde se ubica el cursor.
-* **Guías de Estructura de Control (Branch Lines)**: Líneas verticales que conectan bloques `If...End If`, `Select Case`, `For...Next`, `Do...Loop`, `With...End With` y procedimientos.
-* **Detalles de Fin de Bloque (Inlay Hints / Ghost Text)**: Anotaciones discretas al final de bloques extensos (ej. `End If  ' [If precio > 100]`).
-* **Edición Rápida**: Comentar/descomentar en bloque (<kbd>Ctrl+K, Ctrl+C</kbd> / <kbd>Ctrl+K, Ctrl+U</kbd>), invertir asignaciones (`A = B` ⇄ `B = A`) y conversión de mayúsculas/minúsculas.
+## 2. Fundamentación Arquitectónica: ¿Por qué el IDE en 32 Bits?
 
-### 6. Exploración y Navegación Avanzada
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                   ESPACIO DE MEMORIA DEL PROCESO                       │
+├───────────────────────────────────┬────────────────────────────────────┤
+│   Proceso IDE x64                 │   Proceso ViBa7 IDE x86            │
+│   ❌ NO puede cargar DLLs/OCX x86 │   ✔ Carga directa en memoria de    │
+│   ❌ Requiere IPC / Out-of-proc   │     todos los OCX y TypeLibs       │
+│   ❌ Pérdida de eventos nativos   │   ✔ OLE In-Place Activation nativo │
+│   ❌ Incompatible con msvbvm60    │   ✔ Compatible directo con runtime │
+└───────────────────────────────────┴────────────────────────────────────┘
+```
+
+1. **Alojamiento Nativo de Controles ActiveX (.OCX)**:  
+   La inmensa mayoría de aplicaciones comerciales de VB6 utilizan controles `.ocx` de terceros (FarPoint Spread, MSComCtl, Sheridan, TrueDBGrid, etc.) cuyos códigos fuente están perdidos. En Windows, un proceso de 64 bits no puede cargar librerías de 32 bits en su espacio de memoria. Al ejecutarse en 32 bits, ViBa7 aloja, dibuja e interactúa directamente con cualquier control OCX mediante las interfaces estándar COM/OLE (`IOleObject`, `IOleClientSite`, `IOleInPlaceSite`).
+2. **Capacidad de Orquestación x64**:  
+   En Windows de 64 bits, un proceso de 32 bits dispone de 4 GB de memoria virtual gracias a `LARGEADDRESSAWARE` y puede iniciar, comunicar y depurar procesos y compiladores de 64 bits (`vbc64.exe`) sin ninguna restricción.
+
+---
+
+## 3. Características Implementadas
+
+### 🎨 Diseñador Visual de Formularios y Controles (WYSIWYG)
+* **Lienzo de Diseño Bidireccional**: Renderizado fidedigno a partir de las cabeceras `Begin VB.Form...End` de archivos `.frm`.
+* **Soporte de Contenedores Jerárquicos**: Inserción y arrastre de controles dentro de contenedores (`Frame`, `PictureBox`), manteniendo su árbol visual y coordenadas relativas.
+* **Portapapeles Completo en Diseño**: Operaciones de **Copiar**, **Cortar** y **Pegar** (<kbd>Ctrl+C</kbd>, <kbd>Ctrl+X</kbd>, <kbd>Ctrl+V</kbd>) con cálculo automático de sufijos numéricos unívocos para nombres duplicados.
+* **Matrices de Controles (`Control Arrays`)**: Soporte para la propiedad `Index`, duplicación de controles con el mismo nombre y despacho del argumento `Index As Integer` en eventos compartidos.
+* **Herramienta Gotero de Color (*EyeDropper*)**: Captura de color interactiva de cualquier píxel de la pantalla con asignación directa a propiedades de color (`BackColor`, `ForeColor`).
+* **Manejo Integral de Recursos Binarios (`.frx`)**: Carga, visualización y persistencia de streams de imágenes, mapas de bits e iconos vinculados a formularios y controles sin desfasar sus offsets.
+* **Rejilla Magnética (*Grid & Snap to Grid*)**: Rejilla de puntos ajustable con alineación magnética para posicionamiento preciso de controles.
+* **Alternancia Rápida Código ↔ Objeto**: Atajos estándar (<kbd>F7</kbd> para Código, <kbd>Shift+F7</kbd> para Diseñador visual).
+
+<p align="center">
+  <img width="600" height="510" alt="Diseñador de Formularios" src="https://github.com/user-attachments/assets/55b15372-5360-405d-8ef9-a94e40fea98f" />
+</p>
+
+---
+
+### 🎛️ Soporte Completo de UserControls (`.ctl` / `.ctx`)
+* **Integración en Toolbox**: Los controles de usuario presentes en el proyecto se registran automáticamente en la Caja de Herramientas con el distintivo `🎛️` y su identificador calificado (`Proyecto.MiUserControl`).
+* **Composición Visual Recursiva**: Al colocar un UserControl sobre un formulario, el diseñador lee recursivamente su archivo `.ctl` y dibuja con fidelidad todos sus controles constitutivos (etiquetas, botones, cajas de texto).
+* **Extracción Automática de Propiedades y Enums**: Analizador estático que detecta declaraciones `Property Get/Let/Set`, bloques de enumeración públicos (`Enum`) y persistencia `PropertyBag`, exponiéndolos de forma interactiva en la Ventana de Propiedades.
+* **Escala HiMetric ↔ Twips**: Conversión bidireccional exacta de dimensiones de diseño HiMetric (`_ExtentX`, `_ExtentY`) a Twips y píxeles ($1\text{ pulgada} = 2540\text{ HiMetric} = 1440\text{ Twips}$).
+* **Contenedor de Pruebas (*Test Container*)**: Al pulsar <kbd>F5</kbd> sobre un archivo `.ctl` activo, se lanza en un contenedor de prueba interactivo para ensayar su ciclo de vida y eventos de forma aislada.
+
+---
+
+### 🧩 Soporte para Controles ActiveX / OCX de Terceros
+* **Lector Nativo TypeLib COM**: Invocación P/Invoke a `oleaut32.dll!LoadTypeLibEx` con la bandera `REGKIND_NONE`, permitiendo inspeccionar metadatos de archivos `.ocx`, `.dll` y `.tlb` sin requerir permisos de administrador.
+* **Diálogo Avanzado de Componentes (<kbd>Ctrl+T</kbd>)**:
+  * Escaneo exhaustivo del Registro de Windows (vistas de 32 y 64 bits) y carpetas de sistema para listar todos los controles y TypeLibs registrados.
+  * Casillas de verificación para activar/desactivar componentes en el proyecto activo.
+  * Autoregistro de componentes en disco (`regsvr32.exe /s` y `LoadTypeLibEx REGKIND_REGISTER`).
+  * Persistencia bidireccional de directivas `Object={GUID}#Ver#0; Archivo.ocx` en el archivo `.vbp`.
+* **Páginas de Propiedades de Fabricante `(Custom)`**: Exposición de la propiedad `(Custom)` para invocar los cuadros de diálogo nativos del fabricante del control OCX.
+* **Incorporación en Toolbox e IntelliSense Dinámico**: Los controles del OCX se suman automáticamente a la caja de herramientas con el glifo `🧩` y expanden el catálogo de miembros y eventos expuestos.
+
+---
+
+### 📋 Editor de Menús Clásico (<kbd>Ctrl+E</kbd>)
+* **Diálogo Jerárquico de Menús**: Réplica moderna del editor de menús de VB6.
+* **Visualización de Niveles**: Identificación visual de jerarquía mediante sangrías con puntos guía (`....Menú`) controlados mediante los botones **►** y **◄**.
+* **Configuración de Propiedades**: Edición de `Caption`, `Name`, `Index`, `Shortcut` (<kbd>Ctrl+O</kbd>, <kbd>F1</kbd>, etc.), `Checked`, `Enabled` y `Visible`.
+* **Reordenación y Sincronización**: Botones Subir (**▲**), Bajar (**▼**), Insertar, Eliminar y Siguiente, con serialización y deserialización automática de las estructuras `Begin VB.Menu...End` en el archivo `.frm`.
+
+<p align="center">
+  <img width="590" height="370" alt="Editor de Menús" src="https://github.com/user-attachments/assets/7f7ff856-be5b-47a5-9062-19128916caef" />
+</p>
+
+---
+
+### 💡 Servicios de Lenguaje e IntelliSense
+* **Auto List Members (<kbd>Ctrl+J</kbd> / `.`)**: Despliegue de listas de miembros con iconos tipados para propiedades, métodos y eventos al escribir el punto (`.`) o bajo demanda.
+* **Auto Parameter Info (<kbd>Ctrl+I</kbd>)**: Tooltip interactivo con firmas completas de funciones y métodos, con resaltado en negrita del parámetro actualmente activo.
+* **Auto Complete Word (<kbd>Ctrl+Espacio</kbd>)**: Autocompletado inteligente de palabras reservadas, tipos, variables locales y globales.
+* **IntelliSense para Enumeraciones**: Detección contextual y sugerencia automática de miembros enum (ej. constantes `vbInformation`, `vbCritical`, `vbYesNoCancel`, `vbNormalFocus`).
+* **Auto-Corrector Canónico de Mayúsculas/Minúsculas**: Corrección automática del estilo y casing oficial de palabras reservadas e identificadores reconocidos al confirmar una línea.
+* **Catálogo Exhaustivo del Runtime**: Base de datos completa con funciones intrínsecas de cadena, matemáticas, conversión, fecha y tiempo (`Mid`, `InStr`, `MsgBox`, `Format`, etc.).
+
+<p align="center">
+  <img width="800" alt="IntelliSense y Autocompletado" src="https://github.com/user-attachments/assets/050198c3-ea1c-491c-bd68-390b7abf3557" />
+</p>
+
+---
+
+### 📝 Editor de Código y Productividad Visual
+* **Editor AvalonEdit Personalizado**: Motor de renderizado de texto optimizado para sintaxis VB6/ViBa7.
+* **Plegado y Desplegado de Código (*Code Folding*)**: Colapso visual de rutinas `Sub`, `Function`, `Property`, bloques `Type...End Type` y `Enum...End Enum`.
+* **Guías de Estructura de Control (*Branch Lines*)**: Líneas verticales guía que conectan la apertura y cierre de bloques `If...End If`, `Select Case`, `For...Next`, `Do...Loop` y `With...End With`.
+* **Detalles de Fin de Bloque (*Inlay Hints / Ghost Text*)**: Anotaciones descriptivas automáticas al final de bloques extensos (ej. `End If  ' [If total > 0]`).
+* **Operaciones de Edición Rápida**: Comentar/descomentar en bloque (<kbd>Ctrl+K, Ctrl+C</kbd> / <kbd>Ctrl+K, Ctrl+U</kbd>), inversión de asignaciones (`A = B` ⇄ `B = A`) y cambio de mayúsculas/minúsculas.
+
+---
+
+### 🔍 Exploración y Navegación Avanzada
 * **Explorador de Proyectos Dual**:
-  * **Modo Estándar**: Árbol clásico purista de VB6 (Proyecto ➔ Carpetas de tipos ➔ Archivos).
-  * **Modo Avanzado**: Expansión en profundidad de componentes internos (Sub, Function, Property, Eventos, Constantes, Variables de módulo, Enums y Types).
-  * **Filtrado en Tiempo Real**: Cuadro de búsqueda dinámica instantánea para proyectos, archivos y miembros.
-* **Búsqueda de Referencias y Usos (Find References - <kbd>Shift+F12</kbd>)**: Localiza apariciones del identificador en el archivo, proyecto o grupo `.vbg`, excluyendo comentarios y cadenas, con navegación por doble clic.
-* **Historial de Navegación y Marcadores (Bookmarks)**:
+  * **Modo Estándar**: Árbol tradicional agrupado por carpetas funcionales (Formularios, Módulos, Clases, Controles de usuario).
+  * **Modo Avanzado**: Desglose profundo de miembros internos (Sub, Function, Property, Eventos, Constantes, Variables de módulo y Enums).
+* **Búsqueda de Referencias y Usos (*Find References* - <kbd>Shift+F12</kbd>)**: Localiza todas las apariciones de un símbolo en el archivo, proyecto o grupo `.vbg`.
+* **Historial de Navegación y Marcadores (*Bookmarks*)**:
   * Historial Atrás / Adelante (<kbd>Alt+←</kbd> / <kbd>Alt+→</kbd>).
-  * Marcadores visuales en el margen (`🔖`) con navegación secuencial (<kbd>F2</kbd> / <kbd>Shift+F2</kbd>) y alternancia rápida (<kbd>Ctrl+F2</kbd>).
-* **Explorador de Tareas (TODO / Task List)**: Escaneo automático de etiquetas `' TODO:`, `' BUG:`, `' FIXME:`, `' NOTE:` y `' HACK:` con priorización y salto a la línea.
-
-### 7. Asistentes de Código y Snippets
-* **Asistente de Propiedades (Property Builder)**: Generación automática de bloques `Property Get/Let` (tipos primitivos) y `Property Get/Set` (objetos) con variable de respaldo tipada.
-* **Asistente de Procedimientos (Procedure Builder)**: Diálogo interactivo para declarar métodos con visibilidad, tipos de retorno, argumentos tipados (`ByVal`/`ByRef`/`Optional`) y manejo de errores.
-* **Biblioteca de Snippets (AutoText con expansión por <kbd>Tab</kbd>)**: Plantillas para `if`, `ife`, `sel`, `for`, `fore`, `dow`, `dou`, `whi`, `with`, `prop`, `sub`, `fn`, `err`.
-* **Portapapeles Múltiple (Clipboard Ring - <kbd>Ctrl+Shift+V</kbd>)**: Historial rotativo de los últimos fragmentos copiados con previsualización e inserción directa.
-
-### 8. Mantenimiento y Calidad de Código
-* **Formateador de Código VB6 (Code Formatter)**: Indentación automática según profundidad de anidación, alineación estética de cláusulas `As` en declaraciones `Dim` y normalización de líneas en blanco.
-* **Ordenador de Procedimientos (Sort Procedures)**: Reorganización alfabética o por visibilidad preservando el bloque de declaraciones de módulo.
-* **Comparador de Cambios (File Diff Viewer)**: Visor de diferencias lado a lado y unificado con coloreado de adiciones y supresiones frente a la versión en disco.
-* **Estadísticas de Proyecto (Project Statistics)**: Dashboard analítico con cálculo de SLOC efectivo, volumen de comentarios, recuento de procedimientos y desglose por archivo.
-* **Motor de Manejo de Errores (Error Handling Engine)**: Inserción y retiro masivo de esquemas configurables (`MsgBox`, `Debug.Print`, `HandleError`, `On Error Resume Next`) con soporte de macros dinámicas.
-* **Inyección de Trazas (Tracing Engine)**: Inyección y retiro antes de producción de marcas de trazabilidad (`Debug.Print "--> Entrando a ..."`) con identificadores unívocos (`' [VB7_TRACE]`).
-* **Diseñador de Orden de Tabulación (Tab Order Designer)**: Reordenación manual o auto-ordenación geográfica (Top ➔ Left) de la propiedad `TabIndex` en formularios.
-* **Verificador de Teclas Rápidas (Hotkey Designer)**: Detección y auto-resolución de conflictos de aceleradores `&` en `Caption`.
-* **Analizador de Calidad de Código (Code Analyzer)**: Auditoría estática que reporta falta de `Option Explicit`, código muerto en rutinas `Private` huérfanas, variables sin utilizar y procedimientos vacíos.
-
-### 9. Ejecución en Caliente (Hot-Run / <kbd>F5</kbd>) y Ventana Inmediata
-* **Ejecución Instantánea en Memoria**: Lanzamiento inmediato de formularios y módulos de código sin compilar a disco, utilizando el motor de evaluación e interpretación con semántica exacta de VB6.
-* **Anfitrión Visual Interactivo (`LiveFormWindow`)**: Instanciación dinámica de controles nativos (`CommandButton`, `TextBox`, `Label`, `CheckBox`, `OptionButton`, `ListBox`, `ComboBox`, `Frame`, `Timer`, `Menu`) con proxies bidireccionales (`LiveControlProxy` y `LiveFormProxy`).
-* **Despacho Reactivo de Eventos**: Soporte completo para `Form_Load`, `Click`, `Change`, `Timer`, `DblClick` y `Form_Unload`.
-* **Ventana Inmediata (Immediate Window - <kbd>Ctrl+G</kbd>)**:
-  * Evaluación instantánea de expresiones mediante `? expr` o `Print expr`.
-  * Ejecución directa de sentencias (`Variable = Valor`, llamadas a procedimientos).
-  * Consola de salida de `Debug.Print` en tiempo de ejecución.
-  * Historial de comandos navegable con las flechas <kbd>↑</kbd> y <kbd>↓</kbd>.
-* **Controles de Depuración**:
-  * Iniciar (<kbd>F5</kbd> / Botón ▶️ en Toolbar).
-  * Interrumpir / Pausa (<kbd>Ctrl+Break</kbd> / Botón ⏸️).
-  * Detener / Terminar (<kbd>Shift+F5</kbd> / Botón ⏹️).
-  * Paso a paso por instrucciones (<kbd>F8</kbd>) y por procedimientos (<kbd>Shift+F8</kbd>).
-  * Gestión de Puntos de Interrupción (<kbd>F9</kbd> / <kbd>Ctrl+Shift+F9</kbd>).
-
-### 10. Compilación Nativa x32 con Runtime MSVBVM60.DLL (<kbd>Ctrl+Shift+B</kbd>)
-* **Emisor Nativo PE32 Autónomo**: Generación directa de archivos binarios ejecutables `.exe` de 32 bits (arquitectura x86) sin necesidad de tener instalado el compilador clásico de Microsoft (`VB6.EXE` ni `LINK.EXE`).
-* **Enlace Canónico a `msvbvm60.dll`**: Importación estándar de `msvbvm60.dll!ThunRTMain` mediante tabla de importación IAT y stub x86 de inicio (`push offset VBHeader; call [IAT_ThunRTMain]; ret`).
-* **Estructuras Binarias VB6 (`VB5!`)**: Construcción en bajo nivel del grafo binario oficial de VB6 (`VBHeader`, `ProjInfo`, `ProjectData`, `ObjectTable`, `ObjectInfo`).
-* **Diálogo de Compilación (`Make EXE`)**:
-  * Accesible desde `Archivo ➔ Generar <Proyecto>.exe...`, atajo <kbd>Ctrl+Shift+B</kbd> o botón con engranaje en la barra de herramientas.
-  * Exploración de disco para definir la ruta y nombre del binario.
-  * Control total de propiedades de versión (Mayor, Menor, Revisión) con soporte de auto-incremento automático.
-  * Metadatos descriptivos completos incrustados en el ejecutable: Nombre de la compañía, descripción del archivo y copyright legal.
-* **Compatibilidad Universal sin Dependencias**: Los binarios generados se ejecutan de manera transparente en cualquier versión de Windows (desde Windows 98 hasta Windows 11 64-bit) gracias al runtime nativo preinstalado de fábrica en el sistema (`SysWOW64\msvbvm60.dll`).
-
-### 11. Soporte Completo de UserControls (`.ctl`) en Diseño y Ejecución en Caliente
-* **Aparición Dinámica en la Caja de Herramientas (*Toolbox*)**: Los UserControls presentes en el proyecto se registran automáticamente en la Toolbox con el icono distintivo `🎛️` y nombre calificado (`Proyecto.MiUserControl`).
-* **Composición Visual Fiel en el Diseñador**: Al arrastrar o incrustar un UserControl en un formulario, el diseñador compone y dibuja recursivamente todos sus controles constitutivos (botones, etiquetas, cajas de texto, etc.) leídos directamente desde el archivo `.ctl`.
-* **Soporte de Propiedades de Geometría y Escala**: Conversión bidireccional exacta de dimensiones HiMetric (`_ExtentX`, `_ExtentY`) a Twips y píxeles (`Twips = HiMetric * 0.567`).
-* **Contenedor de Pruebas de UserControl (*Test Container*)**: Al pulsar <kbd>F5</kbd> sobre un archivo `.ctl` activo, se lanza en un contenedor de prueba interactivo con marco de prueba y fondo neutro `#808080` para evaluar su comportamiento y eventos de forma aislada.
-* **Ejecución en Caliente Interactiva (Hot-Run / <kbd>F5</kbd>)**:
-  * Instanciación y renderizado dinámico de los controles internos del UserControl dentro de formularios en tiempo de ejecución.
-  * Disparo automático de eventos de ciclo de vida (`UserControl_Initialize`, `Resize`, `Paint`, `Terminate`).
-  * Despacho y propagación bidireccional de eventos entre los controles internos del UserControl y el formulario anfitrión.
+  * Marcadores visuales en el margen (`🔖`) con navegación cíclica (<kbd>F2</kbd> / <kbd>Shift+F2</kbd>) y alternancia rápida (<kbd>Ctrl+F2</kbd>).
+* **Explorador de Tareas (*Task List*)**: Detección automática de directivas `' TODO:`, `' BUG:`, `' FIXME:`, `' NOTE:` y `' HACK:`.
 
 ---
 
-## 🛡️ Principios e Invariantes de Seguridad
-
-1. **Cero Corrupción de Archivos**: Los archivos que no son modificados por el usuario se preservan byte a byte idénticos al original.
-2. **Preservación Estricta de Cabeceras Visuales**: La edición de formularios `.frm`, controles `.ctl` y páginas `.pag` opera sobre el código de usuario, protegiendo las cabeceras `Begin...End` y metadatos de diseño.
-3. **Codificación ANSI (Windows-1252) y Saltos CRLF**: Todo guardado mantiene rigurosamente la página de códigos Windows y terminadores `\r\n`.
-4. **Protección de Recursos Binarios**: Archivos `.frx` y recursos binarios nunca son procesados como texto y se mantienen inalterados.
-5. **Reemplazo Atómico y Copias de Respaldo**: Escritura mediante archivos temporales con reemplazo atómico y generación opcional de `.bak`.
+### ⚡ Asistentes de Código y Snippets
+* **Asistente de Propiedades (*Property Builder*)**: Generación interactiva de bloques `Property Get/Let` (valores primitivos) y `Property Get/Set` (referencias a objetos).
+* **Asistente de Procedimientos (*Procedure Builder*)**: Diálogo interactivo para declarar métodos con visibilidad, parámetros tipados (`ByVal`/`ByRef`/`Optional`) y plantillas de captura de errores.
+* **Biblioteca de Snippets (AutoText con <kbd>Tab</kbd>)**: Expansión rápida para estructuras de control frecuentes (`if`, `ife`, `sel`, `for`, `dow`, `dou`, `whi`, `with`, `prop`, `sub`, `fn`, `err`).
+* **Portapapeles Múltiple (*Clipboard Ring* - <kbd>Ctrl+Shift+V</kbd>)**: Historial dinámico de los últimos fragmentos copiados con selector emergente e inserción directa.
 
 ---
 
-## 🏗️ Estructura de la Solución
+### 🛠️ Mantenimiento y Calidad de Código
+* **Formateador de Código (*Code Formatter*)**: Indentación basada en anidación, alineación estética de cláusulas `As` en declaraciones `Dim` y normalización de saltos de línea.
+* **Ordenador de Procedimientos (*Sort Procedures*)**: Clasificación alfabética o por visibilidad preservando el encabezado de declaraciones.
+* **Comparador de Cambios (*File Diff Viewer*)**: Visor de diferencias unificado y lado a lado frente a la versión guardada en disco.
+* **Estadísticas de Proyecto (*Project Statistics*)**: Métricas de líneas efectivas (SLOC), líneas de comentarios, densidad y total de procedimientos.
+* **Motor de Manejo de Errores y Trazas**: Inserción o retiro masivo de esquemas de error y sentencias de trazabilidad con marcadores únicos (`' [VIBA7_TRACE]`).
+* **Diseñador de Orden de Tabulación (*Tab Order Designer*)**: Visualización y reordenamiento interactivo o geográfico de la propiedad `TabIndex`.
+* **Verificador de Teclas Rápidas (*Hotkey Designer*)**: Detección y corrección de colisiones de aceleradores `&` en etiquetas y botones.
+
+---
+
+### 🚀 Ejecución en Caliente (Hot-Run / <kbd>F5</kbd>) y Ventana Inmediata
+* **Ejecución Instantánea en Memoria**: Lanzamiento inmediato de la interfaz y lógica del proyecto sin requerir compilación a disco.
+* **Anfitrión Visual Interactivo (`LiveFormWindow`)**: Instanciación dinámica de controles con proxies bidireccionales (`LiveControlProxy`, `LiveFormProxy`).
+* **Temporizadores Funcionales (`Timer`)**: Ejecución continua del temporizador con respeto a la propiedad `Interval`, disparo del evento `_Timer` y persistencia de variables estáticas.
+* **Ventana Inmediata (*Immediate Window* - <kbd>Ctrl+G</kbd>)**:
+  * Evaluación de expresiones mediante `? expr` o `Print expr`.
+  * Asignación y ejecución de sentencias en tiempo de ejecución (`Variable = Valor`, llamadas a rutinas).
+  * Consola de salida de instrucciones `Debug.Print`.
+* **Controles de Depuración**: Iniciar (<kbd>F5</kbd>), Pausa (<kbd>Ctrl+Break</kbd>), Detener (<kbd>Shift+F5</kbd>), Paso a paso (<kbd>F8</kbd> / <kbd>Shift+F8</kbd>) y Puntos de Interrupción (<kbd>F9</kbd>).
+
+---
+
+### 📦 Arquitectura de Compilación: Toolchain Satélite x32 y x64
+Conforme a [docs/TOOLCHAIN_SPEC.md](docs/TOOLCHAIN_SPEC.md), el IDE interactúa con compiladores satélites independientes mediante CLI y diagnósticos estructurados en JSON:
+* **Compilador x32 (`vbc32.exe`)**:
+  * Salida: PE32 (i386) nativo.
+  * Runtime: Enlace canónico a `msvbvm60.dll!ThunRTMain`.
+  * Estructuras: Grafo binario oficial `VB5!` (`VBHeader`, `ProjInfo`, `ObjectTable`).
+  * 100% de compatibilidad binaria para ejecutar en cualquier Windows (desde Windows 98 hasta Windows 11).
+* **Compilador x64 (`vbc64.exe`)**:
+  * Salida: PE64 (x86-64 / AMD64) nativo.
+  * Runtime: Enlace a `vbrunt64.dll` (Modern VB64 Runtime).
+  * Sintaxis extendida: Tipos `LongPtr`, `LongLong` (entero 64 bits con sufijo `^`), `Declare PtrSafe Sub...`, `#If Win64 Then`.
+  * Diseñado para proyectos nuevos creados desde cero que requieren superar el límite de 4 GB de memoria.
+
+---
+
+## 4. Estructura de la Solución y Base de Conocimiento
 
 ```text
-VB7x64.sln
+ViBa7-x86.slnx
 ├── src/
-│   ├── VB7x64.IDE/             # Shell WPF x64: Menús, Toolbar, Editor, Diseñador, Hot-Run, Immediate Window y UI
-│   └── VB7x64.ProjectModel/    # Modelo de proyectos, Parsers, Motor Hot-Run (Execution), Compilador PE32, ActiveX y E/S segura
+│   ├── ViBa7.IDE/             # Aplicación WPF x86 (Shell, Diseñador, Editor, Diálogos)
+│   ├── ViBa7.ActiveXHost/     # Anfitrión COM/OLE In-Place x86 para controles ActiveX (.OCX)
+│   └── ViBa7.ProjectModel/    # Biblioteca de dominio (Parser .vbp, TypeLib, Persistencia, IntelliSense)
 ├── tests/
-│   ├── VB7x64.Tests/           # Suite de pruebas unitarias xUnit (165 pruebas / 100% éxito)
-│   └── fixtures/               # Proyectos de muestra de VB6 para pruebas de round-trip
-└── docs/                       # Arquitectura y Decisiones de Diseño (ADRs)
+│   └── ViBa7.Tests/           # Suite automatizada xUnit (282 pruebas en verde)
+├── LIBRARY VB6/               # Base de conocimiento condensada e indexada (VB6 / COM / Win32 / msvbvm60)
+│   ├── VB6_LIBRARY_INDEX.md             # Índice maestro de ingeniería y referencia cruzada
+│   ├── VB6_LIBRARY_DATABASE.json        # Base de datos estructurada de capítulos y tópicos
+│   ├── TYPELIB_AND_RUNTIME_SYMBOLS.json # Catálogo de símbolos e interfaces COM de msvbvm60.dll y VB6.OLB
+│   ├── CODE_SAMPLES_INDEX.json          # Índice de arquitectura empresarial (418 módulos VB6)
+│   └── query_library.py                 # Herramienta CLI de consulta instantánea de la biblioteca
+└── docs/
+    ├── TOOLCHAIN_SPEC.md                # Especificación formal del contrato CLI/JSON con compiladores
+    ├── PLAN_IMPLEMENTACION_ACTIVEX_VB6.md # Diagnóstico y hoja de ruta ActiveX/OCX al 100%
+    └── adr/                             # Registros de decisiones arquitectónicas (ADR-001, ADR-002)
 ```
 
 ---
 
-## 🚀 Requisitos y Compilación
+## 5. Instrucciones de Compilación y Ejecución
 
 ### Requisitos del Sistema
-* **Sistema Operativo**: Windows 10 / Windows 11 (arquitectura 64-bit).
-* **SDK**: [.NET 10.0 SDK LTS](https://dotnet.microsoft.com/download/dotnet/10.0).
+* **Sistema Operativo**: Windows 10 o Windows 11 (edición de 64 bits o 32 bits).
+* **SDK Requerido**: [.NET 10.0 SDK LTS](https://dotnet.microsoft.com/download/dotnet/10.0) con componente de escritorio de Windows.
 
-### Compilación y Ejecución de Pruebas
-
+### 1. Compilar la Solución Completa
 ```bash
-# Clonar el repositorio
-git clone https://github.com/Axiomedes/VB6-x64-NEW-IDE.git
-cd VB6-x64-NEW-IDE
+dotnet build ViBa7-x86.slnx
+```
 
-# Restaurar paquetes y compilar la solución
-dotnet build
+### 2. Ejecutar la Suite de Pruebas Automatizadas
+El proyecto cuenta con **282 pruebas automatizadas** que validan la preservación de archivos, el parser `.vbp`/`.frm`, el motor de UserControls, el anfitrión ActiveX (`ViBa7.ActiveXHost`), la extracción de TypeLibs y la sincronización HiMetric:
+```bash
+dotnet test ViBa7-x86.slnx
+```
 
-# Ejecutar la suite de pruebas unitarias automatizadas (165 pruebas)
-dotnet test
-
-# Iniciar el IDE
-dotnet run --project src/VB7x64.IDE
+### 3. Iniciar el IDE
+```bash
+dotnet run --project src/ViBa7.IDE
 ```
 
 ---
 
-## 🗺️ Roadmap de Milestones
+## 📄 Licencia y Reconocimientos
 
-| Milestone | Estado | Descripción |
-| :--- | :---: | :--- |
-| **M1: Núcleo y Seguridad de Archivos** | ✅ Completado | Modelos `.vbp`/`.vbg`, manejo ANSI/CRLF, preservación `.frx`, pruebas de round-trip. |
-| **M2: Productividad Visual y Refactorización** | ✅ Completado | Branch lines, Inlay hints, Property/Procedure Builder, AutoText, Tab Order, Hotkey Checker. |
-| **M3: Diseñador de Formularios (Form Designer)** | ✅ Completado | WYSIWYG bidireccional, contenedores (`Frame`/`PictureBox`), portapapeles, Grid Snap, UserControls. |
-| **M4: Editor de Menús (<kbd>Ctrl+E</kbd>)** | ✅ Completado | Editor jerárquico de menús, indentación por puntos `....`, atajos de teclado y sincronización `.frm`. |
-| **M5: IntelliSense y Carga de OCX en Diseño** | ✅ Completado | List Members, Parameter Info, Complete Word, lector COM TypeLib nativo x64, diálogo Componentes (<kbd>Ctrl+T</kbd>). |
-| **M6: Ejecución en Caliente (Hot-Run / <kbd>F5</kbd>)** | ✅ Completado | Motor de ejecución en memoria sin compilar a disco, ventana en vivo interactiva (`LiveFormWindow`), breakpoints (<kbd>F9</kbd>), paso a paso (<kbd>F8</kbd>), Ventana Inmediata (<kbd>Ctrl+G</kbd>, `?` / `Print`) y `Debug.Print` en tiempo real. |
-| **M7: Compilación Nativa x32 (MSVBVM60.DLL)** | ✅ Completado | Emisor nativo de ejecutables PE32 (x86) autónomos con cabeceras `VB5!` clásicas, stubs x86 y enlace canónico a `msvbvm60.dll!ThunRTMain`. Diálogo Make EXE, atajo <kbd>Ctrl+Shift+B</kbd> y metadatos completos. |
-| **M8: UserControls en Diseño y Ejecución** | ⏳ **Planificado** | Renderizado de controles `.ctl`, aparición en Toolbox del proyecto, composición visual dentro de formularios, contenedor de prueba aislado y ejecución interactiva en caliente. |
-| **M9: Generación y Compilación Nativa x64** | ⏳ **Planificado** | Compilador / emisor nativo a ejecutables y librerías de 64 bits para arquitectura Windows x64 moderna. |
+El código fuente de **ViBa7 IDE** se distribuye bajo los términos de la licencia **GNU General Public License v3.0 (GPL-3.0)**. Consulta el archivo [LICENSE](LICENSE) para conocer todos los detalles.
+
+* **Autor**: David Rojas [Axio.UK] (Axiomedes).
+* **Aviso Legal**: Este proyecto es un desarrollo independiente de código abierto y no incluye binarios ni código propietario descompilado de Microsoft Corporation. Visual Basic es una marca registrada de Microsoft Corporation. Las referencias a Visual Basic 6.0 se utilizan exclusivamente con propósitos de identificación técnica y compatibilidad de formatos.

@@ -1,0 +1,311 @@
+﻿<Window x:Class="ViBa7.IDE.Dialogs.OcxPropertyPagesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Páginas de Propiedades"
+        Height="540" Width="640"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="#ECE9D8"
+        ResizeMode="CanResizeWithGrip">
+    <Window.Resources>
+        <Style TargetType="TabItem">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="10,4"/>
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="0,2"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Height" Value="23"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="4,1"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Height" Value="23"/>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Cabecera de Identificación -->
+        <Border Grid.Row="0" Background="#FFFFFF" BorderBrush="#999999" BorderThickness="1" CornerRadius="2" Padding="8,6" Margin="0,0,0,8">
+            <DockPanel LastChildFill="True">
+                <TextBlock Text="🧩" FontSize="18" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <StackPanel VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="TxtControlName" Text="ControlName" FontWeight="Bold" FontSize="12.5" Foreground="#003366"/>
+                        <TextBlock x:Name="TxtControlType" Text=" (TypeName)" FontSize="11" Foreground="#555555" Margin="4,1,0,0"/>
+                        <Border x:Name="BadgeUnresolved" Background="#B45309" CornerRadius="2" Padding="4,1" Margin="8,0,0,0" Visibility="Collapsed" VerticalAlignment="Center">
+                            <TextBlock Text="NO REGISTRADO" FontSize="8.5" FontWeight="Bold" Foreground="White"/>
+                        </Border>
+                    </StackPanel>
+                    <TextBlock x:Name="TxtControlSummary" Text="Páginas de propiedades avanzadas del fabricante / contenedor ActiveX" FontSize="10" Foreground="#777777"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Pestañas de Propiedades -->
+        <TabControl x:Name="MainTabControl" Grid.Row="1" Background="#FFFFFF" BorderBrush="#999999">
+            <!-- 1. GENERAL -->
+            <TabItem Header="General">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Caption -->
+                        <Label Grid.Row="0" Grid.Column="0" Content="Caption / Título:"/>
+                        <TextBox x:Name="TxtCaption" Grid.Row="0" Grid.Column="1" Margin="0,2,0,4" TextChanged="OnFieldValueChanged"/>
+
+                        <!-- Text -->
+                        <Label Grid.Row="1" Grid.Column="0" Content="Text / Contenido:"/>
+                        <TextBox x:Name="TxtText" Grid.Row="1" Grid.Column="1" Margin="0,2,0,4" TextChanged="OnFieldValueChanged"/>
+
+                        <!-- Index -->
+                        <Label Grid.Row="2" Grid.Column="0" Content="Index (Matriz):"/>
+                        <TextBox x:Name="TxtIndex" Grid.Row="2" Grid.Column="1" Width="80" HorizontalAlignment="Left" Margin="0,2,0,4" TextChanged="OnFieldValueChanged"/>
+
+                        <!-- BorderStyle -->
+                        <Label Grid.Row="3" Grid.Column="0" Content="BorderStyle:"/>
+                        <ComboBox x:Name="CmbBorderStyle" Grid.Row="3" Grid.Column="1" Width="180" HorizontalAlignment="Left" Margin="0,2,0,4" SelectionChanged="OnFieldSelectionChanged">
+                            <ComboBoxItem Content="0 - None"/>
+                            <ComboBoxItem Content="1 - Fixed Single"/>
+                        </ComboBox>
+
+                        <!-- Alignment -->
+                        <Label Grid.Row="4" Grid.Column="0" Content="Alignment:"/>
+                        <ComboBox x:Name="CmbAlignment" Grid.Row="4" Grid.Column="1" Width="180" HorizontalAlignment="Left" Margin="0,2,0,4" SelectionChanged="OnFieldSelectionChanged">
+                            <ComboBoxItem Content="0 - Left"/>
+                            <ComboBoxItem Content="1 - Right"/>
+                            <ComboBoxItem Content="2 - Center"/>
+                        </ComboBox>
+
+                        <!-- ToolTipText -->
+                        <Label Grid.Row="5" Grid.Column="0" Content="ToolTipText:"/>
+                        <TextBox x:Name="TxtToolTipText" Grid.Row="5" Grid.Column="1" Margin="0,2,0,4" TextChanged="OnFieldValueChanged"/>
+
+                        <!-- Tag -->
+                        <Label Grid.Row="6" Grid.Column="0" Content="Tag:"/>
+                        <TextBox x:Name="TxtTag" Grid.Row="6" Grid.Column="1" Margin="0,2,0,4" TextChanged="OnFieldValueChanged"/>
+
+                        <!-- CheckBoxes de Estado -->
+                        <StackPanel Grid.Row="7" Grid.Column="1" Orientation="Horizontal" Margin="0,8,0,0">
+                            <CheckBox x:Name="ChkEnabled" Content="Enabled (Habilitado)" IsChecked="True" Margin="0,0,20,0" Click="OnFieldCheckChanged"/>
+                            <CheckBox x:Name="ChkVisible" Content="Visible" IsChecked="True" Margin="0,0,20,0" Click="OnFieldCheckChanged"/>
+                            <CheckBox x:Name="ChkTabStop" Content="TabStop" IsChecked="True" Click="OnFieldCheckChanged"/>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 2. COLORES Y ESTILO -->
+            <TabItem Header="Color">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
+                    <StackPanel>
+                        <!-- BackColor -->
+                        <GroupBox Header="Color de Fondo (BackColor)" Margin="0,0,0,10" Padding="8">
+                            <DockPanel LastChildFill="True">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="6,0,0,0">
+                                    <Button Content="💧 Gotero" Width="70" Height="24" Margin="0,0,4,0" Click="BtnEyedropperBack_Click" ToolTip="Capturar color con el gotero"/>
+                                    <Button Content="🎨 Paleta..." Width="70" Height="24" Click="BtnPickBackColor_Click" ToolTip="Elegir color de paleta"/>
+                                </StackPanel>
+                                <Border x:Name="ColorBoxBack" DockPanel.Dock="Left" Width="24" Height="22" BorderBrush="#888888" BorderThickness="1" Margin="0,0,6,0" Background="#ECE9D8"/>
+                                <TextBox x:Name="TxtBackColor" TextChanged="TxtBackColor_TextChanged"/>
+                            </DockPanel>
+                        </GroupBox>
+
+                        <!-- ForeColor -->
+                        <GroupBox Header="Color de Texto / Primer Plano (ForeColor)" Margin="0,0,0,10" Padding="8">
+                            <DockPanel LastChildFill="True">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="6,0,0,0">
+                                    <Button Content="💧 Gotero" Width="70" Height="24" Margin="0,0,4,0" Click="BtnEyedropperFore_Click" ToolTip="Capturar color con el gotero"/>
+                                    <Button Content="🎨 Paleta..." Width="70" Height="24" Click="BtnPickForeColor_Click" ToolTip="Elegir color de paleta"/>
+                                </StackPanel>
+                                <Border x:Name="ColorBoxFore" DockPanel.Dock="Left" Width="24" Height="22" BorderBrush="#888888" BorderThickness="1" Margin="0,0,6,0" Background="#000000"/>
+                                <TextBox x:Name="TxtForeColor" TextChanged="TxtForeColor_TextChanged"/>
+                            </DockPanel>
+                        </GroupBox>
+
+                        <!-- Muestra de Vista Previa -->
+                        <GroupBox Header="Vista Previa de Colores" Padding="8">
+                            <Border x:Name="ColorSampleBorder" Background="#ECE9D8" BorderBrush="#7F9DB9" BorderThickness="1" Padding="12" CornerRadius="2">
+                                <TextBlock x:Name="ColorSampleText" Text="Texto de muestra con la combinación de colores seleccionada"
+                                           Foreground="#000000" FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            </Border>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 3. DISPOSICIÓN Y MEDIDAS -->
+            <TabItem Header="Disposición">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="140"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Encabezados de unidades -->
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="Twips (VB6)" FontWeight="Bold" FontSize="11" Margin="0,0,0,6"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Píxeles (Pantalla)" FontWeight="Bold" FontSize="11" Margin="0,0,0,6"/>
+
+                        <!-- Left -->
+                        <Label Grid.Row="1" Grid.Column="0" Content="Left (Izquierda):"/>
+                        <TextBox x:Name="TxtLeftTwips" Grid.Row="1" Grid.Column="1" Margin="0,2,8,4" TextChanged="TxtLeftTwips_TextChanged"/>
+                        <TextBox x:Name="TxtLeftPixels" Grid.Row="1" Grid.Column="2" Margin="0,2,0,4" IsReadOnly="True" Background="#F4F4F4"/>
+
+                        <!-- Top -->
+                        <Label Grid.Row="2" Grid.Column="0" Content="Top (Superior):"/>
+                        <TextBox x:Name="TxtTopTwips" Grid.Row="2" Grid.Column="1" Margin="0,2,8,4" TextChanged="TxtTopTwips_TextChanged"/>
+                        <TextBox x:Name="TxtTopPixels" Grid.Row="2" Grid.Column="2" Margin="0,2,0,4" IsReadOnly="True" Background="#F4F4F4"/>
+
+                        <!-- Width -->
+                        <Label Grid.Row="3" Grid.Column="0" Content="Width (Ancho):"/>
+                        <TextBox x:Name="TxtWidthTwips" Grid.Row="3" Grid.Column="1" Margin="0,2,8,4" TextChanged="TxtWidthTwips_TextChanged"/>
+                        <TextBox x:Name="TxtWidthPixels" Grid.Row="3" Grid.Column="2" Margin="0,2,0,4" IsReadOnly="True" Background="#F4F4F4"/>
+
+                        <!-- Height -->
+                        <Label Grid.Row="4" Grid.Column="0" Content="Height (Alto):"/>
+                        <TextBox x:Name="TxtHeightTwips" Grid.Row="4" Grid.Column="1" Margin="0,2,8,4" TextChanged="TxtHeightTwips_TextChanged"/>
+                        <TextBox x:Name="TxtHeightPixels" Grid.Row="4" Grid.Column="2" Margin="0,2,0,4" IsReadOnly="True" Background="#F4F4F4"/>
+
+                        <!-- HIMETRIC Extents (si existen) -->
+                        <GroupBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Header="Extensiones OLE / HIMETRIC (_ExtentX, _ExtentY)" Margin="0,12,0,0" Padding="8">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="_ExtentX:" Margin="0,0,4,0"/>
+                                <TextBox x:Name="TxtExtentX" Width="90" Margin="0,0,16,0" TextChanged="OnFieldValueChanged"/>
+                                <Label Content="_ExtentY:" Margin="0,0,4,0"/>
+                                <TextBox x:Name="TxtExtentY" Width="90" TextChanged="OnFieldValueChanged"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 4. FUENTE -->
+            <TabItem Header="Fuente">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Nombre de Fuente -->
+                        <Label Grid.Row="0" Grid.Column="0" Content="Nombre de Fuente:"/>
+                        <ComboBox x:Name="CmbFontName" Grid.Row="1" Grid.Column="0" Margin="0,2,8,8" SelectionChanged="OnFontChanged"/>
+
+                        <!-- Tamaño -->
+                        <Label Grid.Row="0" Grid.Column="1" Content="Tamaño:"/>
+                        <ComboBox x:Name="CmbFontSize" Grid.Row="1" Grid.Column="1" Margin="0,2,8,8" IsEditable="True" SelectionChanged="OnFontChanged" TextBoxBase.TextChanged="CmbFontSize_TextChanged"/>
+
+                        <!-- Atributos / Estilos -->
+                        <GroupBox Grid.Row="1" Grid.Column="2" Header="Efectos" Padding="6" Margin="0,-12,0,8">
+                            <StackPanel>
+                                <CheckBox x:Name="ChkFontBold" Content="Negrita (Bold)" Margin="0,0,0,4" Click="OnFontChanged"/>
+                                <CheckBox x:Name="ChkFontItalic" Content="Cursiva (Italic)" Margin="0,0,0,4" Click="OnFontChanged"/>
+                                <CheckBox x:Name="ChkFontUnderline" Content="Subrayado (Underline)" Margin="0,0,0,4" Click="OnFontChanged"/>
+                                <CheckBox x:Name="ChkFontStrikethrough" Content="Tachado (Strikethrough)" Click="OnFontChanged"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <!-- Muestra de Vista Previa de Fuente -->
+                        <GroupBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" Header="Muestra" Padding="12" Margin="0,8,0,0">
+                            <Border Background="#FFFFFF" BorderBrush="#7F9DB9" BorderThickness="1" MinHeight="70" Padding="10">
+                                <TextBlock x:Name="TxtFontSample" Text="AaBbYyZz 12345 ¡Texto de prueba!"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                            </Border>
+                        </GroupBox>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- 5. TODAS LAS PROPIEDADES (Grid de Inspección y Edición Completa) -->
+            <TabItem Header="Todas las Propiedades">
+                <Grid Margin="6">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Filtro / Búsqueda -->
+                    <DockPanel Grid.Row="0" Margin="0,0,0,6">
+                        <TextBlock Text="🔍 Filtrar:" VerticalAlignment="Center" Margin="0,0,6,0" FontSize="11"/>
+                        <TextBox x:Name="TxtPropertySearch" TextChanged="TxtPropertySearch_TextChanged" Height="22" Padding="4,1"/>
+                    </DockPanel>
+
+                    <!-- DataGrid de Propiedades -->
+                    <Border Grid.Row="1" Background="#FFFFFF" BorderBrush="#999999" BorderThickness="1">
+                        <DataGrid x:Name="DgProperties" AutoGenerateColumns="False" CanUserAddRows="False"
+                                  HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#EAEAEA"
+                                  BorderThickness="0" Background="Transparent" RowHeaderWidth="0">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Propiedad" Binding="{Binding Name}" Width="160" FontWeight="SemiBold" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Valor" Binding="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                                <DataGridTextColumn Header="Categoría / Origen" Binding="{Binding Category}" Width="130" IsReadOnly="True" Foreground="#555555"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+
+                    <!-- Agregar / Quitar Propiedad Personalizada -->
+                    <DockPanel Grid.Row="2" Margin="0,6,0,0" LastChildFill="False">
+                        <Button Content="➕ Agregar Propiedad..." Height="23" Padding="8,0" Click="BtnAddProperty_Click" ToolTip="Agregar nueva propiedad personalizada al control"/>
+                        <Button Content="➖ Quitar Propiedad" Height="23" Padding="8,0" Margin="6,0,0,0" Click="BtnRemoveProperty_Click" ToolTip="Quitar propiedad seleccionada"/>
+                    </DockPanel>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <!-- Botones de Acción Inferiores -->
+        <DockPanel Grid.Row="2" Margin="0,8,0,0" LastChildFill="False">
+            <TextBlock x:Name="TxtStatus" Text="Listo" VerticalAlignment="Center" Foreground="#555555" FontSize="11" DockPanel.Dock="Left"/>
+
+            <Button Content="Aplicar" Width="75" Height="24" DockPanel.Dock="Right" Margin="6,0,0,0" Click="BtnApply_Click" ToolTip="Aplicar cambios al control inmediatamente"/>
+            <Button Content="Cancelar" Width="75" Height="24" DockPanel.Dock="Right" Margin="6,0,0,0" IsCancel="True" Click="BtnCancel_Click"/>
+            <Button Content="Aceptar" Width="75" Height="24" DockPanel.Dock="Right" IsDefault="True" Click="BtnOK_Click"/>
+        </DockPanel>
+    </Grid>
+</Window>

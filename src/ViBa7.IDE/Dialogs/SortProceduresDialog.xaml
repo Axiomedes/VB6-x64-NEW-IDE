@@ -1,0 +1,86 @@
+﻿<Window x:Class="ViBa7.IDE.Dialogs.SortProceduresDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Ordenar Procedimientos del Módulo"
+        Height="540" Width="820"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="#F4F4F4">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Cabecera -->
+        <TextBlock Grid.Row="0" Text="Configura el criterio para reordenar los procedimientos del módulo activo:" FontSize="12.5" FontWeight="SemiBold" Foreground="#004488" Margin="0,0,0,8"/>
+
+        <!-- Opciones de ordenación -->
+        <Border Grid.Row="1" Background="#FFFFFF" BorderBrush="#D0D0D0" BorderThickness="1" CornerRadius="3" Padding="10" Margin="0,0,0,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Criterio de Ordenación:" FontWeight="SemiBold" FontSize="11.5" Margin="0,0,0,6"/>
+                    <RadioButton x:Name="RbAlphaAsc" Content="Alfabético A-Z" IsChecked="True" Checked="Option_Changed" Margin="0,0,0,4"/>
+                    <RadioButton x:Name="RbAlphaDesc" Content="Alfabético Z-A" Checked="Option_Changed" Margin="0,0,0,4"/>
+                    <RadioButton x:Name="RbByType" Content="Por Tipo (Property ➔ Function ➔ Sub)" Checked="Option_Changed" Margin="0,0,0,4"/>
+                    <RadioButton x:Name="RbByScope" Content="Por Ámbito (Public ➔ Friend ➔ Private)" Checked="Option_Changed"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="16,0,0,0">
+                    <TextBlock Text="Opciones Adicionales:" FontWeight="SemiBold" FontSize="11.5" Margin="0,0,0,6"/>
+                    <CheckBox x:Name="ChkGroupProperties" Content="Mantener pares Property Get/Let/Set juntos" IsChecked="True" Checked="Option_Changed" Unchecked="Option_Changed" Margin="0,0,0,6"/>
+                    <CheckBox x:Name="ChkPreserveComments" Content="Preservar comentarios previos de documentación" IsChecked="True" Checked="Option_Changed" Unchecked="Option_Changed" Margin="0,0,0,6"/>
+                    <TextBlock Text="* Las declaraciones generales (Option Explicit, API Declares, Types) se mantendrán intactas al inicio."
+                               TextWrapping="Wrap" FontSize="11" Foreground="#666666" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Vista Previa de Procedimientos y Código -->
+        <Grid Grid.Row="2" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="340"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Lista Ordenada -->
+            <GroupBox Grid.Column="0" Header="Orden Resultante de Procedimientos" Background="#FFFFFF">
+                <DataGrid x:Name="DgProcedures" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column" SelectionMode="Single"
+                          GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#E8E8E8" SelectionChanged="DgProcedures_SelectionChanged"
+                          BorderThickness="0" Background="Transparent" RowHeaderWidth="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Procedimiento" Binding="{Binding Name}" Width="*" FontWeight="SemiBold"/>
+                        <DataGridTextColumn Header="Tipo" Binding="{Binding Kind}" Width="90"/>
+                        <DataGridTextColumn Header="Ámbito" Binding="{Binding Scope}" Width="65"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+
+            <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Center" Background="#E0E0E0"/>
+
+            <!-- Vista Previa de Código -->
+            <GroupBox Grid.Column="2" Header="Vista Previa del Código Resultante" Background="#FFFFFF">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                    <TextBox x:Name="TxtPreviewCode" FontFamily="Consolas" FontSize="11.5" IsReadOnly="True" BorderThickness="0" Background="Transparent" Padding="6" TextWrapping="NoWrap" AcceptsReturn="True"/>
+                </ScrollViewer>
+            </GroupBox>
+        </Grid>
+
+        <!-- Botones de Acción -->
+        <DockPanel Grid.Row="3" LastChildFill="False">
+            <TextBlock x:Name="TxtProcCount" Text="Total: 0 procedimientos encontrados" VerticalAlignment="Center" Foreground="#555555" FontSize="11.5" DockPanel.Dock="Left"/>
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                <Button Content="Ordenar y Aplicar al Editor" Width="180" Height="26" Margin="0,0,8,0" IsDefault="True" Click="BtnApply_Click"/>
+                <Button Content="Cancelar" Width="80" Height="26" IsCancel="True"/>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Platforms>x86;x64;AnyCPU</Platforms>
+    <PlatformTarget>x86</PlatformTarget>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>ViBa7.ActiveXHost</RootNamespace>
+    <AssemblyName>ViBa7.ActiveXHost</AssemblyName>
+    <Product>ViBa7 ActiveX In-Place Host</Product>
+    <Description>Contenedor OLE In-Place de controles ActiveX (OCX) para ViBa7-x86</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ViBa7.ProjectModel\ViBa7.ProjectModel.csproj" />
+  </ItemGroup>
+
+</Project>

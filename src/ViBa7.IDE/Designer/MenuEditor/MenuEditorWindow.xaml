@@ -1,0 +1,126 @@
+﻿<Window x:Class="ViBa7.IDE.Designer.MenuEditor.MenuEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Editor de Menús" 
+        Height="540" Width="640"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResize"
+        ShowInTaskbar="False"
+        Background="#F0F0F0"
+        FontFamily="Segoe UI" FontSize="12">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- 0: Propiedades Caption & Name -->
+            <RowDefinition Height="Auto"/> <!-- 1: Index, Shortcut, Help, Negotiate -->
+            <RowDefinition Height="Auto"/> <!-- 2: Checkboxes -->
+            <RowDefinition Height="Auto"/> <!-- 3: Botones de control (Flechas, Next, Insert, Delete, OK, Cancel) -->
+            <RowDefinition Height="*"/>    <!-- 4: ListBox jerárquico -->
+        </Grid.RowDefinitions>
+
+        <!-- 0: Caption y Name -->
+        <Grid Grid.Row="0" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Título (&amp;Caption):" Margin="0,0,0,3" FontWeight="SemiBold"/>
+                <TextBox x:Name="TxtCaption" Height="24" VerticalContentAlignment="Center" Padding="4,1" TextChanged="TxtCaption_TextChanged"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Nombre (&amp;Name):" Margin="0,0,0,3" FontWeight="SemiBold"/>
+                <TextBox x:Name="TxtName" Height="24" VerticalContentAlignment="Center" Padding="4,1" TextChanged="TxtName_TextChanged"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- 1: Index, Shortcut, HelpContextID, NegotiatePosition -->
+        <Grid Grid.Row="1" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="110"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Índice (&amp;Index):" Margin="0,0,0,3"/>
+                <TextBox x:Name="TxtIndex" Height="24" VerticalContentAlignment="Center" Padding="4,1" TextChanged="TxtIndex_TextChanged"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Atajo (&amp;Shortcut):" Margin="0,0,0,3"/>
+                <ComboBox x:Name="CmbShortcut" Height="24" SelectionChanged="CmbShortcut_SelectionChanged"/>
+            </StackPanel>
+            <StackPanel Grid.Column="4">
+                <TextBlock Text="HelpContextID:" Margin="0,0,0,3"/>
+                <TextBox x:Name="TxtHelpContextID" Height="24" VerticalContentAlignment="Center" Padding="4,1" TextChanged="TxtHelpContextID_TextChanged"/>
+            </StackPanel>
+            <StackPanel Grid.Column="6">
+                <TextBlock Text="NegotiatePosition:" Margin="0,0,0,3"/>
+                <ComboBox x:Name="CmbNegotiatePosition" Height="24" SelectionChanged="CmbNegotiatePosition_SelectionChanged">
+                    <ComboBoxItem Content="0 - None"/>
+                    <ComboBoxItem Content="1 - Left"/>
+                    <ComboBoxItem Content="2 - Middle"/>
+                    <ComboBoxItem Content="3 - Right"/>
+                </ComboBox>
+            </StackPanel>
+        </Grid>
+
+        <!-- 2: Checkboxes -->
+        <WrapPanel Grid.Row="2" Margin="0,0,0,10" VerticalAlignment="Center">
+            <CheckBox x:Name="ChkChecked" Content="Activo (&amp;Checked)" Margin="0,0,16,0" Checked="ChkProperty_Changed" Unchecked="ChkProperty_Changed"/>
+            <CheckBox x:Name="ChkEnabled" Content="Habilitado (&amp;Enabled)" Margin="0,0,16,0" Checked="ChkProperty_Changed" Unchecked="ChkProperty_Changed"/>
+            <CheckBox x:Name="ChkVisible" Content="Visible" Margin="0,0,16,0" Checked="ChkProperty_Changed" Unchecked="ChkProperty_Changed"/>
+            <CheckBox x:Name="ChkWindowList" Content="&amp;WindowList" Margin="0,0,16,0" Checked="ChkProperty_Changed" Unchecked="ChkProperty_Changed"/>
+        </WrapPanel>
+
+        <!-- 3: Barra de Herramientas de Estructura y Acciones -->
+        <Border Grid.Row="3" Background="#E5E8EB" BorderBrush="#D0D4D8" BorderThickness="1" CornerRadius="3" Padding="6,4" Margin="0,0,0,8">
+            <DockPanel LastChildFill="False">
+                <!-- Flechas de sangría y orden -->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                    <Button x:Name="BtnOutdent" Content="◄" Width="28" Height="24" Margin="0,0,3,0" ToolTip="Reducir Sangría / Subir nivel hacia la izquierda (Outdent)" Click="BtnOutdent_Click" FontWeight="Bold"/>
+                    <Button x:Name="BtnIndent" Content="►" Width="28" Height="24" Margin="0,0,6,0" ToolTip="Aumentar Sangría / Bajar nivel hacia la derecha (Indent)" Click="BtnIndent_Click" FontWeight="Bold"/>
+                    <Button x:Name="BtnUp" Content="▲" Width="28" Height="24" Margin="0,0,3,0" ToolTip="Mover Elemento hacia Arriba" Click="BtnUp_Click" FontWeight="Bold"/>
+                    <Button x:Name="BtnDown" Content="▼" Width="28" Height="24" Margin="0,0,12,0" ToolTip="Mover Elemento hacia Abajo" Click="BtnDown_Click" FontWeight="Bold"/>
+                    <Separator Width="1" Margin="0,2,12,2" Background="#C0C4C8"/>
+                    <Button x:Name="BtnNext" Content="&amp;Siguiente" Padding="10,2" Margin="0,0,4,0" ToolTip="Ir al siguiente elemento o crear uno nuevo al final" Click="BtnNext_Click"/>
+                    <Button x:Name="BtnInsert" Content="&amp;Insertar" Padding="10,2" Margin="0,0,4,0" ToolTip="Insertar nuevo elemento en la posición actual" Click="BtnInsert_Click"/>
+                    <Button x:Name="BtnDelete" Content="&amp;Eliminar" Padding="10,2" Margin="0,0,4,0" ToolTip="Eliminar el elemento seleccionado" Click="BtnDelete_Click"/>
+                </StackPanel>
+
+                <!-- Aceptar y Cancelar -->
+                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                    <Button x:Name="BtnOk" Content="Aceptar" IsDefault="True" Width="80" Height="24" Margin="0,0,6,0" FontWeight="SemiBold" Click="BtnOk_Click"/>
+                    <Button x:Name="BtnCancel" Content="Cancelar" IsCancel="True" Width="75" Height="24" Click="BtnCancel_Click"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- 4: ListBox Jerárquico de Menús -->
+        <Border Grid.Row="4" BorderBrush="#C0C4C8" BorderThickness="1" Background="#FFFFFF">
+            <ListBox x:Name="LstMenuItems" 
+                     FontFamily="Consolas, Segoe UI" FontSize="12.5"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     HorizontalContentAlignment="Stretch"
+                     SelectionChanged="LstMenuItems_SelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel LastChildFill="True">
+                            <TextBlock DockPanel.Dock="Right" 
+                                       Text="{Binding ShortcutDisplay}" 
+                                       Foreground="#0055EA" 
+                                       Margin="20,0,8,0" 
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Right"/>
+                            <TextBlock Text="{Binding IndentedCaption}"/>
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+    </Grid>
+</Window>

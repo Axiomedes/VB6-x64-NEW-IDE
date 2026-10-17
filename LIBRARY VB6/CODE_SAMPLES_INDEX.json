@@ -1,0 +1,4524 @@
+{
+  "summary": {
+    "total_files": 418,
+    "class_modules_cls": 197,
+    "forms_frm": 51,
+    "standard_modules_bas": 41,
+    "projects_vbp": 59,
+    "project_groups_vbg": 16,
+    "other_files": 54
+  },
+  "projects": [
+    {
+      "file": "PersonDemo.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence1\\PersonDemo.vbp",
+      "project_type": "Exe",
+      "project_title": "PersonDemo"
+    },
+    {
+      "file": "PersonObjects.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence1\\PersonObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "PersonObjects"
+    },
+    {
+      "file": "PersonServer.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence1\\PersonServer.vbp",
+      "project_type": "OleExe",
+      "project_title": "PersonServer"
+    },
+    {
+      "file": "PersonDemo.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence2\\PersonDemo.vbp",
+      "project_type": "Exe",
+      "project_title": "PersonDemo"
+    },
+    {
+      "file": "PersonObjects.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence2\\PersonObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "PersonObjects"
+    },
+    {
+      "file": "PersonServer.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence2\\PersonServer.vbp",
+      "project_type": "OleExe",
+      "project_title": "PersonServer"
+    },
+    {
+      "file": "PersonDemo.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Person\\PersonDemo.vbp",
+      "project_type": "Exe",
+      "project_title": "PersonDemo"
+    },
+    {
+      "file": "PersonObjects.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Person\\PersonObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "PersonObjects"
+    },
+    {
+      "file": "VideoObjects.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 05\\VideoObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "VideoObjects"
+    },
+    {
+      "file": "VideoObjects.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\VideoObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "VideoObjects"
+    },
+    {
+      "file": "VideoUI.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 07\\VideoUI.vbp",
+      "project_type": "Exe",
+      "project_title": "VideoUI"
+    },
+    {
+      "file": "VideoObjects.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\VideoObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "VideoObjects"
+    },
+    {
+      "file": "VideoObjects.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\VideoObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "VideoObjects"
+    },
+    {
+      "file": "VideoServer.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoServer\\VideoServer.vbp",
+      "project_type": "OleExe",
+      "project_title": "VideoServer"
+    },
+    {
+      "file": "VideoObjects.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\VideoObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "VideoObjects"
+    },
+    {
+      "file": "VideoServer.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\VideoServer.vbp",
+      "project_type": "OleDll",
+      "project_title": "VideoServer"
+    },
+    {
+      "file": "HelloWorld.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 14\\HelloWorld.vbp",
+      "project_type": "OleDll",
+      "project_title": "Project1"
+    },
+    {
+      "file": "VideoIIS.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 14\\VideoIIS.vbp",
+      "project_type": "OleDll",
+      "project_title": "Project1"
+    },
+    {
+      "file": "VideoDHTML.vbp",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 15\\VideoDHTML.vbp",
+      "project_type": "OleDll",
+      "project_title": "VideoDHTML"
+    },
+    {
+      "file": "TaskManager.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\TaskManager.vbp",
+      "project_type": "Exe",
+      "project_title": "TaskManager"
+    },
+    {
+      "file": "TaskObjects.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\TaskObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskObjects"
+    },
+    {
+      "file": "TaskServer.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\TaskServer.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskServer"
+    },
+    {
+      "file": "TaskManager.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\TaskManager.vbp",
+      "project_type": "Exe",
+      "project_title": "TaskManager"
+    },
+    {
+      "file": "TaskObjects.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\TaskObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskObjects"
+    },
+    {
+      "file": "TaskServer.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\TaskServer.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskServer"
+    },
+    {
+      "file": "TaskManager.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\TaskManager.vbp",
+      "project_type": "Exe",
+      "project_title": "TaskManager"
+    },
+    {
+      "file": "TaskObjects.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\TaskObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskObjects"
+    },
+    {
+      "file": "TaskServer.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\TaskServer.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskServer"
+    },
+    {
+      "file": "ODSOLEDB.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\ODSOLEDB.vbp",
+      "project_type": "OleDll",
+      "project_title": "ODSOLEDB"
+    },
+    {
+      "file": "TaskManager.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\TaskManager.vbp",
+      "project_type": "Exe",
+      "project_title": "TaskManager"
+    },
+    {
+      "file": "TaskObjects.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\TaskObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskObjects"
+    },
+    {
+      "file": "TaskServer.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\TaskServer.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskServer"
+    },
+    {
+      "file": "TaskManager.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\TaskManager.vbp",
+      "project_type": "Exe",
+      "project_title": "TaskManager"
+    },
+    {
+      "file": "TaskObjects.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\TaskObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskObjects"
+    },
+    {
+      "file": "TaskProxyServer.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\TaskProxyServer.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskProxyServer"
+    },
+    {
+      "file": "TaskReceiver.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\TaskReceiver.vbp",
+      "project_type": "Exe",
+      "project_title": "TaskReceiver"
+    },
+    {
+      "file": "TaskServer.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\TaskServer.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskServer"
+    },
+    {
+      "file": "BrowserObjects.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\BrowserObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "BrowserObjects"
+    },
+    {
+      "file": "TaskManager.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\TaskManager.vbp",
+      "project_type": "Exe",
+      "project_title": "TaskManager"
+    },
+    {
+      "file": "TaskObjects.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\TaskObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskObjects"
+    },
+    {
+      "file": "TaskProxyServer.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\TaskProxyServer.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskProxyServer"
+    },
+    {
+      "file": "TaskReceiver.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\TaskReceiver.vbp",
+      "project_type": "Exe",
+      "project_title": "TaskReceiver"
+    },
+    {
+      "file": "TaskServer.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\TaskServer.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskServer"
+    },
+    {
+      "file": "BrowserObjects.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\BrowserObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "BrowserObjects"
+    },
+    {
+      "file": "TaskManager.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\TaskManager.vbp",
+      "project_type": "Exe",
+      "project_title": "TaskManager"
+    },
+    {
+      "file": "TaskObjects.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\TaskObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskObjects"
+    },
+    {
+      "file": "TaskProxyServer.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\TaskProxyServer.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskProxyServer"
+    },
+    {
+      "file": "TaskReceiver.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\TaskReceiver.vbp",
+      "project_type": "Exe",
+      "project_title": "TaskReceiver"
+    },
+    {
+      "file": "TaskServer.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\TaskServer.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskServer"
+    },
+    {
+      "file": "BrowserObjects.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\BrowserObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "BrowserObjects"
+    },
+    {
+      "file": "TaskManager.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\TaskManager.vbp",
+      "project_type": "Exe",
+      "project_title": "TaskManager"
+    },
+    {
+      "file": "TaskObjects.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\TaskObjects.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskObjects"
+    },
+    {
+      "file": "TaskProxyServer.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\TaskProxyServer.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskProxyServer"
+    },
+    {
+      "file": "TaskReceiver.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\TaskReceiver.vbp",
+      "project_type": "Exe",
+      "project_title": "TaskReceiver"
+    },
+    {
+      "file": "TaskServer.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\TaskServer.vbp",
+      "project_type": "OleDll",
+      "project_title": "TaskServer"
+    },
+    {
+      "file": "Cluster.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Cluster Server)\\Cluster.vbp",
+      "project_type": "OleDll",
+      "project_title": "Cluster"
+    },
+    {
+      "file": "ClusterMonitor.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Cluster Server)\\ClusterMonitor.vbp",
+      "project_type": "OleExe",
+      "project_title": "ClusterMonitor"
+    },
+    {
+      "file": "ClusterServer.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Cluster Server)\\ClusterServer.vbp",
+      "project_type": "OleDll",
+      "project_title": "ClusterServer"
+    },
+    {
+      "file": "ServerMonitor.vbp",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Worker Server)\\ServerMonitor.vbp",
+      "project_type": "OleDll",
+      "project_title": "ServerMonitor"
+    }
+  ],
+  "classes": [
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence1\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Person.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence1\\Person.cls",
+      "class_name": "Person",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 14,
+      "methods": [
+        "Property Let SSN",
+        "Property Get SSN",
+        "Property Let Name",
+        "Property Get Name",
+        "Property Let Birthdate",
+        "Property Get Birthdate",
+        "Property Get Age",
+        "Property Get IsValid",
+        "Sub BeginEdit",
+        "Sub ApplyEdit",
+        "Sub CancelEdit",
+        "Property Get IsNew",
+        "Function GetState",
+        "Sub SetState"
+      ]
+    },
+    {
+      "file": "PersonManager.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence1\\PersonManager.cls",
+      "class_name": "PersonManager",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Sub Load",
+        "Sub Save",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence2\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Person.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence2\\Person.cls",
+      "class_name": "Person",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 16,
+      "methods": [
+        "Property Let SSN",
+        "Property Get SSN",
+        "Property Let Name",
+        "Property Get Name",
+        "Property Let Birthdate",
+        "Property Get Birthdate",
+        "Property Get Age",
+        "Property Get IsValid",
+        "Sub BeginEdit",
+        "Sub ApplyEdit",
+        "Sub CancelEdit",
+        "Property Get IsNew",
+        "Function GetState",
+        "Sub SetState",
+        "Sub Load",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "PersonManager.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence2\\PersonManager.cls",
+      "class_name": "PersonManager",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Sub Load",
+        "Sub Save",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Person\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Person.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Person\\Person.cls",
+      "class_name": "Person",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 12,
+      "methods": [
+        "Property Let SSN",
+        "Property Get SSN",
+        "Property Let Name",
+        "Property Get Name",
+        "Property Let Birthdate",
+        "Property Get Birthdate",
+        "Property Get Age",
+        "Property Get IsValid",
+        "Sub BeginEdit",
+        "Sub ApplyEdit",
+        "Sub CancelEdit",
+        "Property Get IsNew"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 05\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Business.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 05\\Business.cls",
+      "class_name": "Business",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 9,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty"
+      ]
+    },
+    {
+      "file": "Customer.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 05\\Customer.cls",
+      "class_name": "Customer",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 25,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get CustomerID",
+        "Property Let Name",
+        "Property Get Name",
+        "Property Let Address1",
+        "Property Get Address1",
+        "Property Let Address2",
+        "Property Get Address2",
+        "Property Let City",
+        "Property Get City",
+        "Property Let State",
+        "Property Get State",
+        "Property Let ZipCode",
+        "Property Get ZipCode",
+        "Property Let Phone",
+        "Property Get Phone",
+        "Function CreateInvoice"
+      ]
+    },
+    {
+      "file": "CustomerDisplay.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 05\\CustomerDisplay.cls",
+      "class_name": "CustomerDisplay",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Property Get CustomerID",
+        "Property Get Name",
+        "Property Get Phone"
+      ]
+    },
+    {
+      "file": "Customers.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 05\\Customers.cls",
+      "class_name": "Customers",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Sub Load"
+      ]
+    },
+    {
+      "file": "TextList.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 05\\TextList.cls",
+      "class_name": "TextList",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Item",
+        "Function NewEnum",
+        "Function Key"
+      ]
+    },
+    {
+      "file": "Video.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 05\\Video.cls",
+      "class_name": "Video",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 23,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get VideoID",
+        "Property Let Title",
+        "Property Get Title",
+        "Property Let Studio",
+        "Property Get Studio",
+        "Property Let ReleaseDate",
+        "Property Get ReleaseDate",
+        "Property Let Category",
+        "Property Get Category",
+        "Property Get Categories",
+        "Property Let Rating",
+        "Property Get Rating",
+        "Property Get Ratings",
+        "Property Get Tapes"
+      ]
+    },
+    {
+      "file": "VideoDisplay.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 05\\VideoDisplay.cls",
+      "class_name": "VideoDisplay",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Property Get VideoID",
+        "Property Get Title",
+        "Property Get ReleaseDate"
+      ]
+    },
+    {
+      "file": "Videos.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 05\\Videos.cls",
+      "class_name": "Videos",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Sub Load",
+        "Function Item",
+        "Function Count",
+        "Function NewEnum"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Business.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\Business.cls",
+      "class_name": "Business",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 9,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty"
+      ]
+    },
+    {
+      "file": "Customer.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\Customer.cls",
+      "class_name": "Customer",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 25,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get CustomerID",
+        "Property Let Name",
+        "Property Get Name",
+        "Property Let Address1",
+        "Property Get Address1",
+        "Property Let Address2",
+        "Property Get Address2",
+        "Property Let City",
+        "Property Get City",
+        "Property Let State",
+        "Property Get State",
+        "Property Let ZipCode",
+        "Property Get ZipCode",
+        "Property Let Phone",
+        "Property Get Phone",
+        "Function CreateInvoice"
+      ]
+    },
+    {
+      "file": "CustomerDisplay.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\CustomerDisplay.cls",
+      "class_name": "CustomerDisplay",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Property Get CustomerID",
+        "Property Get Name",
+        "Property Get Phone"
+      ]
+    },
+    {
+      "file": "Customers.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\Customers.cls",
+      "class_name": "Customers",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Sub Load"
+      ]
+    },
+    {
+      "file": "Invoice.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\Invoice.cls",
+      "class_name": "Invoice",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 17,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get InvoiceID",
+        "Property Get InvoiceItems",
+        "Property Get CustomerID",
+        "Property Get CustomerName",
+        "Property Get CustomerPhone",
+        "Property Get SubTotal",
+        "Property Get Tax",
+        "Property Get Total"
+      ]
+    },
+    {
+      "file": "InvoiceFee.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\InvoiceFee.cls",
+      "class_name": "InvoiceFee",
+      "implements": [
+        "InvoiceItem"
+      ],
+      "instancing": "1",
+      "methods_count": 13,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get FeeID",
+        "Property Get VideoTitle",
+        "Property Get DaysOver",
+        "Property Get Fee",
+        "Property Get EnteredDate"
+      ]
+    },
+    {
+      "file": "InvoiceItem.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\InvoiceItem.cls",
+      "class_name": "InvoiceItem",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 11,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete",
+        "Property Get IsValid",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get IsDeleted",
+        "Property Get Total",
+        "Property Get ItemDescription",
+        "Property Get ItemType"
+      ]
+    },
+    {
+      "file": "InvoiceItems.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\InvoiceItems.cls",
+      "class_name": "InvoiceItems",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 9,
+      "methods": [
+        "Function Item",
+        "Function Count",
+        "Function NewEnum",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete",
+        "Function Add",
+        "Sub Remove"
+      ]
+    },
+    {
+      "file": "InvoiceTape.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\InvoiceTape.cls",
+      "class_name": "InvoiceTape",
+      "implements": [
+        "InvoiceItem"
+      ],
+      "instancing": "1",
+      "methods_count": 12,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ItemID",
+        "Property Get Title",
+        "Property Let Price",
+        "Property Get Price"
+      ]
+    },
+    {
+      "file": "Tape.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\Tape.cls",
+      "class_name": "Tape",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 17,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get TapeID",
+        "Property Get Title",
+        "Property Get CheckedOut",
+        "Property Let DateAcquired",
+        "Property Get DateAcquired",
+        "Property Get Invoice",
+        "Sub CheckIn",
+        "Property Get DateDue"
+      ]
+    },
+    {
+      "file": "Tapes.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\Tapes.cls",
+      "class_name": "Tapes",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 9,
+      "methods": [
+        "Function Item",
+        "Function Count",
+        "Function NewEnum",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete",
+        "Function Add",
+        "Sub Remove"
+      ]
+    },
+    {
+      "file": "TextList.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\TextList.cls",
+      "class_name": "TextList",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Item",
+        "Function NewEnum",
+        "Function Key"
+      ]
+    },
+    {
+      "file": "Video.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\Video.cls",
+      "class_name": "Video",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 23,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get VideoID",
+        "Property Let Title",
+        "Property Get Title",
+        "Property Let Studio",
+        "Property Get Studio",
+        "Property Let ReleaseDate",
+        "Property Get ReleaseDate",
+        "Property Let Category",
+        "Property Get Category",
+        "Property Get Categories",
+        "Property Let Rating",
+        "Property Get Rating",
+        "Property Get Ratings",
+        "Property Get Tapes"
+      ]
+    },
+    {
+      "file": "VideoDisplay.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\VideoDisplay.cls",
+      "class_name": "VideoDisplay",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Property Get VideoID",
+        "Property Get Title",
+        "Property Get ReleaseDate"
+      ]
+    },
+    {
+      "file": "Videos.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 06\\Videos.cls",
+      "class_name": "Videos",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Sub Load",
+        "Function Item",
+        "Function Count",
+        "Function NewEnum"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Business.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\Business.cls",
+      "class_name": "Business",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 9,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty"
+      ]
+    },
+    {
+      "file": "Customer.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\Customer.cls",
+      "class_name": "Customer",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 25,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get CustomerID",
+        "Property Let Name",
+        "Property Get Name",
+        "Property Let Address1",
+        "Property Get Address1",
+        "Property Let Address2",
+        "Property Get Address2",
+        "Property Let City",
+        "Property Get City",
+        "Property Let State",
+        "Property Get State",
+        "Property Let ZipCode",
+        "Property Get ZipCode",
+        "Property Let Phone",
+        "Property Get Phone",
+        "Function CreateInvoice"
+      ]
+    },
+    {
+      "file": "CustomerDisplay.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\CustomerDisplay.cls",
+      "class_name": "CustomerDisplay",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Property Get CustomerID",
+        "Property Get Name",
+        "Property Get Phone"
+      ]
+    },
+    {
+      "file": "Customers.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\Customers.cls",
+      "class_name": "Customers",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Sub Load"
+      ]
+    },
+    {
+      "file": "Invoice.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\Invoice.cls",
+      "class_name": "Invoice",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 17,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get InvoiceID",
+        "Property Get InvoiceItems",
+        "Property Get CustomerID",
+        "Property Get CustomerName",
+        "Property Get CustomerPhone",
+        "Property Get SubTotal",
+        "Property Get Tax",
+        "Property Get Total"
+      ]
+    },
+    {
+      "file": "InvoiceFee.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\InvoiceFee.cls",
+      "class_name": "InvoiceFee",
+      "implements": [
+        "InvoiceItem"
+      ],
+      "instancing": "1",
+      "methods_count": 13,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get FeeID",
+        "Property Get VideoTitle",
+        "Property Get DaysOver",
+        "Property Get Fee",
+        "Property Get EnteredDate"
+      ]
+    },
+    {
+      "file": "InvoiceItem.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\InvoiceItem.cls",
+      "class_name": "InvoiceItem",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 11,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete",
+        "Property Get IsValid",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get IsDeleted",
+        "Property Get Total",
+        "Property Get ItemDescription",
+        "Property Get ItemType"
+      ]
+    },
+    {
+      "file": "InvoiceItems.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\InvoiceItems.cls",
+      "class_name": "InvoiceItems",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 9,
+      "methods": [
+        "Function Item",
+        "Function Count",
+        "Function NewEnum",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete",
+        "Function Add",
+        "Sub Remove"
+      ]
+    },
+    {
+      "file": "InvoiceTape.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\InvoiceTape.cls",
+      "class_name": "InvoiceTape",
+      "implements": [
+        "InvoiceItem"
+      ],
+      "instancing": "1",
+      "methods_count": 12,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ItemID",
+        "Property Get Title",
+        "Property Let Price",
+        "Property Get Price"
+      ]
+    },
+    {
+      "file": "Tape.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\Tape.cls",
+      "class_name": "Tape",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 17,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get TapeID",
+        "Property Get Title",
+        "Property Get CheckedOut",
+        "Property Let DateAcquired",
+        "Property Get DateAcquired",
+        "Property Get Invoice",
+        "Sub CheckIn",
+        "Property Get DateDue"
+      ]
+    },
+    {
+      "file": "Tapes.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\Tapes.cls",
+      "class_name": "Tapes",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 9,
+      "methods": [
+        "Function Item",
+        "Function Count",
+        "Function NewEnum",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete",
+        "Function Add",
+        "Sub Remove"
+      ]
+    },
+    {
+      "file": "TextList.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\TextList.cls",
+      "class_name": "TextList",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Item",
+        "Function NewEnum",
+        "Function Key"
+      ]
+    },
+    {
+      "file": "Video.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\Video.cls",
+      "class_name": "Video",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 23,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get VideoID",
+        "Property Let Title",
+        "Property Get Title",
+        "Property Let Studio",
+        "Property Get Studio",
+        "Property Let ReleaseDate",
+        "Property Get ReleaseDate",
+        "Property Let Category",
+        "Property Get Category",
+        "Property Get Categories",
+        "Property Let Rating",
+        "Property Get Rating",
+        "Property Get Ratings",
+        "Property Get Tapes"
+      ]
+    },
+    {
+      "file": "VideoDisplay.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\VideoDisplay.cls",
+      "class_name": "VideoDisplay",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Property Get VideoID",
+        "Property Get Title",
+        "Property Get ReleaseDate"
+      ]
+    },
+    {
+      "file": "Videos.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\Videos.cls",
+      "class_name": "Videos",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Sub Load",
+        "Function Item",
+        "Function Count",
+        "Function NewEnum"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Business.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\Business.cls",
+      "class_name": "Business",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 9,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty"
+      ]
+    },
+    {
+      "file": "Customer.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\Customer.cls",
+      "class_name": "Customer",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 25,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get CustomerID",
+        "Property Let Name",
+        "Property Get Name",
+        "Property Let Address1",
+        "Property Get Address1",
+        "Property Let Address2",
+        "Property Get Address2",
+        "Property Let City",
+        "Property Get City",
+        "Property Let State",
+        "Property Get State",
+        "Property Let ZipCode",
+        "Property Get ZipCode",
+        "Property Let Phone",
+        "Property Get Phone",
+        "Function CreateInvoice"
+      ]
+    },
+    {
+      "file": "CustomerDisplay.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\CustomerDisplay.cls",
+      "class_name": "CustomerDisplay",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Property Get CustomerID",
+        "Property Get Name",
+        "Property Get Phone"
+      ]
+    },
+    {
+      "file": "Customers.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\Customers.cls",
+      "class_name": "Customers",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Sub Load"
+      ]
+    },
+    {
+      "file": "Invoice.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\Invoice.cls",
+      "class_name": "Invoice",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 18,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get InvoiceID",
+        "Property Get InvoiceItems",
+        "Property Get CustomerID",
+        "Property Get CustomerName",
+        "Property Get CustomerPhone",
+        "Property Get SubTotal",
+        "Property Get Tax",
+        "Property Get Total",
+        "Function CreateInvoice"
+      ]
+    },
+    {
+      "file": "InvoiceFee.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\InvoiceFee.cls",
+      "class_name": "InvoiceFee",
+      "implements": [
+        "InvoiceItem"
+      ],
+      "instancing": "1",
+      "methods_count": 13,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get FeeID",
+        "Property Get VideoTitle",
+        "Property Get DaysOver",
+        "Property Get Fee",
+        "Property Get EnteredDate"
+      ]
+    },
+    {
+      "file": "InvoiceItem.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\InvoiceItem.cls",
+      "class_name": "InvoiceItem",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 11,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete",
+        "Property Get IsValid",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get IsDeleted",
+        "Property Get Total",
+        "Property Get ItemDescription",
+        "Property Get ItemType"
+      ]
+    },
+    {
+      "file": "InvoiceItems.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\InvoiceItems.cls",
+      "class_name": "InvoiceItems",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 9,
+      "methods": [
+        "Function Item",
+        "Function Count",
+        "Function NewEnum",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete",
+        "Function Add",
+        "Sub Remove"
+      ]
+    },
+    {
+      "file": "InvoiceTape.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\InvoiceTape.cls",
+      "class_name": "InvoiceTape",
+      "implements": [
+        "InvoiceItem"
+      ],
+      "instancing": "1",
+      "methods_count": 12,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ItemID",
+        "Property Get Title",
+        "Property Let Price",
+        "Property Get Price"
+      ]
+    },
+    {
+      "file": "Tape.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\Tape.cls",
+      "class_name": "Tape",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 17,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get TapeID",
+        "Property Get Title",
+        "Property Get CheckedOut",
+        "Property Let DateAcquired",
+        "Property Get DateAcquired",
+        "Property Get Invoice",
+        "Sub CheckIn",
+        "Property Get DateDue"
+      ]
+    },
+    {
+      "file": "Tapes.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\Tapes.cls",
+      "class_name": "Tapes",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 9,
+      "methods": [
+        "Function Item",
+        "Function Count",
+        "Function NewEnum",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete",
+        "Function Add",
+        "Sub Remove"
+      ]
+    },
+    {
+      "file": "TextList.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\TextList.cls",
+      "class_name": "TextList",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Item",
+        "Function NewEnum",
+        "Function Key"
+      ]
+    },
+    {
+      "file": "Video.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\Video.cls",
+      "class_name": "Video",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 23,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get VideoID",
+        "Property Let Title",
+        "Property Get Title",
+        "Property Let Studio",
+        "Property Get Studio",
+        "Property Let ReleaseDate",
+        "Property Get ReleaseDate",
+        "Property Let Category",
+        "Property Get Category",
+        "Property Get Categories",
+        "Property Let Rating",
+        "Property Get Rating",
+        "Property Get Ratings",
+        "Property Get Tapes"
+      ]
+    },
+    {
+      "file": "VideoDisplay.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\VideoDisplay.cls",
+      "class_name": "VideoDisplay",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Property Get VideoID",
+        "Property Get Title",
+        "Property Get ReleaseDate"
+      ]
+    },
+    {
+      "file": "Videos.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\Videos.cls",
+      "class_name": "Videos",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Sub Load",
+        "Function Item",
+        "Function Count",
+        "Function NewEnum"
+      ]
+    },
+    {
+      "file": "Buffer.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoServer\\Buffer.cls",
+      "class_name": "Buffer",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 8,
+      "methods": [
+        "Sub Initialize",
+        "Sub Add",
+        "Function GetState",
+        "Sub SetState",
+        "Property Get Item",
+        "Function Count",
+        "Function Length",
+        "Property Let Item"
+      ]
+    },
+    {
+      "file": "CustomerPersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoServer\\CustomerPersist.cls",
+      "class_name": "CustomerPersist",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Save",
+        "Sub DeleteObject",
+        "Function Fetch"
+      ]
+    },
+    {
+      "file": "CustomersPersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoServer\\CustomersPersist.cls",
+      "class_name": "CustomersPersist",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 1,
+      "methods": [
+        "Function Fetch"
+      ]
+    },
+    {
+      "file": "InvoiceFeePersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoServer\\InvoiceFeePersist.cls",
+      "class_name": "InvoiceFeePersist",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "InvoiceItemsPersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoServer\\InvoiceItemsPersist.cls",
+      "class_name": "InvoiceItemsPersist",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function FetchTapes",
+        "Function FetchFees",
+        "Function SaveTapes",
+        "Function SaveFees"
+      ]
+    },
+    {
+      "file": "InvoicePersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoServer\\InvoicePersist.cls",
+      "class_name": "InvoicePersist",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Save",
+        "Sub DeleteObject",
+        "Function Fetch"
+      ]
+    },
+    {
+      "file": "InvoiceTapePersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoServer\\InvoiceTapePersist.cls",
+      "class_name": "InvoiceTapePersist",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TapePersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoServer\\TapePersist.cls",
+      "class_name": "TapePersist",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject",
+        "Sub CheckOut"
+      ]
+    },
+    {
+      "file": "TapesPersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoServer\\TapesPersist.cls",
+      "class_name": "TapesPersist",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Function Fetch",
+        "Function Save"
+      ]
+    },
+    {
+      "file": "TextListPersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoServer\\TextListPersist.cls",
+      "class_name": "TextListPersist",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 1,
+      "methods": [
+        "Function Fetch"
+      ]
+    },
+    {
+      "file": "VideoPersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoServer\\VideoPersist.cls",
+      "class_name": "VideoPersist",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Save",
+        "Sub DeleteObject",
+        "Function Fetch"
+      ]
+    },
+    {
+      "file": "VideosPersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoServer\\VideosPersist.cls",
+      "class_name": "VideosPersist",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 1,
+      "methods": [
+        "Function Fetch"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Buffer.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\Buffer.cls",
+      "class_name": "Buffer",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 8,
+      "methods": [
+        "Sub Initialize",
+        "Sub Add",
+        "Function GetState",
+        "Sub SetState",
+        "Property Get Item",
+        "Function Count",
+        "Function Length",
+        "Property Let Item"
+      ]
+    },
+    {
+      "file": "Business.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\Business.cls",
+      "class_name": "Business",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 9,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty"
+      ]
+    },
+    {
+      "file": "Customer.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\Customer.cls",
+      "class_name": "Customer",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 25,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get CustomerID",
+        "Property Let Name",
+        "Property Get Name",
+        "Property Let Address1",
+        "Property Get Address1",
+        "Property Let Address2",
+        "Property Get Address2",
+        "Property Let City",
+        "Property Get City",
+        "Property Let State",
+        "Property Get State",
+        "Property Let ZipCode",
+        "Property Get ZipCode",
+        "Property Let Phone",
+        "Property Get Phone",
+        "Function CreateInvoice"
+      ]
+    },
+    {
+      "file": "CustomerDisplay.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\CustomerDisplay.cls",
+      "class_name": "CustomerDisplay",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Property Get CustomerID",
+        "Property Get Name",
+        "Property Get Phone"
+      ]
+    },
+    {
+      "file": "Customers.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\Customers.cls",
+      "class_name": "Customers",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Sub Load"
+      ]
+    },
+    {
+      "file": "Invoice.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\Invoice.cls",
+      "class_name": "Invoice",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 18,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get InvoiceID",
+        "Property Get InvoiceItems",
+        "Property Get CustomerID",
+        "Property Get CustomerName",
+        "Property Get CustomerPhone",
+        "Property Get SubTotal",
+        "Property Get Tax",
+        "Property Get Total",
+        "Function CreateInvoice"
+      ]
+    },
+    {
+      "file": "InvoiceFee.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\InvoiceFee.cls",
+      "class_name": "InvoiceFee",
+      "implements": [
+        "InvoiceItem"
+      ],
+      "instancing": "1",
+      "methods_count": 13,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get FeeID",
+        "Property Get VideoTitle",
+        "Property Get DaysOver",
+        "Property Get Fee",
+        "Property Get EnteredDate"
+      ]
+    },
+    {
+      "file": "InvoiceItem.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\InvoiceItem.cls",
+      "class_name": "InvoiceItem",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 11,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete",
+        "Property Get IsValid",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get IsDeleted",
+        "Property Get Total",
+        "Property Get ItemDescription",
+        "Property Get ItemType"
+      ]
+    },
+    {
+      "file": "InvoiceItems.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\InvoiceItems.cls",
+      "class_name": "InvoiceItems",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 9,
+      "methods": [
+        "Function Item",
+        "Function Count",
+        "Function NewEnum",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete",
+        "Function Add",
+        "Sub Remove"
+      ]
+    },
+    {
+      "file": "InvoiceTape.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\InvoiceTape.cls",
+      "class_name": "InvoiceTape",
+      "implements": [
+        "InvoiceItem"
+      ],
+      "instancing": "1",
+      "methods_count": 12,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ItemID",
+        "Property Get Title",
+        "Property Let Price",
+        "Property Get Price"
+      ]
+    },
+    {
+      "file": "Tape.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\Tape.cls",
+      "class_name": "Tape",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 17,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get TapeID",
+        "Property Get Title",
+        "Property Get CheckedOut",
+        "Property Let DateAcquired",
+        "Property Get DateAcquired",
+        "Property Get Invoice",
+        "Sub CheckIn",
+        "Property Get DateDue"
+      ]
+    },
+    {
+      "file": "Tapes.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\Tapes.cls",
+      "class_name": "Tapes",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 9,
+      "methods": [
+        "Function Item",
+        "Function Count",
+        "Function NewEnum",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete",
+        "Function Add",
+        "Sub Remove"
+      ]
+    },
+    {
+      "file": "TextList.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\TextList.cls",
+      "class_name": "TextList",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Item",
+        "Function NewEnum",
+        "Function Key"
+      ]
+    },
+    {
+      "file": "Video.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\Video.cls",
+      "class_name": "Video",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 23,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get VideoID",
+        "Property Let Title",
+        "Property Get Title",
+        "Property Let Studio",
+        "Property Get Studio",
+        "Property Let ReleaseDate",
+        "Property Get ReleaseDate",
+        "Property Let Category",
+        "Property Get Category",
+        "Property Get Categories",
+        "Property Let Rating",
+        "Property Get Rating",
+        "Property Get Ratings",
+        "Property Get Tapes"
+      ]
+    },
+    {
+      "file": "VideoDisplay.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\VideoDisplay.cls",
+      "class_name": "VideoDisplay",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Property Get VideoID",
+        "Property Get Title",
+        "Property Get ReleaseDate"
+      ]
+    },
+    {
+      "file": "Videos.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\Videos.cls",
+      "class_name": "Videos",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Sub Load",
+        "Function Item",
+        "Function Count",
+        "Function NewEnum"
+      ]
+    },
+    {
+      "file": "Buffer.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\Buffer.cls",
+      "class_name": "Buffer",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 8,
+      "methods": [
+        "Sub Initialize",
+        "Sub Add",
+        "Function GetState",
+        "Sub SetState",
+        "Property Get Item",
+        "Function Count",
+        "Function Length",
+        "Property Let Item"
+      ]
+    },
+    {
+      "file": "CustomerPersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\CustomerPersist.cls",
+      "class_name": "CustomerPersist",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Save",
+        "Sub DeleteObject",
+        "Function Fetch"
+      ]
+    },
+    {
+      "file": "CustomersPersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\CustomersPersist.cls",
+      "class_name": "CustomersPersist",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 1,
+      "methods": [
+        "Function Fetch"
+      ]
+    },
+    {
+      "file": "InvoiceFeePersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\InvoiceFeePersist.cls",
+      "class_name": "InvoiceFeePersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "InvoiceItemsPersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\InvoiceItemsPersist.cls",
+      "class_name": "InvoiceItemsPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function FetchTapes",
+        "Function FetchFees",
+        "Function SaveTapes",
+        "Function SaveFees"
+      ]
+    },
+    {
+      "file": "InvoicePersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\InvoicePersist.cls",
+      "class_name": "InvoicePersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Save",
+        "Sub DeleteObject",
+        "Function Fetch"
+      ]
+    },
+    {
+      "file": "InvoiceTapePersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\InvoiceTapePersist.cls",
+      "class_name": "InvoiceTapePersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TapePersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\TapePersist.cls",
+      "class_name": "TapePersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 5,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject",
+        "Function SaveChild",
+        "Sub CheckOut"
+      ]
+    },
+    {
+      "file": "TapesPersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\TapesPersist.cls",
+      "class_name": "TapesPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Function Fetch",
+        "Function Save"
+      ]
+    },
+    {
+      "file": "TextListPersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\TextListPersist.cls",
+      "class_name": "TextListPersist",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 1,
+      "methods": [
+        "Function Fetch"
+      ]
+    },
+    {
+      "file": "VideoPersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\VideoPersist.cls",
+      "class_name": "VideoPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Save",
+        "Sub DeleteObject",
+        "Function Fetch"
+      ]
+    },
+    {
+      "file": "VideosPersist.cls",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\VideosPersist.cls",
+      "class_name": "VideosPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 1,
+      "methods": [
+        "Function Fetch"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Buffer.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\Buffer.cls",
+      "class_name": "Buffer",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 8,
+      "methods": [
+        "Sub Initialize",
+        "Sub Add",
+        "Property Get Item",
+        "Property Let Item",
+        "Function Count",
+        "Function Length",
+        "Function GetState",
+        "Sub SetState"
+      ]
+    },
+    {
+      "file": "Client.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\Client.cls",
+      "class_name": "Client",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 17,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ContactName",
+        "Property Let ContactName",
+        "Property Get Phone",
+        "Property Let Phone",
+        "Property Get Projects"
+      ]
+    },
+    {
+      "file": "ClientPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\ClientPersist.cls",
+      "class_name": "ClientPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Project.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\Project.cls",
+      "class_name": "Project",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 11,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name"
+      ]
+    },
+    {
+      "file": "ProjectPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\ProjectPersist.cls",
+      "class_name": "ProjectPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Projects.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\Projects.cls",
+      "class_name": "Projects",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Sub Delete",
+        "Sub BeginEdit",
+        "Sub ApplyEdit",
+        "Sub CancelEdit",
+        "Function IsDirty"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Buffer.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\Buffer.cls",
+      "class_name": "Buffer",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 8,
+      "methods": [
+        "Sub Initialize",
+        "Sub Add",
+        "Property Get Item",
+        "Property Let Item",
+        "Function Count",
+        "Function Length",
+        "Function GetState",
+        "Sub SetState"
+      ]
+    },
+    {
+      "file": "Client.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\Client.cls",
+      "class_name": "Client",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 17,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ContactName",
+        "Property Let ContactName",
+        "Property Get Phone",
+        "Property Let Phone",
+        "Property Get Projects"
+      ]
+    },
+    {
+      "file": "ClientPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\ClientPersist.cls",
+      "class_name": "ClientPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Project.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\Project.cls",
+      "class_name": "Project",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 12,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get Tasks"
+      ]
+    },
+    {
+      "file": "ProjectPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\ProjectPersist.cls",
+      "class_name": "ProjectPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject",
+        "Sub DeleteProject"
+      ]
+    },
+    {
+      "file": "Projects.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\Projects.cls",
+      "class_name": "Projects",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Function IsDirty",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "Task.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\Task.cls",
+      "class_name": "Task",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 16,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ProjectedDays",
+        "Property Let ProjectedDays",
+        "Property Get PercentComplete",
+        "Property Let PercentComplete"
+      ]
+    },
+    {
+      "file": "Tasks.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\Tasks.cls",
+      "class_name": "Tasks",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Function IsDirty",
+        "Sub BeginEdit",
+        "Sub ApplyEdit",
+        "Sub CancelEdit",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Client.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\Client.cls",
+      "class_name": "Client",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 17,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ContactName",
+        "Property Let ContactName",
+        "Property Get Phone",
+        "Property Let Phone",
+        "Property Get Projects"
+      ]
+    },
+    {
+      "file": "ClientPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\ClientPersist.cls",
+      "class_name": "ClientPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Sub DeleteObject",
+        "Function Save"
+      ]
+    },
+    {
+      "file": "Project.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\Project.cls",
+      "class_name": "Project",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 12,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get Tasks"
+      ]
+    },
+    {
+      "file": "ProjectPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\ProjectPersist.cls",
+      "class_name": "ProjectPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteProject",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Projects.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\Projects.cls",
+      "class_name": "Projects",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Function IsDirty",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "Task.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\Task.cls",
+      "class_name": "Task",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 16,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ProjectedDays",
+        "Property Let ProjectedDays",
+        "Property Get PercentComplete",
+        "Property Let PercentComplete"
+      ]
+    },
+    {
+      "file": "TaskPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\TaskPersist.cls",
+      "class_name": "TaskPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Tasks.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\Tasks.cls",
+      "class_name": "Tasks",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Function IsDirty",
+        "Sub BeginEdit",
+        "Sub ApplyEdit",
+        "Sub CancelEdit",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "BusinessObjects.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\BusinessObjects.cls",
+      "class_name": "BusinessObjects",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 5,
+      "methods": [
+        "Function Count",
+        "Sub Add",
+        "Function Item",
+        "Sub Remove",
+        "Sub RemoveAll"
+      ]
+    },
+    {
+      "file": "Client.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\Client.cls",
+      "class_name": "Client",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 17,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ContactName",
+        "Property Let ContactName",
+        "Property Get Phone",
+        "Property Let Phone",
+        "Property Get Projects"
+      ]
+    },
+    {
+      "file": "ClientPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\ClientPersist.cls",
+      "class_name": "ClientPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Sub DeleteObject",
+        "Function Save"
+      ]
+    },
+    {
+      "file": "CollectionProvider.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\CollectionProvider.cls",
+      "class_name": "CollectionProvider",
+      "implements": [
+        "OLEDBSimpleProvider"
+      ],
+      "instancing": "1",
+      "methods_count": 1,
+      "methods": [
+        "Sub LoadData"
+      ]
+    },
+    {
+      "file": "Field.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\Field.cls",
+      "class_name": "Field",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get Writable",
+        "Property Let Writable"
+      ]
+    },
+    {
+      "file": "ODS.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\ODS.cls",
+      "class_name": "ODS",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "Project.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\Project.cls",
+      "class_name": "Project",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 12,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get Tasks"
+      ]
+    },
+    {
+      "file": "ProjectPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\ProjectPersist.cls",
+      "class_name": "ProjectPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteProject",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Projects.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\Projects.cls",
+      "class_name": "Projects",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Function IsDirty",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "SimpleObjectProvider.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\SimpleObjectProvider.cls",
+      "class_name": "SimpleObjectProvider",
+      "implements": [
+        "OLEDBSimpleProvider"
+      ],
+      "instancing": "1",
+      "methods_count": 1,
+      "methods": [
+        "Sub LoadData"
+      ]
+    },
+    {
+      "file": "Task.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\Task.cls",
+      "class_name": "Task",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 16,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ProjectedDays",
+        "Property Let ProjectedDays",
+        "Property Get PercentComplete",
+        "Property Let PercentComplete"
+      ]
+    },
+    {
+      "file": "TaskPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\TaskPersist.cls",
+      "class_name": "TaskPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Tasks.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\Tasks.cls",
+      "class_name": "Tasks",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Function IsDirty",
+        "Sub BeginEdit",
+        "Sub ApplyEdit",
+        "Sub CancelEdit",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Client.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\Client.cls",
+      "class_name": "Client",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 17,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ContactName",
+        "Property Let ContactName",
+        "Property Get Phone",
+        "Property Let Phone",
+        "Property Get Projects"
+      ]
+    },
+    {
+      "file": "ClientPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\ClientPersist.cls",
+      "class_name": "ClientPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Sub DeleteObject",
+        "Function Save"
+      ]
+    },
+    {
+      "file": "ClientProxy.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\ClientProxy.cls",
+      "class_name": "ClientProxy",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Project.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\Project.cls",
+      "class_name": "Project",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 12,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get Tasks"
+      ]
+    },
+    {
+      "file": "ProjectPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\ProjectPersist.cls",
+      "class_name": "ProjectPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteProject",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Projects.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\Projects.cls",
+      "class_name": "Projects",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Function IsDirty",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "Receiver.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\Receiver.cls",
+      "class_name": "Receiver",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 1,
+      "methods": [
+        "Sub CheckMessages"
+      ]
+    },
+    {
+      "file": "Task.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\Task.cls",
+      "class_name": "Task",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 16,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ProjectedDays",
+        "Property Let ProjectedDays",
+        "Property Get PercentComplete",
+        "Property Let PercentComplete"
+      ]
+    },
+    {
+      "file": "TaskPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\TaskPersist.cls",
+      "class_name": "TaskPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Tasks.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\Tasks.cls",
+      "class_name": "Tasks",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Function IsDirty",
+        "Sub BeginEdit",
+        "Sub ApplyEdit",
+        "Sub CancelEdit",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Client.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\Client.cls",
+      "class_name": "Client",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 19,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Function GetSuperState",
+        "Sub SetSuperState",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ContactName",
+        "Property Let ContactName",
+        "Property Get Phone",
+        "Property Let Phone",
+        "Property Get Projects"
+      ]
+    },
+    {
+      "file": "ClientPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\ClientPersist.cls",
+      "class_name": "ClientPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Sub DeleteObject",
+        "Function Save"
+      ]
+    },
+    {
+      "file": "ClientProxy.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\ClientProxy.cls",
+      "class_name": "ClientProxy",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Project.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\Project.cls",
+      "class_name": "Project",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 12,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get Tasks"
+      ]
+    },
+    {
+      "file": "ProjectPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\ProjectPersist.cls",
+      "class_name": "ProjectPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteProject",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Projects.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\Projects.cls",
+      "class_name": "Projects",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Function IsDirty",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "Receiver.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\Receiver.cls",
+      "class_name": "Receiver",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 1,
+      "methods": [
+        "Sub CheckMessages"
+      ]
+    },
+    {
+      "file": "Session.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\Session.cls",
+      "class_name": "Session",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 6,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Sub Add",
+        "Function CreateObject",
+        "Sub Remove"
+      ]
+    },
+    {
+      "file": "Task.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\Task.cls",
+      "class_name": "Task",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 16,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ProjectedDays",
+        "Property Let ProjectedDays",
+        "Property Get PercentComplete",
+        "Property Let PercentComplete"
+      ]
+    },
+    {
+      "file": "TaskPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\TaskPersist.cls",
+      "class_name": "TaskPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Tasks.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\Tasks.cls",
+      "class_name": "Tasks",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Function IsDirty",
+        "Sub BeginEdit",
+        "Sub ApplyEdit",
+        "Sub CancelEdit",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Client.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\Client.cls",
+      "class_name": "Client",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 19,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Function GetSuperState",
+        "Sub SetSuperState",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ContactName",
+        "Property Let ContactName",
+        "Property Get Phone",
+        "Property Let Phone",
+        "Property Get Projects"
+      ]
+    },
+    {
+      "file": "ClientPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\ClientPersist.cls",
+      "class_name": "ClientPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Sub DeleteObject",
+        "Function Save"
+      ]
+    },
+    {
+      "file": "ClientProxy.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\ClientProxy.cls",
+      "class_name": "ClientProxy",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Project.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\Project.cls",
+      "class_name": "Project",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 12,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get Tasks"
+      ]
+    },
+    {
+      "file": "ProjectPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\ProjectPersist.cls",
+      "class_name": "ProjectPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteProject",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Projects.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\Projects.cls",
+      "class_name": "Projects",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Function IsDirty",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "Receiver.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\Receiver.cls",
+      "class_name": "Receiver",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 1,
+      "methods": [
+        "Sub CheckMessages"
+      ]
+    },
+    {
+      "file": "Session.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\Session.cls",
+      "class_name": "Session",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 6,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Sub Add",
+        "Function CreateObject",
+        "Sub Remove"
+      ]
+    },
+    {
+      "file": "Task.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\Task.cls",
+      "class_name": "Task",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 16,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ProjectedDays",
+        "Property Let ProjectedDays",
+        "Property Get PercentComplete",
+        "Property Let PercentComplete"
+      ]
+    },
+    {
+      "file": "TaskPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\TaskPersist.cls",
+      "class_name": "TaskPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Tasks.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\Tasks.cls",
+      "class_name": "Tasks",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Function IsDirty",
+        "Sub BeginEdit",
+        "Sub ApplyEdit",
+        "Sub CancelEdit",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "BrokenRules.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\BrokenRules.cls",
+      "class_name": "BrokenRules",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub RuleBroken",
+        "Property Get Count"
+      ]
+    },
+    {
+      "file": "Client.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\Client.cls",
+      "class_name": "Client",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 19,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Function GetSuperState",
+        "Sub SetSuperState",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ContactName",
+        "Property Let ContactName",
+        "Property Get Phone",
+        "Property Let Phone",
+        "Property Get Projects"
+      ]
+    },
+    {
+      "file": "ClientPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\ClientPersist.cls",
+      "class_name": "ClientPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Sub DeleteObject",
+        "Function Save"
+      ]
+    },
+    {
+      "file": "ClientProxy.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\ClientProxy.cls",
+      "class_name": "ClientProxy",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Project.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\Project.cls",
+      "class_name": "Project",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 12,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get Tasks"
+      ]
+    },
+    {
+      "file": "ProjectPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\ProjectPersist.cls",
+      "class_name": "ProjectPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 4,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteProject",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Projects.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\Projects.cls",
+      "class_name": "Projects",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Function IsDirty",
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "Receiver.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\Receiver.cls",
+      "class_name": "Receiver",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 1,
+      "methods": [
+        "Sub CheckMessages"
+      ]
+    },
+    {
+      "file": "Session.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\Session.cls",
+      "class_name": "Session",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 6,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Sub Add",
+        "Function CreateObject",
+        "Sub Remove"
+      ]
+    },
+    {
+      "file": "Task.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\Task.cls",
+      "class_name": "Task",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 16,
+      "methods": [
+        "Sub BeginEdit",
+        "Sub CancelEdit",
+        "Sub ApplyEdit",
+        "Property Get IsValid",
+        "Sub Load",
+        "Sub Delete",
+        "Property Get IsDeleted",
+        "Property Get IsNew",
+        "Property Get IsDirty",
+        "Property Get ID",
+        "Property Get Name",
+        "Property Let Name",
+        "Property Get ProjectedDays",
+        "Property Let ProjectedDays",
+        "Property Get PercentComplete",
+        "Property Let PercentComplete"
+      ]
+    },
+    {
+      "file": "TaskPersist.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\TaskPersist.cls",
+      "class_name": "TaskPersist",
+      "implements": [
+        "ObjectControl"
+      ],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Function Fetch",
+        "Function Save",
+        "Sub DeleteObject"
+      ]
+    },
+    {
+      "file": "Tasks.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\Tasks.cls",
+      "class_name": "Tasks",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 10,
+      "methods": [
+        "Function Count",
+        "Function NewEnum",
+        "Function Item",
+        "Function Add",
+        "Sub Remove",
+        "Function IsDirty",
+        "Sub BeginEdit",
+        "Sub ApplyEdit",
+        "Sub CancelEdit",
+        "Sub Delete"
+      ]
+    },
+    {
+      "file": "Cluster.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Cluster Server)\\Cluster.cls",
+      "class_name": "Cluster",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 1,
+      "methods": [
+        "Function GetServerName"
+      ]
+    },
+    {
+      "file": "ClusterClient.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Cluster Server)\\ClusterClient.cls",
+      "class_name": "ClusterClient",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Function GetServerName",
+        "Function CreateObject"
+      ]
+    },
+    {
+      "file": "ClusterSvr.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Cluster Server)\\ClusterSvr.cls",
+      "class_name": "ClusterSvr",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 1,
+      "methods": [
+        "Sub UpdateStatus"
+      ]
+    },
+    {
+      "file": "MemoryMap.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Cluster Server)\\MemoryMap.cls",
+      "class_name": "MemoryMap",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 3,
+      "methods": [
+        "Sub Initialize",
+        "Sub SetData",
+        "Function GetData"
+      ]
+    },
+    {
+      "file": "Monitor.cls",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Worker Server)\\Monitor.cls",
+      "class_name": "Monitor",
+      "implements": [],
+      "instancing": "1",
+      "methods_count": 2,
+      "methods": [
+        "Sub Initialize",
+        "Sub Shutdown"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "file": "PersonUDTs.bas",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence1\\PersonUDTs.bas",
+      "module_name": "PersonUDTs",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "PersonUDTs.bas",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence2\\PersonUDTs.bas",
+      "module_name": "PersonUDTs",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "VUImain.bas",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 07\\VUImain.bas",
+      "module_name": "VUImain",
+      "methods_count": 2,
+      "methods": [
+        "Sub TextChange",
+        "Function TextLostFocus"
+      ]
+    },
+    {
+      "file": "VOmain.bas",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 08\\VideoObjects\\VOmain.bas",
+      "module_name": "VOmain",
+      "methods_count": 1,
+      "methods": [
+        "Sub Main"
+      ]
+    },
+    {
+      "file": "VideoTypes.bas",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\VideoTypes.bas",
+      "module_name": "VideoTypes",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "VOmain.bas",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoObjects\\VOmain.bas",
+      "module_name": "VOmain",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "VOmain.bas",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 10\\VideoServer\\VOmain.bas",
+      "module_name": "VOmain",
+      "methods_count": 1,
+      "methods": [
+        "Sub Main"
+      ]
+    },
+    {
+      "file": "VideoTypes.bas",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\VideoTypes.bas",
+      "module_name": "VideoTypes",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "VOmain.bas",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoObjectsMTS\\VOmain.bas",
+      "module_name": "VOmain",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "VideoTypes.bas",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\VideoTypes.bas",
+      "module_name": "VideoTypes",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "VOmain.bas",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 12\\VideoServerMTS\\VOmain.bas",
+      "module_name": "VOmain",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "modDHTML.bas",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 15\\modDHTML.bas",
+      "module_name": "modDHTML",
+      "methods_count": 2,
+      "methods": [
+        "Sub PutProperty",
+        "Function GetProperty"
+      ]
+    },
+    {
+      "file": "TOtypes.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\TOtypes.bas",
+      "module_name": "TOtypes",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TSmain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\TSmain.bas",
+      "module_name": "TSmain",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TUImain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\TUImain.bas",
+      "module_name": "TUImain",
+      "methods_count": 2,
+      "methods": [
+        "Sub TextChange",
+        "Function TextLostFocus"
+      ]
+    },
+    {
+      "file": "TOtypes.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\TOtypes.bas",
+      "module_name": "TOtypes",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TSmain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\TSmain.bas",
+      "module_name": "TSmain",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TUImain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\TUImain.bas",
+      "module_name": "TUImain",
+      "methods_count": 2,
+      "methods": [
+        "Sub TextChange",
+        "Function TextLostFocus"
+      ]
+    },
+    {
+      "file": "TOtypes.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\TOtypes.bas",
+      "module_name": "TOtypes",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TSmain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\TSmain.bas",
+      "module_name": "TSmain",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TUImain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\TUImain.bas",
+      "module_name": "TUImain",
+      "methods_count": 2,
+      "methods": [
+        "Sub TextChange",
+        "Function TextLostFocus"
+      ]
+    },
+    {
+      "file": "ODSmain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\ODSmain.bas",
+      "module_name": "ODSmain",
+      "methods_count": 1,
+      "methods": [
+        "Sub Main"
+      ]
+    },
+    {
+      "file": "TOtypes.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\TOtypes.bas",
+      "module_name": "TOtypes",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TSmain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\TSmain.bas",
+      "module_name": "TSmain",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TUImain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\TUImain.bas",
+      "module_name": "TUImain",
+      "methods_count": 3,
+      "methods": [
+        "Sub TextChange",
+        "Function TextLostFocus",
+        "Function SelectedItem"
+      ]
+    },
+    {
+      "file": "TOtypes.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\TOtypes.bas",
+      "module_name": "TOtypes",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TSmain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\TSmain.bas",
+      "module_name": "TSmain",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TUImain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\TUImain.bas",
+      "module_name": "TUImain",
+      "methods_count": 3,
+      "methods": [
+        "Sub TextChange",
+        "Function TextLostFocus",
+        "Function SelectedItem"
+      ]
+    },
+    {
+      "file": "BOmain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\BOmain.bas",
+      "module_name": "BOmain",
+      "methods_count": 1,
+      "methods": [
+        "Sub Main"
+      ]
+    },
+    {
+      "file": "TOtypes.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\TOtypes.bas",
+      "module_name": "TOtypes",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TSmain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\TSmain.bas",
+      "module_name": "TSmain",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TUImain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\TUImain.bas",
+      "module_name": "TUImain",
+      "methods_count": 3,
+      "methods": [
+        "Sub TextChange",
+        "Function TextLostFocus",
+        "Function SelectedItem"
+      ]
+    },
+    {
+      "file": "BOmain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\BOmain.bas",
+      "module_name": "BOmain",
+      "methods_count": 1,
+      "methods": [
+        "Sub Main"
+      ]
+    },
+    {
+      "file": "TOtypes.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\TOtypes.bas",
+      "module_name": "TOtypes",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TSmain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\TSmain.bas",
+      "module_name": "TSmain",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TUImain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\TUImain.bas",
+      "module_name": "TUImain",
+      "methods_count": 3,
+      "methods": [
+        "Sub TextChange",
+        "Function TextLostFocus",
+        "Function SelectedItem"
+      ]
+    },
+    {
+      "file": "BOmain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\BOmain.bas",
+      "module_name": "BOmain",
+      "methods_count": 1,
+      "methods": [
+        "Sub Main"
+      ]
+    },
+    {
+      "file": "TOtypes.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\TOtypes.bas",
+      "module_name": "TOtypes",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TSmain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\TSmain.bas",
+      "module_name": "TSmain",
+      "methods_count": 0,
+      "methods": []
+    },
+    {
+      "file": "TUImain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\TUImain.bas",
+      "module_name": "TUImain",
+      "methods_count": 3,
+      "methods": [
+        "Sub TextChange",
+        "Function TextLostFocus",
+        "Function SelectedItem"
+      ]
+    },
+    {
+      "file": "CSMain.bas",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Cluster Server)\\CSMain.bas",
+      "module_name": "CSMain",
+      "methods_count": 1,
+      "methods": [
+        "Sub Main"
+      ]
+    }
+  ],
+  "forms": [
+    {
+      "file": "frmEditPerson.frm",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence1\\frmEditPerson.frm",
+      "form_name": "frmEditPerson"
+    },
+    {
+      "file": "frmEditPerson.frm",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Persistence2\\frmEditPerson.frm",
+      "form_name": "frmEditPerson"
+    },
+    {
+      "file": "frmEditPerson.frm",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 04\\Person\\frmEditPerson.frm",
+      "form_name": "frmEditPerson"
+    },
+    {
+      "file": "BusForm.frm",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 07\\BusForm.frm",
+      "form_name": "BusForm"
+    },
+    {
+      "file": "CustomerEdit.frm",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 07\\CustomerEdit.frm",
+      "form_name": "CustomerEdit"
+    },
+    {
+      "file": "CustomerList.frm",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 07\\CustomerList.frm",
+      "form_name": "CustomerList"
+    },
+    {
+      "file": "CustomerSearch.frm",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 07\\CustomerSearch.frm",
+      "form_name": "CustomerSearch"
+    },
+    {
+      "file": "InvoiceEdit.frm",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 07\\InvoiceEdit.frm",
+      "form_name": "InvoiceEdit"
+    },
+    {
+      "file": "InvoiceTapeEdit.frm",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 07\\InvoiceTapeEdit.frm",
+      "form_name": "InvoiceTapeEdit"
+    },
+    {
+      "file": "TapeEdit.frm",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 07\\TapeEdit.frm",
+      "form_name": "TapeEdit"
+    },
+    {
+      "file": "VideoEdit.frm",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 07\\VideoEdit.frm",
+      "form_name": "VideoEdit"
+    },
+    {
+      "file": "VideoList.frm",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 07\\VideoList.frm",
+      "form_name": "VideoList"
+    },
+    {
+      "file": "VideoMain.frm",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 07\\VideoMain.frm",
+      "form_name": "VideoMain"
+    },
+    {
+      "file": "VideoSearch.frm",
+      "relative_path": "Professional VB6 Business Objects 2003\\Chapter 07\\VideoSearch.frm",
+      "form_name": "VideoSearch"
+    },
+    {
+      "file": "ClientEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\ClientEdit.frm",
+      "form_name": "ClientEdit"
+    },
+    {
+      "file": "ProjectEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\ProjectEdit.frm",
+      "form_name": "ProjectEdit"
+    },
+    {
+      "file": "StartForm.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter2\\Code\\StartForm.frm",
+      "form_name": "StartForm"
+    },
+    {
+      "file": "ClientEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\ClientEdit.frm",
+      "form_name": "ClientEdit"
+    },
+    {
+      "file": "ProjectEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\ProjectEdit.frm",
+      "form_name": "ProjectEdit"
+    },
+    {
+      "file": "StartForm.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\StartForm.frm",
+      "form_name": "StartForm"
+    },
+    {
+      "file": "TaskEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter3\\Code\\TaskEdit.frm",
+      "form_name": "TaskEdit"
+    },
+    {
+      "file": "ClientEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\ClientEdit.frm",
+      "form_name": "ClientEdit"
+    },
+    {
+      "file": "ProjectEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\ProjectEdit.frm",
+      "form_name": "ProjectEdit"
+    },
+    {
+      "file": "StartForm.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\StartForm.frm",
+      "form_name": "StartForm"
+    },
+    {
+      "file": "TaskEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter4\\Code\\TaskEdit.frm",
+      "form_name": "TaskEdit"
+    },
+    {
+      "file": "ClientEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\ClientEdit.frm",
+      "form_name": "ClientEdit"
+    },
+    {
+      "file": "ProjectEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\ProjectEdit.frm",
+      "form_name": "ProjectEdit"
+    },
+    {
+      "file": "StartForm.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\StartForm.frm",
+      "form_name": "StartForm"
+    },
+    {
+      "file": "TaskEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter5\\Code\\TaskEdit.frm",
+      "form_name": "TaskEdit"
+    },
+    {
+      "file": "ClientEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\ClientEdit.frm",
+      "form_name": "ClientEdit"
+    },
+    {
+      "file": "ProjectEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\ProjectEdit.frm",
+      "form_name": "ProjectEdit"
+    },
+    {
+      "file": "ReceiveDisplay.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\ReceiveDisplay.frm",
+      "form_name": "ReceiveDisplay"
+    },
+    {
+      "file": "StartForm.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\StartForm.frm",
+      "form_name": "StartForm"
+    },
+    {
+      "file": "TaskEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter6\\Code\\TaskEdit.frm",
+      "form_name": "TaskEdit"
+    },
+    {
+      "file": "ClientEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\ClientEdit.frm",
+      "form_name": "ClientEdit"
+    },
+    {
+      "file": "ProjectEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\ProjectEdit.frm",
+      "form_name": "ProjectEdit"
+    },
+    {
+      "file": "ReceiveDisplay.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\ReceiveDisplay.frm",
+      "form_name": "ReceiveDisplay"
+    },
+    {
+      "file": "StartForm.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\StartForm.frm",
+      "form_name": "StartForm"
+    },
+    {
+      "file": "TaskEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (ASP)\\TaskEdit.frm",
+      "form_name": "TaskEdit"
+    },
+    {
+      "file": "ClientEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\ClientEdit.frm",
+      "form_name": "ClientEdit"
+    },
+    {
+      "file": "ProjectEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\ProjectEdit.frm",
+      "form_name": "ProjectEdit"
+    },
+    {
+      "file": "ReceiveDisplay.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\ReceiveDisplay.frm",
+      "form_name": "ReceiveDisplay"
+    },
+    {
+      "file": "StartForm.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\StartForm.frm",
+      "form_name": "StartForm"
+    },
+    {
+      "file": "TaskEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter7\\Code (RDS)\\TaskEdit.frm",
+      "form_name": "TaskEdit"
+    },
+    {
+      "file": "ClientEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\ClientEdit.frm",
+      "form_name": "ClientEdit"
+    },
+    {
+      "file": "ProjectEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\ProjectEdit.frm",
+      "form_name": "ProjectEdit"
+    },
+    {
+      "file": "ReceiveDisplay.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\ReceiveDisplay.frm",
+      "form_name": "ReceiveDisplay"
+    },
+    {
+      "file": "StartForm.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\StartForm.frm",
+      "form_name": "StartForm"
+    },
+    {
+      "file": "TaskEdit.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Client Workstation)\\TaskEdit.frm",
+      "form_name": "TaskEdit"
+    },
+    {
+      "file": "MonitorDisplay.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Cluster Server)\\MonitorDisplay.frm",
+      "form_name": "MonitorDisplay"
+    },
+    {
+      "file": "AppMain.frm",
+      "relative_path": "Professional VB6 Distributed Objects 2003\\Chapter8\\Code (Worker Server)\\AppMain.frm",
+      "form_name": "AppMain"
+    }
+  ]
+}

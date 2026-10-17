@@ -1,0 +1,265 @@
+﻿<Window x:Class="ViBa7.IDE.Settings.OptionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Opciones del Entorno"
+        Height="590" Width="680"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Background="#F4F4F4">
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TabControl Grid.Row="0">
+            <TabItem Header="Editor">
+                <StackPanel Margin="12">
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Fuente del Editor:" VerticalAlignment="Center" FontSize="12"/>
+                        <ComboBox x:Name="CmbFontFamily" Grid.Column="1" Height="24"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Tamaño de Fuente:" VerticalAlignment="Center" FontSize="12"/>
+                        <ComboBox x:Name="CmbFontSize" Grid.Column="1" Height="24"/>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Tamaño de Tabulación:" VerticalAlignment="Center" FontSize="12"/>
+                        <ComboBox x:Name="CmbTabSize" Grid.Column="1" Height="24"/>
+                    </Grid>
+
+                    <CheckBox x:Name="ChkLineNumbers" Content="Mostrar números de línea" Margin="0,5,0,8" FontSize="12"/>
+                    <CheckBox x:Name="ChkCreateBak" Content="Crear copia de respaldo (.bak) al guardar" Margin="0,0,0,8" FontSize="12"/>
+                    <Separator Margin="0,6,0,10"/>
+                    <TextBlock Text="Funciones Avanzadas:" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6" Foreground="#004488"/>
+                    <CheckBox x:Name="ChkCurrentLineHighlight" Content="Habilitar resaltado de línea activa" Margin="0,0,0,8" FontSize="12"/>
+                    <CheckBox x:Name="ChkBranchLines" Content="Habilitar guías de estructura de bloques (Branch Lines)" Margin="0,0,0,8" FontSize="12"/>
+                    <CheckBox x:Name="ChkEndOfLineDetails" Content="Habilitar detalles de fin de bloque (Inlay Hints)" Margin="0,0,0,8" FontSize="12"/>
+                    <Separator Margin="0,6,0,10"/>
+                    <TextBlock Text="IntelliSense &amp; Autocompletado:" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6" Foreground="#004488"/>
+                    <CheckBox x:Name="ChkEnableIntelliSense" Content="Habilitar IntelliSense y autocompletado de código" Margin="0,0,0,8" FontSize="12"/>
+                    <CheckBox x:Name="ChkAutoListMembers" Content="Listar miembros automáticamente (Auto List Members)" Margin="16,0,0,8" FontSize="12"/>
+                    <CheckBox x:Name="ChkAutoQuickInfo" Content="Información rápida de parámetros automática (Parameter Info)" Margin="16,0,0,8" FontSize="12"/>
+                    <CheckBox x:Name="ChkCompleteWordOnTabOrEnter" Content="Aceptar sugerencia con Tab y Enter" Margin="16,0,0,8" FontSize="12"/>
+                    <Separator Margin="0,6,0,10"/>
+                    <TextBlock Text="Explorador de Proyectos:" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,6" Foreground="#004488"/>
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Modo de Visualización:" VerticalAlignment="Center" FontSize="12"/>
+                        <ComboBox x:Name="CmbProjectExplorerMode" Grid.Column="1" Height="24">
+                            <ComboBoxItem Content="Estándar (Árbol clásico VB6 por tipos de archivo)"/>
+                            <ComboBoxItem Content="Avanzado (Árbol con miembros de código e inspección)"/>
+                        </ComboBox>
+                    </Grid>
+                </StackPanel>
+            </TabItem>
+            
+            <TabItem Header="Colores del Editor">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
+                    <StackPanel>
+                        <!-- Presets / Temas Rápidos -->
+                        <DockPanel Margin="0,0,0,12">
+                            <TextBlock Text="Temas predefinidos:" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="12" Margin="0,0,10,0"/>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Clásico VB6" Padding="8,3" Margin="0,0,6,0" Click="BtnThemeClassic_Click" ToolTip="Fondo blanco con colores tradicionales de VB6"/>
+                                <Button Content="Oscuro Moderno" Padding="8,3" Margin="0,0,6,0" Click="BtnThemeDark_Click" ToolTip="Tema oscuro estilo VS Code / moderno"/>
+                                <Button Content="Alto Contraste" Padding="8,3" Margin="0,0,6,0" Click="BtnThemeContrast_Click" ToolTip="Fondo negro con texto y elementos de alto contraste"/>
+                            </StackPanel>
+                        </DockPanel>
+
+                        <!-- Paleta de Colores Rápidos -->
+                        <Border Background="#ECECEC" BorderBrush="#D0D0D0" BorderThickness="1" CornerRadius="3" Padding="8" Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="Paleta de selección rápida (haz clic en un color para aplicarlo al elemento enfocado):" FontSize="11" Foreground="#555555" Margin="0,0,0,6"/>
+                                <WrapPanel x:Name="PalettePanel"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Columnas de configuración de colores -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="15"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Columna 1 -->
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Fondo del Editor:" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchBg" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtBgColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+
+                                <TextBlock Text="Texto Normal:" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchFg" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtFgColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+
+                                <TextBlock Text="Palabras Clave (Keywords):" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchKeyword" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtKeywordColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+
+                                <TextBlock Text="Nombres de Sub / Function / Call:" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchMethod" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtMethodColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+
+                                <TextBlock Text="Comentarios (' / Rem):" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchComment" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtCommentColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+
+                                <TextBlock Text="Fondo de Línea Activa:" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchCurrentLine" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtCurrentLineColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Columna 2 -->
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Cadenas de Texto (Strings):" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchString" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtStringColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+
+                                <TextBlock Text="Tipos de Datos (Types):" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchType" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtTypeColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+
+                                <TextBlock Text="Constantes (Constants):" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchConstant" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtConstantColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+
+                                <TextBlock Text="Números y Literales:" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchNumber" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtNumberColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+
+                                <TextBlock Text="Números de Línea:" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchLineNumbers" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtLineNumbersColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+
+                                <TextBlock Text="Guías de Bloques (Branch Lines):" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchBranchLines" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtBranchLinesColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+
+                                <TextBlock Text="Detalles Fin Bloque (Inlay Hints):" FontSize="11.5" Margin="0,0,0,2"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="28"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border x:Name="SwatchEndOfLineDetails" Width="22" Height="22" BorderBrush="#888888" BorderThickness="1" CornerRadius="2" Margin="0,0,6,0"/>
+                                    <TextBox x:Name="TxtEndOfLineDetailsColor" Grid.Column="1" Height="24" VerticalContentAlignment="Center" TextChanged="ColorField_TextChanged" GotFocus="ColorField_GotFocus"/>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Vista Previa en Vivo -->
+                        <TextBlock Text="Vista previa en tiempo real:" FontWeight="SemiBold" FontSize="12" Margin="0,4,0,4"/>
+                        <Border x:Name="PreviewBorder" BorderBrush="#B0B0B0" BorderThickness="1" CornerRadius="3" Padding="12">
+                            <TextBlock x:Name="PreviewTextBlock" FontFamily="Consolas" FontSize="12.5" LineHeight="20"/>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            
+            <TabItem Header="Codificación">
+                <StackPanel Margin="12">
+                    <TextBlock Text="Página de Códigos por Defecto:" FontWeight="SemiBold" Margin="0,0,0,8" FontSize="12"/>
+                    <ComboBox x:Name="CmbEncoding" Height="24" Margin="0,0,0,12"/>
+                    <TextBlock Text="Los archivos VB6 clásicos sin BOM se interpretan mediante la página de códigos ANSI de Windows (Windows-1252 o ACP del sistema) preservando acentos y caracteres especiales."
+                               TextWrapping="Wrap" Foreground="#555555" FontSize="11.5"/>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Content="Aceptar" Width="80" Height="26" Margin="0,0,8,0" IsDefault="True" Click="BtnOk_Click"/>
+            <Button Content="Cancelar" Width="80" Height="26" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,49 @@
+﻿<Window x:Class="ViBa7.IDE.CodeBuilders.ClipboardRingDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Historial del Portapapeles (Clipboard Ring)"
+        Height="460" Width="680"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        Background="#F4F4F4">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Selecciona un fragmento de código del historial para insertarlo en la posición actual del cursor:" FontSize="12" Foreground="#333333" Margin="0,0,0,8"/>
+
+        <Grid Grid.Row="1" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Lista de Fragmentos -->
+            <Border Grid.Column="0" Background="#FFFFFF" BorderBrush="#C0CAD4" BorderThickness="1" CornerRadius="2">
+                <ListBox x:Name="LstClipboardItems" BorderThickness="0" SelectionChanged="LstClipboardItems_SelectionChanged" MouseDoubleClick="LstClipboardItems_MouseDoubleClick"/>
+            </Border>
+
+            <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Center" Background="#E0E0E0"/>
+
+            <!-- Vista Previa del Fragmento Seleccionado -->
+            <Border Grid.Column="2" Background="#FFFFFF" BorderBrush="#C0CAD4" BorderThickness="1" CornerRadius="2">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                    <TextBox x:Name="TxtPreview" FontFamily="Consolas" FontSize="12" IsReadOnly="True" BorderThickness="0" Background="Transparent" Padding="8" TextWrapping="NoWrap" AcceptsReturn="True"/>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- Botones de Acción -->
+        <DockPanel Grid.Row="2" LastChildFill="False">
+            <Button Content="🗑️ Limpiar Historial" Width="130" Height="26" DockPanel.Dock="Left" Click="BtnClear_Click"/>
+            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                <Button Content="Pegar en Editor" Width="120" Height="26" Margin="0,0,8,0" IsDefault="True" Click="BtnPaste_Click"/>
+                <Button Content="Cancelar" Width="80" Height="26" IsCancel="True"/>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</Window>

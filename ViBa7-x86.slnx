@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ViBa7.IDE/ViBa7.IDE.csproj" />
+    <Project Path="src/ViBa7.ActiveXHost/ViBa7.ActiveXHost.csproj" />
+    <Project Path="src/ViBa7.ProjectModel/ViBa7.ProjectModel.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ViBa7.Tests/ViBa7.Tests.csproj" />
+  </Folder>
+</Solution>

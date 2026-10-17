@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Platforms>x86;x64;AnyCPU</Platforms>
+    <PlatformTarget>x86</PlatformTarget>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>ViBa7.ProjectModel</RootNamespace>
+    <AssemblyName>ViBa7.ProjectModel</AssemblyName>
+    <Product>ViBa7 Project Model (Compatibilidad con VB6)</Product>
+  </PropertyGroup>
+
+</Project>

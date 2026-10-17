@@ -41,3 +41,9 @@ $RECYCLE.BIN/
 *.swp
 *~
 *.lnk
+
+# Raw uncondensed books and sample folders in LIBRARY VB6 (keep condensed JSON/MD/TXT/PY tracked)
+LIBRARY VB6/*.pdf
+LIBRARY VB6/VB6 Business  Distributed Objects/
+50c8f02c-4453-44a4-b639-e0c59efe7c90.jpg
+

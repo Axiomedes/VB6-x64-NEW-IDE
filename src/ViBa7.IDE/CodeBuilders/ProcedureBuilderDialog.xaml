@@ -1,0 +1,101 @@
+﻿<Window x:Class="ViBa7.IDE.CodeBuilders.ProcedureBuilderDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Asistente de Procedimientos (Sub / Function Builder)"
+        Height="590" Width="740"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Background="#F4F4F4">
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="140"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Cabecera de Configuración del Procedimiento -->
+        <Grid Grid.Row="0" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="1.2*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Nombre del Procedimiento:" FontSize="11.5" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                <TextBox x:Name="TxtProcedureName" Height="24" VerticalContentAlignment="Center" TextChanged="Inputs_Changed"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Tipo:" FontSize="11.5" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                <ComboBox x:Name="CmbKind" Height="24" SelectionChanged="CmbKind_SelectionChanged"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="4">
+                <TextBlock Text="Ámbito (Scope):" FontSize="11.5" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                <ComboBox x:Name="CmbScope" Height="24" SelectionChanged="Inputs_Changed"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="6">
+                <TextBlock x:Name="LblReturnType" Text="Tipo de Retorno:" FontSize="11.5" FontWeight="SemiBold" Margin="0,0,0,3"/>
+                <ComboBox x:Name="CmbReturnType" Height="24" IsEditable="True" SelectionChanged="Inputs_Changed" TextBoxBase.TextChanged="Inputs_Changed"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Lista de Parámetros -->
+        <GroupBox Grid.Row="1" Header="Parámetros del Procedimiento:" Margin="0,0,0,10" FontSize="11.5" FontWeight="SemiBold">
+            <Grid Margin="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+
+                <DataGrid x:Name="DgParameters" Grid.Column="0" AutoGenerateColumns="False" CanUserAddRows="False" HeadersVisibility="Column" SelectionMode="Single" Margin="0,0,6,0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Nombre" Binding="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="140"/>
+                        <DataGridComboBoxColumn Header="Paso" SelectedItemBinding="{Binding PassingMechanism, UpdateSourceTrigger=PropertyChanged}" Width="80" x:Name="ColPass"/>
+                        <DataGridComboBoxColumn Header="Tipo de Dato" SelectedItemBinding="{Binding DataType, UpdateSourceTrigger=PropertyChanged}" Width="120" x:Name="ColType"/>
+                        <DataGridCheckBoxColumn Header="Opcional" Binding="{Binding IsOptional, UpdateSourceTrigger=PropertyChanged}" Width="70"/>
+                        <DataGridTextColumn Header="Valor Defecto" Binding="{Binding DefaultValue, UpdateSourceTrigger=PropertyChanged}" Width="100"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Top">
+                    <Button Content="➕ Agregar" Height="25" Margin="0,0,0,6" Click="BtnAddParam_Click"/>
+                    <Button Content="➖ Eliminar" Height="25" Margin="0,0,0,6" Click="BtnRemoveParam_Click"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+        <!-- Vista Previa de Código y Opciones -->
+        <Grid Grid.Row="2" Margin="0,0,0,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,6">
+                <CheckBox x:Name="ChkErrorHandler" Content="Incluir bloque de manejo de errores (On Error GoTo ErrorHandler)" IsChecked="True" Margin="0,0,16,0" FontSize="11.5" Click="Inputs_Changed"/>
+                <CheckBox x:Name="ChkComments" Content="Incluir comentarios descriptivos de cabecera" IsChecked="False" FontSize="11.5" Click="Inputs_Changed"/>
+            </StackPanel>
+
+            <Border Grid.Row="1" Background="#FFFFFF" BorderBrush="#C0CAD4" BorderThickness="1" CornerRadius="2">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                    <TextBox x:Name="TxtPreview" FontFamily="Consolas" FontSize="12.5" IsReadOnly="True" BorderThickness="0" Background="Transparent" Padding="8" TextWrapping="NoWrap" AcceptsReturn="True"/>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- Botones de Acción -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="BtnInsert" Content="Insertar en Editor" Width="120" Height="26" Margin="0,0,8,0" IsDefault="True" Click="BtnInsert_Click"/>
+            <Button Content="Cancelar" Width="80" Height="26" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

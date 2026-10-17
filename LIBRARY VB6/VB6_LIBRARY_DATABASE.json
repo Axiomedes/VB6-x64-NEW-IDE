@@ -1,0 +1,1411 @@
+{
+  "metadata": {
+    "title": "VB6 / COM / Win32 Quick-Access Engineering Library",
+    "version": "1.0",
+    "created": "2026-10-15",
+    "location": "C:\\Programming\\IDE VB6 x64\\LIBRARY VB6",
+    "target_ecosystems": [
+      "VB x32/x64 Compiler (Rust parser, AST, codegen, vtables, linking)",
+      "VB7-x64 IDE (.NET C# forms, syntax highlighting, IntelliSense, COM browser)",
+      "VB x32/x64 New Runtime (msvbvm60 replacement, BSTR, SAFEARRAY, VARIANT, ErrObject, Collection)",
+      "Win32 API x64 Migration (LongPtr, LongLong, 64-bit alignment, Subclassing, WndProc)"
+    ]
+  },
+  "books": [
+    {
+      "id": "curland",
+      "title": "Advanced Visual Basic 6: Power Techniques for Everyday Programs",
+      "author": "Matthew Curland",
+      "publisher": "Addison-Wesley",
+      "year": 2000,
+      "pages": 514,
+      "file": "Advanced-Visual-Basic-6-Power-Techniques-for-Everyday-Programs.pdf",
+      "importance": "CRITICAL / FOUNDATIONAL",
+      "summary": "The ultimate authority on the internal plumbing of VB6. Details how the VB6 runtime represents memory, object references, virtual method tables (vtables), array descriptors (SAFEARRAY), strings (BSTR), and thread apartments.",
+      "relevance": {
+        "compiler_x64": "Blueprint for implementing COM vtable layout, direct interface implementation without dual interface overhead, function pointers via AddressOf, and ASM call thunks.",
+        "runtime_x64": "Crucial details for reimplementing SAFEARRAY descriptors, BSTR length-prefixed strings, Variant memory layouts, weak reference management, and memory manipulation (VarPtr, StrPtr, ObjPtr).",
+        "ide_x64": "Understanding type library generation, interface introspection, early vs late binding mechanics.",
+        "win32_api_x64": "Window subclassing, hooking, function pointer dispatch, and thunks."
+      },
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Building Blocks",
+          "page": 1,
+          "topics": [
+            "Living Pointers",
+            "VBoost Objects",
+            "CopyMemory",
+            "VarPtr, StrPtr, ObjPtr",
+            "Memory Layout"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Leveraging Arrays",
+          "page": 11,
+          "topics": [
+            "SAFEARRAY Descriptors",
+            "Reading Array Variables",
+            "Writing to Array Variables",
+            "Wrapping C Arrays",
+            "Multidimensional Redim"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "IUnknown: An Unknown Quantity",
+          "page": 41,
+          "topics": [
+            "VB and IUnknown",
+            "Calling IUnknown Functions Directly",
+            "QueryInterface Rules",
+            "VTable Layout"
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Binding Functions to Objects",
+          "page": 53,
+          "topics": [
+            "Early vs Late Binding",
+            "Name Binding at Runtime (IDispatch)",
+            "VTable-Binding Custom Control Interfaces"
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Object Design Constructs",
+          "page": 73,
+          "topics": [
+            "Implements Abstraction",
+            "Interface Polymorphism",
+            "Pluggability",
+            "Aggregation and Reuse"
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Circular References",
+          "page": 101,
+          "topics": [
+            "Reference Counting Pitfalls",
+            "Intermediate Objects",
+            "Weak References",
+            "Collection Cleanups"
+          ]
+        },
+        {
+          "number": 7,
+          "title": "External Object Creation",
+          "page": 119,
+          "topics": [
+            "CoCreateInstance",
+            "IClassFactory",
+            "Custom Class Activation"
+          ]
+        },
+        {
+          "number": 8,
+          "title": "Lightweight COM Objects",
+          "page": 143,
+          "topics": [
+            "COM Objects without Class Modules",
+            "Direct Memory VTables",
+            "Zero-Overhead COM Entities"
+          ]
+        },
+        {
+          "number": 9,
+          "title": "Large Systems of Objects",
+          "page": 183,
+          "topics": [
+            "Complex Object Graphs",
+            "Identity Maintenance",
+            "Flyweight Design"
+          ]
+        },
+        {
+          "number": 10,
+          "title": "VB Objects and the Running Object Table",
+          "page": 203,
+          "topics": [
+            "ROT (Running Object Table)",
+            "Monikers",
+            "ActiveX EXE Shared Objects"
+          ]
+        },
+        {
+          "number": 11,
+          "title": "Calling Function Pointers",
+          "page": 227,
+          "topics": [
+            "Dynamic Function Dispatch",
+            "CallWindowProc Hack",
+            "Machine Code Thunks",
+            "stdcall vs cdecl"
+          ]
+        },
+        {
+          "number": 12,
+          "title": "Overriding Functions",
+          "page": 261,
+          "topics": [
+            "VTable Patching",
+            "Function Hooking",
+            "Crash-Proof Subclassing"
+          ]
+        },
+        {
+          "number": 13,
+          "title": "Threads in VB",
+          "page": 279,
+          "topics": [
+            "Apartment Threading (STA)",
+            "CoInitialize",
+            "Cross-Apartment Marshaling",
+            "Worker Threads"
+          ]
+        },
+        {
+          "number": 14,
+          "title": "Strings in VB",
+          "page": 357,
+          "topics": [
+            "BSTR Memory Architecture",
+            "Unicode / ANSI Conversions",
+            "SysAllocString & SysFreeString"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mckinney",
+      "title": "Hardcore Visual Basic",
+      "author": "Bruce McKinney",
+      "publisher": "Microsoft Press",
+      "year": 1997,
+      "pages": 768,
+      "file": "hardcorevisualbasic5.pdf",
+      "importance": "HIGH / PRACTICAL LOW-LEVEL",
+      "summary": "Classic practical guide to low-level Windows programming in Visual Basic. Unveils the C-like power hidden behind Basic: pointers, memory copies, subclassing, Windows API, and COM type libraries.",
+      "relevance": {
+        "compiler_x64": "Shows exact behavior of AddressOf, callback signatures, type aliasing in Declare, and type coercion rules.",
+        "runtime_x64": "Detailed behavior of BSTR strings, byte arrays, ANSI-to-Unicode conversion layers in Declare calls, error raising and Win32 error translation.",
+        "ide_x64": "Techniques for project structuring, resource management, and debugging tools.",
+        "win32_api_x64": "HWND handling, Windows messaging architecture, subclassing traps, memory handles (HGLOBAL, GDI)."
+      },
+      "chapters": [
+        {
+          "number": 1,
+          "title": "The Spirit of Basic",
+          "page": 1,
+          "topics": [
+            "Language Philosophy",
+            "Language Purification",
+            "Control Flow"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Variables, Types, and Pointers",
+          "page": 47,
+          "topics": [
+            "CopyMemory Tricks",
+            "VarPtr, StrPtr, ObjPtr",
+            "Pointers to Variables",
+            "User-Defined Types (UDT)"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Objects, Interfaces, and Collections",
+          "page": 109,
+          "topics": [
+            "Implements Polymorphism",
+            "Polymorphic Filters",
+            "Custom Collection Classes"
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Strings and Memory",
+          "page": 181,
+          "topics": [
+            "BSTR Internals",
+            "Unicode / ANSI String Bridging",
+            "Byte Array Manipulation"
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Error Handling and Debugging",
+          "page": 247,
+          "topics": [
+            "Raising and Trapping Errors",
+            "Translating Win32 Errors to VB Errors",
+            "Assertions"
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Windows Architecture and API",
+          "page": 315,
+          "topics": [
+            "HWND Handles",
+            "Process IDs",
+            "Windows Messages Traps",
+            "Window Subclassing"
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Resources, Dialogs, and Bitmaps",
+          "page": 389,
+          "topics": [
+            "Windows Resource Files (.res)",
+            "GDI Bitmaps",
+            "Custom Dialogs"
+          ]
+        },
+        {
+          "number": 8,
+          "title": "Controls and Windows Extensions",
+          "page": 471,
+          "topics": [
+            "Common Dialog Extensions",
+            "Shell Integration",
+            "Custom Control Behaviors"
+          ]
+        },
+        {
+          "number": 9,
+          "title": "COM Behind the Curtain",
+          "page": 539,
+          "topics": [
+            "COM Terminology",
+            "COM Registry Layout",
+            "Type Libraries (TLB)",
+            "Direct VTables"
+          ]
+        },
+        {
+          "number": 10,
+          "title": "Files, Directories, and Shell Operations",
+          "page": 657,
+          "topics": [
+            "File Times",
+            "Directory Walking",
+            "Shell Namespace"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "balena",
+      "title": "Programming Microsoft Visual Basic 6.0",
+      "author": "Francesco Balena",
+      "publisher": "Microsoft Press",
+      "year": 1999,
+      "pages": 1318,
+      "file": "Programming VB6.pdf",
+      "importance": "NORMATIVE STANDARD / COMPLETE LANGUAGE SPECIFICATION",
+      "summary": "The definitive, comprehensive reference for VB6 syntax, controls, events, and runtime functions. Defines the baseline expected language behavior for the compiler, form designer, and runtime.",
+      "relevance": {
+        "compiler_x64": "Serves as the golden specification for AST parsing, statement semantics, operator precedence, scoping, variable declaration, arrays, and classes.",
+        "runtime_x64": "Full functional specification for VBA runtime modules: Strings (Mid, InStr, Replace), Conversion (CStr, CLng, Val), Math, DateTime, FileSystem, ErrObject, and Collection.",
+        "ide_x64": "Complete blueprint for form files (.frm), control properties, events, menus, toolbars, user controls, and data binding.",
+        "win32_api_x64": "Includes comprehensive Appendix of Win32 API functions adapted to VB6."
+      },
+      "chapters": [
+        {
+          "number": 1,
+          "title": "First Steps with Microsoft Visual Basic 6",
+          "page": 3,
+          "topics": [
+            "IDE Architecture",
+            "Project Types",
+            "Compilation Models"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Introduction to Forms",
+          "page": 35,
+          "topics": [
+            "Form Lifecycle",
+            "Load, Show, Activate, QueryUnload, Unload",
+            "MDI Forms"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Intrinsic Controls",
+          "page": 91,
+          "topics": [
+            "TextBox, Label, CommandButton, CheckBox, OptionButton, ListBox, ComboBox, Timer, ScrollBars"
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Variables and Procedures",
+          "page": 151,
+          "topics": [
+            "Data Types",
+            "ByVal / ByRef Parameters",
+            "Optional & ParamArray",
+            "Scoping & Static"
+          ]
+        },
+        {
+          "number": 5,
+          "title": "The Visual Basic for Applications Library",
+          "page": 211,
+          "topics": [
+            "Strings, Conversion, Math, DateTime, FileSystem, Interaction, Information"
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Classes and Objects",
+          "page": 275,
+          "topics": [
+            "Class Modules (.cls)",
+            "Property Get/Let/Set",
+            "Class_Initialize & Class_Terminate"
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Events, Polymorphism, and Inheritance",
+          "page": 333,
+          "topics": [
+            "Custom Events",
+            "RaiseEvent & WithEvents",
+            "Implements Interface Polymorphism"
+          ]
+        },
+        {
+          "number": 8,
+          "title": "Advanced Forms and Dialogs",
+          "page": 449,
+          "topics": [
+            "Dynamic Control Arrays",
+            "Menus",
+            "System Dialogs"
+          ]
+        },
+        {
+          "number": 9,
+          "title": "Windows Common Controls: Part I",
+          "page": 499,
+          "topics": [
+            "ImageList, ToolBar, StatusBar, ProgressBar, Slider"
+          ]
+        },
+        {
+          "number": 10,
+          "title": "Windows Common Controls: Part II",
+          "page": 561,
+          "topics": [
+            "TreeView, ListView, TabStrip, CoolBar"
+          ]
+        },
+        {
+          "number": 11,
+          "title": "ActiveX Components (DLL & EXE)",
+          "page": 813,
+          "topics": [
+            "In-Process vs Out-of-Process Servers",
+            "Threading Models",
+            "Instancing Options"
+          ]
+        },
+        {
+          "number": 12,
+          "title": "ActiveX Controls (UserControls)",
+          "page": 905,
+          "topics": [
+            "UserControl Lifecycle",
+            "PropertyBag Persistence",
+            "Ambient & Extender Properties"
+          ]
+        },
+        {
+          "number": 13,
+          "title": "Appendix: Windows API Functions",
+          "page": 1189,
+          "topics": [
+            "Declare Syntax",
+            "Core Win32 APIs for VB6",
+            "Structures and Constants"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "appleman_win32",
+      "title": "Visual Basic Programmer's Guide to the Win32 API",
+      "author": "Daniel Appleman",
+      "publisher": "Ziff-Davis Press / Macmillan",
+      "year": 1999,
+      "pages": 1556,
+      "file": "VB Programmer Guide Win32 API.pdf",
+      "importance": "ESSENTIAL WIN32 / 64-BIT PORTING BIBLE",
+      "summary": "The monumental guide to calling the Windows Win32 API from Visual Basic. Details parameter passing conventions, memory layouts, pointers, handles, structures, callbacks, and Windows messages.",
+      "relevance": {
+        "compiler_x64": "Crucial for designing 64-bit Declare syntax, LongPtr / LongLong types, ByVal/ByRef marshaling, struct padding/alignment, and callback calling conventions.",
+        "runtime_x64": "Memory allocation APIs (GlobalAlloc, LocalAlloc, HeapAlloc), ANSI/Unicode BSTR marshaling, and translating API errors.",
+        "ide_x64": "API declaration text viewer and validator.",
+        "win32_api_x64": "Complete reference for HWND, HDC, HBITMAP handles, GDI drawing, Windows messaging, and process/thread management."
+      },
+      "chapters": [
+        {
+          "number": 1,
+          "title": "What is the Win32 API?",
+          "page": 3,
+          "topics": [
+            "Win32 Subsystem",
+            "DLL Architecture",
+            "16-bit to 32-bit Evolution"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Handles and Objects",
+          "page": 27,
+          "topics": [
+            "HWND, HDC, HPEN, HBRUSH, HGLOBAL",
+            "Handle Lifetimes",
+            "Kernel vs User vs GDI"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "The Visual Basic-Windows Interface",
+          "page": 40,
+          "topics": [
+            "Declare Statement",
+            "ByVal vs ByRef",
+            "Strings (LPSTR, LPWSTR, BSTR)",
+            "Any Keyword",
+            "Callbacks & AddressOf"
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Real World API Programming",
+          "page": 76,
+          "topics": [
+            "Translating C Headers (.h) to VB",
+            "Structure Packing & Alignment",
+            "Error Handling (GetLastError)"
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Windows Control and Information Functions",
+          "page": 134,
+          "topics": [
+            "Window Hierarchy",
+            "GetWindowLong / SetWindowLong (GetWindowLongPtr in x64)",
+            "FindWindow",
+            "SetWindowPos"
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Hardware and System Functions",
+          "page": 250,
+          "topics": [
+            "System Metrics",
+            "Time, Timers",
+            "Registry Access"
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Device Contexts",
+          "page": 360,
+          "topics": [
+            "HDC Creation",
+            "GetDC, ReleaseDC",
+            "Mapping Modes"
+          ]
+        },
+        {
+          "number": 8,
+          "title": "Drawing Functions",
+          "page": 472,
+          "topics": [
+            "GDI Primitives",
+            "Pens, Brushes",
+            "Paths, Regions"
+          ]
+        },
+        {
+          "number": 9,
+          "title": "Bitmaps, Icons, and Raster Operations",
+          "page": 620,
+          "topics": [
+            "DIB & DDB Bitmaps",
+            "BitBlt, StretchBlt",
+            "Icons, Cursors"
+          ]
+        },
+        {
+          "number": 10,
+          "title": "Working with Menus",
+          "page": 720,
+          "topics": [
+            "HMENU",
+            "Dynamic Menu Modification",
+            "TrackPopupMenu"
+          ]
+        },
+        {
+          "number": 11,
+          "title": "Text and Fonts",
+          "page": 786,
+          "topics": [
+            "LOGFONT",
+            "CreateFontIndirect",
+            "TextOut, DrawText"
+          ]
+        },
+        {
+          "number": 12,
+          "title": "Printing",
+          "page": 862,
+          "topics": [
+            "Printer DC",
+            "Print Spooler API",
+            "DEVMODE"
+          ]
+        },
+        {
+          "number": 13,
+          "title": "File Operations",
+          "page": 956,
+          "topics": [
+            "CreateFile, ReadFile, WriteFile",
+            "File Mapping",
+            "File Security"
+          ]
+        },
+        {
+          "number": 14,
+          "title": "Processes and Threads",
+          "page": 1090,
+          "topics": [
+            "CreateProcess",
+            "Thread Management",
+            "Synchronization (Mutex, Semaphore, Event)"
+          ]
+        },
+        {
+          "number": 15,
+          "title": "Memory, Strings, Structures, and Resources",
+          "page": 1192,
+          "topics": [
+            "VirtualAlloc",
+            "GlobalAlloc",
+            "CopyMemory",
+            "RtlMoveMemory",
+            "Structure Alignment"
+          ]
+        },
+        {
+          "number": 16,
+          "title": "General Windows Messages",
+          "page": 1270,
+          "topics": [
+            "SendMessage, PostMessage",
+            "Window Lifecycle Messages (WM_CREATE, WM_DESTROY, WM_PAINT)"
+          ]
+        },
+        {
+          "number": 17,
+          "title": "Edit Control Messages",
+          "page": 1334,
+          "topics": [
+            "EM_GETSEL, EM_SETSEL, EM_REPLACESEL, EM_LIMITTEXT"
+          ]
+        },
+        {
+          "number": 18,
+          "title": "List Box, Combo Box, and Button Messages",
+          "page": 1362,
+          "topics": [
+            "LB_ADDSTRING, CB_ADDSTRING, BM_CLICK"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "appleman_com",
+      "title": "Developing COM/ActiveX Components with Visual Basic 6: A Guide to the Perplexed",
+      "author": "Dan Appleman",
+      "publisher": "Sams",
+      "year": 1998,
+      "pages": 892,
+      "file": "Developing-COMActiveX-components-VB6.pdf",
+      "importance": "ESSENTIAL FOR ACTIVEX / IDE & COMPILER",
+      "summary": "Deep exploration of how VB6 creates, compiles, and hosts COM components: ActiveX DLLs, ActiveX EXEs, ActiveX Controls (OCX), and ActiveX Documents.",
+      "relevance": {
+        "compiler_x64": "Rules for generating COM interfaces, IDispatch implementations, connection points (IConnectionPointContainer), and binary compatibility verification.",
+        "runtime_x64": "Component activation, ClassFactory stubs, threading models (Single, Apartment, Multi-threaded), and object persistence (PropertyBag).",
+        "ide_x64": "UserControl designer, Ambient and Extender properties, Property Pages, and ActiveX control hosting.",
+        "win32_api_x64": "In-process DLL loading vs Out-of-process EXE marshaling."
+      },
+      "chapters": [
+        {
+          "number": 1,
+          "title": "ActiveX Myths and Fundamentals",
+          "page": 14,
+          "topics": [
+            "Component Software",
+            "ActiveX Architecture"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Objects and Visual Basic",
+          "page": 42,
+          "topics": [
+            "VB Object Model",
+            "Encapsulation, State, Lifetime"
+          ]
+        },
+        {
+          "number": 4,
+          "title": "The Component Object Model",
+          "page": 66,
+          "topics": [
+            "Interfaces, Automation (IDispatch), Type Libraries, GUIDs"
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Aggregation and Polymorphism",
+          "page": 96,
+          "topics": [
+            "Interface Reuse",
+            "Implements mechanics",
+            "Containment"
+          ]
+        },
+        {
+          "number": 6,
+          "title": "The Life and Times of an ActiveX Component",
+          "page": 124,
+          "topics": [
+            "Registration (regsvr32)",
+            "In-Process DLL vs Out-of-Process EXE",
+            "Unloading"
+          ]
+        },
+        {
+          "number": 10,
+          "title": "Code and Classes: Beyond the Manuals",
+          "page": 230,
+          "topics": [
+            "Instancing Properties: Private, PublicNotCreatable, SingleUse, MultiUse, GlobalSingleUse, GlobalMultiUse"
+          ]
+        },
+        {
+          "number": 11,
+          "title": "Events and Connection Points",
+          "page": 264,
+          "topics": [
+            "IConnectionPoint",
+            "IConnectionPointContainer",
+            "WithEvents wiring"
+          ]
+        },
+        {
+          "number": 14,
+          "title": "Multithreading",
+          "page": 354,
+          "topics": [
+            "Thread Pools in ActiveX DLL/EXE",
+            "Apartment Threading (STA)",
+            "Cross-Thread Marshaling"
+          ]
+        },
+        {
+          "number": 16,
+          "title": "ActiveX Control Fundamentals",
+          "page": 440,
+          "topics": [
+            "OCX Architecture",
+            "IOleObject, IOleControl, IViewObject"
+          ]
+        },
+        {
+          "number": 17,
+          "title": "The UserControl Object",
+          "page": 468,
+          "topics": [
+            "UserControl Events: Initialize, InitProperties, ReadProperties, WriteProperties, Terminate"
+          ]
+        },
+        {
+          "number": 18,
+          "title": "The Extender and Ambient Objects",
+          "page": 512,
+          "topics": [
+            "Host-provided Properties (Top, Left, Visible, Enabled, Name)",
+            "AmbientProperties (UserMode, BackColor)"
+          ]
+        },
+        {
+          "number": 19,
+          "title": "The Wonderful World of Properties",
+          "page": 540,
+          "topics": [
+            "Property Procedures",
+            "PropertyBag Object",
+            "Binary vs Text Serialization"
+          ]
+        },
+        {
+          "number": 25,
+          "title": "Versioning and Binary Compatibility",
+          "page": 760,
+          "topics": [
+            "No Compatibility vs Project vs Binary Compatibility",
+            "GUID preservation rules"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "don_box",
+      "title": "Essential COM",
+      "author": "Don Box",
+      "publisher": "Addison-Wesley",
+      "year": 1998,
+      "pages": 464,
+      "file": "Don Box - Essential COM.pdf",
+      "importance": "THEORETICAL COM FOUNDATION",
+      "summary": "The definitive theoretical guide to the Component Object Model. Explains COM at the binary and ABI level: vtables, IUnknown, QueryInterface identity rules, IClassFactory, Apartments, and Marshaling.",
+      "relevance": {
+        "compiler_x64": "Authoritative reference for COM ABI in x64 Windows (64-bit vtables, 64-bit pointer offsets, calling conventions).",
+        "runtime_x64": "Reimplementing IUnknown, IDispatch, IClassFactory, IEnumVARIANT, IMalloc, and IErrorInfo from scratch in 64 bits.",
+        "ide_x64": "Understanding type library generation and COM registration.",
+        "win32_api_x64": "CoInitializeEx, CoCreateInstance, CoRegisterClassObject."
+      },
+      "chapters": [
+        {
+          "number": 1,
+          "title": "COM as a Better C++",
+          "page": 1,
+          "topics": [
+            "Software Distribution",
+            "Binary Interfaces",
+            "VTable Layout",
+            "Dynamic Linking"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Interfaces",
+          "page": 37,
+          "topics": [
+            "Interface Definition Language (IDL)",
+            "HRESULT Structure",
+            "IUnknown",
+            "QueryInterface Axioms (Reflexive, Symmetric, Transitive)",
+            "AddRef / Release"
+          ]
+        },
+        {
+          "number": 3,
+          "title": "Classes",
+          "page": 85,
+          "topics": [
+            "IClassFactory",
+            "CoCreateInstance",
+            "Activation Logic",
+            "Monikers"
+          ]
+        },
+        {
+          "number": 4,
+          "title": "Objects",
+          "page": 139,
+          "topics": [
+            "COM Object Identity",
+            "Encapsulation",
+            "Containment",
+            "Aggregation Rules"
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Apartments",
+          "page": 193,
+          "topics": [
+            "Threading Models",
+            "Single-Threaded Apartments (STA)",
+            "Multi-Threaded Apartments (MTA)",
+            "Thread Neutral Apartments (TNA)",
+            "Message Pumps"
+          ]
+        },
+        {
+          "number": 6,
+          "title": "Applications",
+          "page": 259,
+          "topics": [
+            "Marshaling",
+            "Type Libraries (ITypeLib, ITypeInfo)",
+            "Dual Interfaces",
+            "IDispatch Automation"
+          ]
+        },
+        {
+          "number": 7,
+          "title": "Miscellanea",
+          "page": 323,
+          "topics": [
+            "IConnectionPoint / IConnectionPointContainer",
+            "Memory Management (IMalloc)",
+            "Rich Error Handling (IErrorInfo, ICreateErrorInfo)"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lhotka",
+      "title": "Professional VB6 Business Objects & Distributed Objects Codebase",
+      "author": "Rockford Lhotka",
+      "publisher": "Wrox Press",
+      "year": 1998,
+      "pages": 0,
+      "file": "VB6 Business  Distributed Objects",
+      "importance": "REAL-WORLD ENTERPRISE ARCHITECTURE BENCHMARK",
+      "summary": "Complete source code collection (418 files, 197 classes) from Rockford Lhotka's landmark books on N-Tier object-oriented architecture in VB6. Precursor to the CSLA framework.",
+      "relevance": {
+        "compiler_x64": "The ultimate test suite for the compiler! Contains massive class hierarchies, deep Implements usage, custom collections, and serialization.",
+        "runtime_x64": "Tests PropertyBag persistence, Variant serialization, collection enumeration (_NewEnum), and MTS/COM+ transaction context.",
+        "ide_x64": "Large complex multi-project workspace (.vbg) loader test.",
+        "win32_api_x64": "Distributed DCOM / MTS transactional state transfer."
+      },
+      "chapters": [
+        {
+          "number": 4,
+          "title": "Chapter 04: Object Persistence & BrokenRules",
+          "page": 0,
+          "topics": [
+            "BrokenRules Object",
+            "Person & PersonManager",
+            "State Serialization",
+            "ApplyEdit / CancelEdit"
+          ]
+        },
+        {
+          "number": 5,
+          "title": "Chapter 05: Business Object Foundation",
+          "page": 0,
+          "topics": [
+            "Business Base Class",
+            "Validation Rules",
+            "Parent-Child Collections"
+          ]
+        },
+        {
+          "number": 8,
+          "title": "Chapter 08: VideoObjects Domain Model",
+          "page": 0,
+          "topics": [
+            "VideoObjects Project",
+            "Complete Business Logic Tier",
+            "Persistence Layer"
+          ]
+        },
+        {
+          "number": 10,
+          "title": "Chapter 10: 2-Tier and 3-Tier Distributed Objects",
+          "page": 0,
+          "topics": [
+            "VideoServer In-Process / Out-of-Process",
+            "Data Separation across Tiers"
+          ]
+        },
+        {
+          "number": 12,
+          "title": "Chapter 12-15: MTS / COM+ Transactional Objects",
+          "page": 0,
+          "topics": [
+            "VideoObjectsMTS",
+            "VideoServerMTS",
+            "ObjectContext, SetComplete, SetAbort",
+            "Database Transactions"
+          ]
+        },
+        {
+          "number": 16,
+          "title": "Distributed Objects: Multi-Tier Clusters",
+          "page": 0,
+          "topics": [
+            "Cluster Server",
+            "Worker Server",
+            "Client Workstation",
+            "ASP & RDS Web Integration"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "msdn_ref_es",
+      "title": "Referencia de Visual Basic 6 (MSDN Oficial en Espa\u00f1ol)",
+      "author": "Microsoft Corporation",
+      "publisher": "Microsoft Press / MSDN",
+      "year": 1999,
+      "pages": 909,
+      "file": "Referencia Visual Basic 6.pdf",
+      "importance": "OFFICIAL SPANISH LANGUAGE & RUNTIME REFERENCE",
+      "summary": "909-page complete alphabetical MSDN reference for Visual Basic 6 in Spanish. Details syntax, parameters, return types, constants, and error codes for every VB6 keyword and function.",
+      "relevance": {
+        "compiler_x64": "Exact grammar syntax, parameter rules, and keyword reserved list.",
+        "runtime_x64": "Detailed behavior of all standard functions, enums, constants, and error conditions.",
+        "ide_x64": "Ideal source for Spanish IntelliSense tooltips and documentation.",
+        "win32_api_x64": "Constants and type descriptions."
+      },
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Referencia Alfab\u00e9tica de Funciones e Instrucciones",
+          "page": 1,
+          "topics": [
+            "Abs hasta Year",
+            "Declaraciones Dim, ReDim, Sub, Function, Property, Type, Enum",
+            "Operadores y Constantes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "balena_api_appendix",
+      "title": "Appendix: Windows API Functions",
+      "author": "Francesco Balena",
+      "publisher": "Microsoft Press",
+      "year": 1999,
+      "pages": 46,
+      "file": "Programming Win32 API.pdf",
+      "importance": "QUICK WIN32 API REFERENCE",
+      "summary": "46-page condensed reference of Win32 API declarations, structures, and constants specifically crafted and tested for Visual Basic.",
+      "relevance": {
+        "compiler_x64": "Quick declaration tests for API Declare parser.",
+        "runtime_x64": "Direct mapping of standard Windows API calls.",
+        "ide_x64": "API declaration library snippets.",
+        "win32_api_x64": "Standard API lookup table."
+      },
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Windows API Declarations Reference",
+          "page": 1189,
+          "topics": [
+            "Window Management",
+            "GDI Graphics",
+            "File Operations",
+            "System Information"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mcsd_guide",
+      "title": "Visual Basic 6 The Complete Reference / MCSD Training Guide",
+      "author": "New Riders Publishing",
+      "publisher": "New Riders",
+      "year": 1999,
+      "pages": 1245,
+      "file": "Visual Basic 6 The Complete Reference.pdf",
+      "importance": "COMPREHENSIVE TRAINING & DESIGN PATTERNS",
+      "summary": "1245-page exhaustive guide covering desktop and distributed VB6 enterprise architectures, COM+, MTS, ADO, deployment, and security.",
+      "relevance": {
+        "compiler_x64": "Enterprise application compatibility benchmark.",
+        "runtime_x64": "Validation of transaction contexts and enterprise APIs.",
+        "ide_x64": "Project wizard templates and testing patterns.",
+        "win32_api_x64": "Deployment packaging and registry dependencies."
+      },
+      "chapters": [
+        {
+          "number": 1,
+          "title": "Desktop Application Development",
+          "page": 1,
+          "topics": [
+            "Forms, Controls, Menus, Validation"
+          ]
+        },
+        {
+          "number": 2,
+          "title": "Distributed Application Architecture",
+          "page": 400,
+          "topics": [
+            "COM Components, MTS, COM+ Transactions, ADO"
+          ]
+        }
+      ]
+    }
+  ],
+  "core_topics_cross_index": {
+    "vtable_and_com_abi": {
+      "title": "Virtual Method Tables (VTables) & COM ABI",
+      "description": "How VB6 and COM represent objects in memory, table of pointers to functions, IUnknown base (QueryInterface, AddRef, Release), and 64-bit alignment.",
+      "references": [
+        {
+          "book": "curland",
+          "chapter": 3,
+          "pages": "41-52",
+          "notes": "VB's internal IUnknown, calling vtable functions directly"
+        },
+        {
+          "book": "curland",
+          "chapter": 4,
+          "pages": "53-72",
+          "notes": "VTable-binding custom control interfaces"
+        },
+        {
+          "book": "curland",
+          "chapter": 8,
+          "pages": "143-182",
+          "notes": "Creating lightweight COM objects with custom raw vtables"
+        },
+        {
+          "book": "curland",
+          "chapter": 12,
+          "pages": "261-278",
+          "notes": "VTable patching and method interception"
+        },
+        {
+          "book": "don_box",
+          "chapter": 1,
+          "pages": "14-25",
+          "notes": "Abstract base classes as binary interfaces & vtables"
+        },
+        {
+          "book": "don_box",
+          "chapter": 2,
+          "pages": "48-72",
+          "notes": "IUnknown implementation, vtable layout, QueryInterface"
+        },
+        {
+          "book": "mckinney",
+          "chapter": 9,
+          "pages": "539-570",
+          "notes": "COM behind the curtain, vtable inspection"
+        }
+      ],
+      "compiler_relevance": "Emit 64-bit pointer vtables for Class modules and Implements interfaces. Offset 0=QI, Offset 8=AddRef, Offset 16=Release, Offset 24+ = Custom methods (or IDispatch for dual).",
+      "runtime_relevance": "Object headers must point to the vtable pointer. Implement IUnknown and IDispatch vtable stubs."
+    },
+    "safearray_memory_descriptors": {
+      "title": "Array Descriptors & SAFEARRAY Memory Layout",
+      "description": "The exact internal memory structure of VB6 arrays: SAFEARRAY structure, SAFEARRAYBOUND, cDims, cbElements, pvData, and bounds checking.",
+      "references": [
+        {
+          "book": "curland",
+          "chapter": 2,
+          "pages": "11-40",
+          "notes": "Complete breakdown of SAFEARRAY descriptor, reading/writing array variables, wrapping raw C pointers in SAFEARRAY without copying"
+        },
+        {
+          "book": "curland",
+          "chapter": 1,
+          "pages": "1-10",
+          "notes": "Using VarPtrArray and living pointers to array headers"
+        },
+        {
+          "book": "balena",
+          "chapter": 4,
+          "pages": "165-178",
+          "notes": "Dynamic arrays, ReDim Preserve behavior, Erase rules"
+        },
+        {
+          "book": "appleman_win32",
+          "chapter": 3,
+          "pages": "67-68",
+          "notes": "Passing arrays to Win32 DLLs, array pointers"
+        }
+      ],
+      "compiler_relevance": "Array indexing syntax array(i, j) calculation based on SAFEARRAY bounds. Generating calls to SafeArrayGetElement / SafeArrayAccessData or raw pointer arithmetic.",
+      "runtime_relevance": "In 64 bits: cbElements and pvData are 64-bit aligned. SafeArrayCreate, SafeArrayDestroy, SafeArrayRedim implementation."
+    },
+    "bstr_unicode_strings": {
+      "title": "BSTR Strings & Unicode/ANSI Bridging",
+      "description": "BSTR memory model: 4-byte length prefix before the string pointer, UTF-16 wchar_t data, null-terminated. Handling automatic ANSI conversion in Win32 Declare statements.",
+      "references": [
+        {
+          "book": "curland",
+          "chapter": 14,
+          "pages": "357-390",
+          "notes": "Strings in VB: BSTR internals, SysAllocString, SysFreeString, StrPtr vs VarPtr"
+        },
+        {
+          "book": "mckinney",
+          "chapter": 4,
+          "pages": "181-246",
+          "notes": "Deep dive into VB string memory, Unicode vs ANSI bridging, byte arrays (StrConv)"
+        },
+        {
+          "book": "appleman_win32",
+          "chapter": 3,
+          "pages": "43-46, 63-65",
+          "notes": "How VB converts strings to ANSI during API calls, LPSTR vs LPWSTR"
+        },
+        {
+          "book": "balena",
+          "chapter": 5,
+          "pages": "211-230",
+          "notes": "VBA String functions: Left, Right, Mid, InStr, Replace, StrConv"
+        }
+      ],
+      "compiler_relevance": "Distinguish between Declare Function ... (ByVal s As String) [auto ANSI] and modern x64 Unicode declarations. StrPtr returns pointer to raw UTF-16 data.",
+      "runtime_relevance": "Fast UTF-16 string engine, SysAllocStringByteLen, SysAllocStringLen, SysFreeString, BSTR concatenation with pre-allocated buffer."
+    },
+    "variant_and_type_coercion": {
+      "title": "VARIANT & VARIANTARG Memory Layout",
+      "description": "16-byte union in 32-bit (24-byte in 64-bit due to 8-byte alignment): VARTYPE vt, wReserved1-3, data union (llVal, lVal, bstrVal, pdispVal, punkVal, parray, etc.).",
+      "references": [
+        {
+          "book": "curland",
+          "chapter": 1,
+          "pages": "3-9",
+          "notes": "Variant internals, living pointers into Variants, VarPtr on Variants"
+        },
+        {
+          "book": "don_box",
+          "chapter": 6,
+          "pages": "285-305",
+          "notes": "IDispatch, VARIANT types, DISPPARAMS marshaling"
+        },
+        {
+          "book": "mckinney",
+          "chapter": 2,
+          "pages": "47-70",
+          "notes": "Variant overhead, internal subtypes, VariantCopyInd"
+        },
+        {
+          "book": "balena",
+          "chapter": 4,
+          "pages": "154-162",
+          "notes": "Variant type coercion rules, IsMissing, Empty vs Null"
+        }
+      ],
+      "compiler_relevance": "64-bit VARIANT size is 24 bytes (alignment padding). Subtyping rules, implicit Variant conversion.",
+      "runtime_relevance": "VariantInit, VariantClear, VariantCopy, VariantChangeType routines in 64 bits."
+    },
+    "win32_api_64bit_migration": {
+      "title": "Win32 API Declarations & 64-Bit Migration (LongPtr & LongLong)",
+      "description": "Porting Declare statements from 32-bit to 64-bit: replacing 32-bit Long with LongPtr for handles (HWND, HDC, HINSTANCE) and pointers; LongLong for 64-bit integers; struct alignment.",
+      "references": [
+        {
+          "book": "appleman_win32",
+          "chapter": 3,
+          "pages": "40-75",
+          "notes": "Visual Basic-Windows Interface: Declare, ByVal/ByRef, Types, Any, Callbacks"
+        },
+        {
+          "book": "appleman_win32",
+          "chapter": 4,
+          "pages": "76-133",
+          "notes": "Translating C headers (.h) to VB, struct packing rules"
+        },
+        {
+          "book": "appleman_win32",
+          "chapter": 5,
+          "pages": "134-249",
+          "notes": "GetWindowLong/SetWindowLong -> Must use GetWindowLongPtr/SetWindowLongPtr in x64"
+        },
+        {
+          "book": "appleman_win32",
+          "chapter": 15,
+          "pages": "1192-1269",
+          "notes": "Memory, structures, CopyMemory, structure alignment in 64 bits"
+        }
+      ],
+      "compiler_relevance": "Introduce LongPtr keyword (resolves to 64-bit integer on x64, 32-bit on x86). Introduce LongLong keyword (^ suffix). Adjust UDT struct padding to 8-byte boundaries.",
+      "runtime_relevance": "Foreign Function Interface (FFI) call generator using x64 Windows calling convention (RCX, RDX, R8, R9 + stack shadow space of 32 bytes)."
+    },
+    "subclassing_and_wndproc": {
+      "title": "Safe Window Subclassing, Hooking & CallWindowProc",
+      "description": "Intercepting Windows messages (WM_*) for VB forms and controls without IDE crashes. Machine-code thunks vs SetWindowLongPtr.",
+      "references": [
+        {
+          "book": "curland",
+          "chapter": 11,
+          "pages": "227-260",
+          "notes": "Calling function pointers, CallWindowProc hack, ASM thunks"
+        },
+        {
+          "book": "curland",
+          "chapter": 12,
+          "pages": "261-278",
+          "notes": "Overriding functions, safe subclassing"
+        },
+        {
+          "book": "mckinney",
+          "chapter": 6,
+          "pages": "344-362",
+          "notes": "Receiving messages, encapsulating message traps"
+        },
+        {
+          "book": "appleman_win32",
+          "chapter": 16,
+          "pages": "1270-1333",
+          "notes": "Window lifecycle messages, message queues"
+        }
+      ],
+      "compiler_relevance": "AddressOf operator returning function pointers that adhere to the x64 Windows ABI for callback procedures.",
+      "runtime_relevance": "Integration with SetWindowSubclass (comctl32.dll) for safe, crash-free subclassing."
+    },
+    "error_handling_errobject": {
+      "title": "ErrObject, On Error, and HRESULT Exception Handling",
+      "description": "How VB6 traps runtime errors and HRESULTs from COM calls. ErrObject interface (_ErrObject), Number, Source, Description, Raise, Clear.",
+      "references": [
+        {
+          "book": "balena",
+          "chapter": 4,
+          "pages": "188-210",
+          "notes": "On Error GoTo, On Error Resume Next, Err object methods"
+        },
+        {
+          "book": "curland",
+          "chapter": 3,
+          "pages": "45-50",
+          "notes": "How VB6 converts failing HRESULTs to Err.Raise"
+        },
+        {
+          "book": "mckinney",
+          "chapter": 5,
+          "pages": "247-270",
+          "notes": "When and how to raise errors, Win32 error translation"
+        },
+        {
+          "book": "don_box",
+          "chapter": 7,
+          "pages": "342-358",
+          "notes": "ISupportErrorInfo, IErrorInfo, ICreateErrorInfo"
+        }
+      ],
+      "compiler_relevance": "Implement On Error GoTo / Resume Next jump tables and exception handlers in generated code.",
+      "runtime_relevance": "Implement ErrObject coclass with GUID {a4c46654-499f-101b-bb78-00aa00383cbb} and exact dispids: Number(0), Source(0x60020002), Description(0x60020004), Raise(0x6002000a), Clear(0x6002000b)."
+    },
+    "collections_and_for_each": {
+      "title": "Collection Object & For Each Enumeration (_NewEnum)",
+      "description": "Internal implementation of VB.Collection: Add, Remove, Count, Item, and the hidden _NewEnum (dispid -4) returning IEnumVARIANT for For Each loops.",
+      "references": [
+        {
+          "book": "balena",
+          "chapter": 6,
+          "pages": "300-320",
+          "notes": "Using Collection, Key hashing, 1-based indexing"
+        },
+        {
+          "book": "curland",
+          "chapter": 6,
+          "pages": "110-118",
+          "notes": "Weak references and Collections, avoiding circular leaks"
+        },
+        {
+          "book": "appleman_com",
+          "chapter": 12,
+          "pages": "286-315",
+          "notes": "Building custom strongly-typed collection classes, wrapping _NewEnum"
+        },
+        {
+          "book": "don_box",
+          "chapter": 7,
+          "pages": "330-340",
+          "notes": "IEnumVARIANT specification: Next, Skip, Reset, Clone"
+        }
+      ],
+      "compiler_relevance": "Compile For Each var In col into: call col._NewEnum -> QueryInterface IEnumVARIANT -> call Next(1, var, fetched) -> loop.",
+      "runtime_relevance": "Implement Collection coclass with GUID {a4c4671c-499f-101b-bb78-00aa00383cbb} and exact dispids: Item(0), Add(1), Count(2), Remove(3), _NewEnum(-4)."
+    },
+    "usercontrols_and_ocx": {
+      "title": "ActiveX Controls (UserControl) & PropertyBag Persistence",
+      "description": "UserControl architecture, AmbientProperties, ExtenderProperties, PropertyBag binary/text serialization, and Form designer integration.",
+      "references": [
+        {
+          "book": "appleman_com",
+          "chapter": 16,
+          "pages": "440-467",
+          "notes": "ActiveX Control Fundamentals, OLE Control architecture"
+        },
+        {
+          "book": "appleman_com",
+          "chapter": 17,
+          "pages": "468-511",
+          "notes": "The UserControl Object, lifecycle events"
+        },
+        {
+          "book": "appleman_com",
+          "chapter": 18,
+          "pages": "512-539",
+          "notes": "Extender and Ambient Objects"
+        },
+        {
+          "book": "appleman_com",
+          "chapter": 19,
+          "pages": "540-587",
+          "notes": "Properties, PropertyBag, ReadProperties / WriteProperties"
+        },
+        {
+          "book": "balena",
+          "chapter": 12,
+          "pages": "905-978",
+          "notes": "Step-by-step UserControl development in VB6"
+        }
+      ],
+      "compiler_relevance": "Compile UserControl into an OCX / COM component exposing IOleObject, IOleControl, IViewObject, IProvideClassInfo.",
+      "runtime_relevance": "PropertyBag object implementation (ReadProperty, WriteProperty).",
+      "ide_x64": "Form Designer hosting UserControls, resolving AmbientProperties (UserMode, BackColor) and ExtenderProperties (Left, Top, Width, Height, Name)."
+    },
+    "enterprise_business_objects_csla": {
+      "title": "Enterprise Business Objects & N-Tier Distributed Architecture",
+      "description": "Rockford Lhotka's architecture for domain objects: State preservation, BrokenRules validation, BeginEdit/ApplyEdit/CancelEdit, and transaction handling.",
+      "references": [
+        {
+          "book": "lhotka",
+          "chapter": 4,
+          "pages": "All",
+          "notes": "Object Persistence, Person, PersonManager, BrokenRules"
+        },
+        {
+          "book": "lhotka",
+          "chapter": 5,
+          "pages": "All",
+          "notes": "Business base class, validation engine"
+        },
+        {
+          "book": "lhotka",
+          "chapter": 8,
+          "pages": "All",
+          "notes": "Complete VideoObjects project, real enterprise domain model"
+        },
+        {
+          "book": "lhotka",
+          "chapter": 12,
+          "pages": "All",
+          "notes": "VideoObjectsMTS: Transactional COM+ / MTS components"
+        },
+        {
+          "book": "mcsd_guide",
+          "chapter": 2,
+          "pages": "400-600",
+          "notes": "Multi-tier enterprise systems, MTS/COM+ architecture"
+        }
+      ],
+      "compiler_relevance": "Benchmark for large complex enterprise VB6 applications.",
+      "runtime_relevance": "Compatibility with COM+ transaction context and multi-tier state marshalling.",
+      "ide_x64": "Multi-project group (.vbg) support."
+    }
+  }
+}

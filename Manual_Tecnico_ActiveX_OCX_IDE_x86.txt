@@ -1,0 +1,1315 @@
+MANUAL TECNICO REPLICACION DE CONTROLES ACTIVEX / OCX EN UN IDE X86
+Enfoque: compatibilidad de diseño y ejecucion con Visual Basic 6.0 Fecha
+de compilacion: 16 de octubre de 2026
+
+===============================================================================
+0. PROPOSITO, ALCANCE Y ADVERTENCIA DE IMPLEMENTACION
+===============================================================================
+
+Este documento es una guia de arquitectura e implementacion para
+construir un contenedor de controles ActiveX de 32 bits dentro de un IDE
+propio, tomando como referencia el comportamiento observable de Visual
+Basic 6.0 (VB6).
+
+El objetivo no es dibujar una representacion visual de un OCX. El
+objetivo es poder descubrir un control registrado, activarlo como objeto
+COM, alojarlo en una ventana de diseño, comunicarse con el control y su
+contenedor, editar sus propiedades, recibir sus eventos, guardar su
+estado y restaurarlo al abrir el formulario. Para compatibilidad en
+ejecucion, el entorno tambien debe poder instanciarlo y dejar que
+interactue con la aplicacion anfitriona.
+
+IMPORTANTE: - Este documento no es una implementacion completa ni una
+certificacion de compatibilidad binaria con VB6. Los controles OCX de
+terceros difieren mucho. - La documentacion oficial describe contratos e
+interfaces, no entrega un clon completo del diseñador de VB6. - Los
+ejemplos son patrones de implementacion. Los fragmentos que usan
+interfaces COM de OLE omiten deliberadamente detalles dependientes de la
+arquitectura de ventanas, la administracion de errores y la
+infraestructura de la aplicacion. No se deben compilar como si fueran un
+host terminado. - No se deben copiar ciegamente implementaciones,
+nombres comerciales, recursos, codigo ni elementos protegidos de
+Microsoft o de terceros. Se puede implementar comportamiento
+interoperable siguiendo especificaciones publicas y probar contra
+componentes licenciados de forma legitima. - Este manual se centra en
+OCX x86 dentro de un proceso x86. Un OCX de 32 bits no puede cargarse
+directamente dentro de un proceso x64. La arquitectura x64 del nuevo IDE
+debe tratarse como un sistema de controles distinto si no necesita OCX
+binarios.
+
+La compatibilidad con “tal cual VB6” es un objetivo de pruebas, no una
+propiedad que se obtenga solo implementando unas pocas interfaces. Hay
+que definir un conjunto de controles y escenarios de referencia y
+ampliar la cobertura de forma medible.
+
+=============================================================================== 
+1. RESUMEN EJECUTIVO
+===============================================================================
+
+Un contenedor ActiveX es un cliente COM/OLE especializado. El control es
+un objeto COM; puede exponer interfaces para automatizacion, activacion
+visual, persistencia, eventos, informacion de tipo, paginas de
+propiedades, teclado, transferencia de datos y otras capacidades.
+
+Las areas funcionales principales son:
+
+1.  Descubrimiento del control: CLSID, ProgID, TypeLib, version,
+    categoria, ubicacion del servidor y arquitectura.
+2.  Activacion COM: CoCreateInstance/CoGetClassObject, interfaces
+    IUnknown, errores HRESULT, liberacion correcta de referencias.
+3.  Alojamiento OLE: IOleObject, IOleClientSite, IOleInPlaceSite,
+    IOleInPlaceFrame, IOleInPlaceUIWindow, IOleInPlaceObject,
+    IOleInPlaceActiveObject.
+4.  Sitio de control: IOleControlSite, propiedades ambientales, foco,
+    aceleradores y coordenadas.
+5.  Presentacion: ventanas propias del control, IViewObject/IViewObject2
+    cuando corresponda, invalidacion, clipping, redimensionamiento, DPI
+    y activacion.
+6.  Automatizacion y metadatos: IDispatch, ITypeInfo, ITypeLib, VARIANT,
+    BSTR, SAFEARRAY, DISPIDs.
+7.  Eventos: IConnectionPointContainer, IConnectionPoint, interfaz de
+    salida, Advise/Unadvise, gestion del ciclo de vida del sink.
+8.  Persistencia: IPersistStreamInit, IPersistStream,
+    IPersistPropertyBag, IPersistStorage u otras interfaces que soporte
+    el control; el host debe detectar cual usa.
+9.  Diseñador: seleccion, handles, z-order, tab order, propiedad,
+    evento, cortar/copiar/ pegar, copiar/duplicar, undo, recursos y
+    serializacion de formulario.
+10. Ejecucion: creacion de instancias, conexion de eventos al codigo de
+    usuario, orden de inicializacion y destruccion, manejo de errores y
+    cierre limpio.
+11. Registro y despliegue: registro COM, controles ausentes,
+    dependencias, licencias y diagnosticos.
+12. Pruebas: controles simples y complejos, errores, persistencia,
+    eventos, foco, teclado, cierre, memoria y compatibilidad entre
+    versiones.
+
+Recomendacion: crear primero un host de prueba independiente del IDE. Si
+el host no puede alojar correctamente un OCX real, no conviene comenzar
+por la interfaz visual del diseñador.
+
+===============================================================================
+2. DOCUMENTACION PRIMARIA Y REFERENCIAS REALES
+===============================================================================
+
+Las siguientes referencias son documentacion tecnica publica,
+principalmente Microsoft Learn. Los nombres de las interfaces, sus
+metodos y los contratos COM/OLE son la fuente normativa principal.
+
+A. Arquitectura ActiveX y contenedores 1. ActiveX Controls Architecture
+https://learn.microsoft.com/en-us/windows/win32/com/activex-controls-architecture
+Explica las capacidades que pueden ofrecer los controles: visualizacion,
+persistencia, eventos, teclado, registro y licencias.
+
+2.  ActiveX Controls
+    https://learn.microsoft.com/en-us/windows/win32/com/activex-controls
+    Resume las tecnologias implicadas: COM, objetos conectables,
+    documentos compuestos OLE, Automation, persistencia y paginas de
+    propiedades.
+
+3.  ActiveX Controls Interfaces
+    https://learn.microsoft.com/en-us/windows/win32/com/activex-controls-interfaces
+    Describe IOleControl, IOleControlSite y otras interfaces
+    especificas.
+
+4.  Overview of Control and Control Container Guidelines
+    https://learn.microsoft.com/en-us/windows/win32/com/overview-of-control-and-control-container-guidelines
+    Esencial: las interfaces adicionales son opcionales; el contenedor
+    debe consultar capacidades con QueryInterface y degradarse con
+    elegancia.
+
+5.  Using the Container’s Functionality
+    https://learn.microsoft.com/en-us/windows/win32/com/using-the-container-s-functionality
+    Describe llamadas que un control hace al sitio del contenedor
+    durante la activacion en el lugar, los eventos de vista, foco y
+    coordinacion.
+
+6.  Interfaces (OLE and Data Transfer)
+    https://learn.microsoft.com/en-us/windows/win32/com/interfaces-odt
+    Indice de interfaces OLE, incluidas interfaces de activacion y
+    ventana.
+
+B. COM, activacion, registro e interfaces 7. Component Object Model
+(COM)
+https://learn.microsoft.com/en-us/windows/win32/com/component-object-model–com-
+Conceptos basicos de objetos e interfaces COM.
+
+8.  Creating an Object in COM
+    https://learn.microsoft.com/en-us/windows/win32/learnwin32/creating-an-object-in-com
+    Activacion mediante CoCreateInstance y contextos de ejecucion.
+
+9.  COM Class Objects and CLSIDs
+    https://learn.microsoft.com/en-us/windows/win32/com/com-class-objects-and-clsids
+    CLSID, class factory y creacion de objetos.
+
+10. Registering COM Servers
+    https://learn.microsoft.com/en-us/windows/win32/com/registering-com-servers
+    Registro de clases y localizacion de servidores COM.
+
+11. InprocServer32
+    https://learn.microsoft.com/en-us/windows/win32/com/inprocserver32
+    Registro de servidores dentro del proceso y ThreadingModel.
+
+12. The COM Library
+    https://learn.microsoft.com/en-us/windows/win32/com/the-com-library
+    Inicializacion y finalizacion de COM.
+
+13. IDispatch
+    https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nn-oaidl-idispatch
+    Interfaz Automation para propiedades y metodos invocables por
+    nombre/DISPID.
+
+14. IDispatch::GetIDsOfNames
+    https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-idispatch-getidsofnames
+    Resolucion de nombres a DISPIDs.
+
+15. ITypeInfo::Invoke
+    https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-itypeinfo-invoke
+    Invocacion usando metadatos de tipo.
+
+C. Persistencia y eventos 16. Persistence
+https://learn.microsoft.com/en-us/windows/win32/com/persistence
+Interfaces de persistencia, incluida IPersistStreamInit.
+
+17. Using IConnectionPointContainer
+    https://learn.microsoft.com/en-us/windows/win32/com/using-iconnectionpointcontainer
+    Descubrimiento de interfaces de salida y connection points.
+
+D. Hilos y apartamentos 18. Processes, Threads, and Apartments
+https://learn.microsoft.com/en-us/windows/win32/com/processes–threads–and-apartments
+Modelos STA/MTA, mensajes y llamadas entre apartamentos.
+
+19. Single-Threaded Apartments
+    https://learn.microsoft.com/en-us/windows/win32/com/single-threaded-apartments
+    Reglas de STA, message loop y marshaling.
+
+20. In-Process Server Threading Issues
+    https://learn.microsoft.com/en-us/windows/win32/com/in-process-server-threading-issues
+    Consideraciones de threading para DLLs COM.
+
+E. Documentacion de Visual Basic 6 21. Visual Basic 6.0 Documentation
+(archivada)
+https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/
+Punto de entrada a la documentacion antigua de VB6. Parte de la
+informacion puede estar archivada o tener enlaces que ya no se
+mantienen.
+
+F. Especificaciones y herramientas auxiliares 22. Windows SDK: headers y
+type libraries Los contratos de las interfaces OLE/COM se reflejan en
+headers como oleidl.h, olectl.h, ocidl.h, objidl.h, oaidl.h, oleauto.h y
+en las bibliotecas del Windows SDK. Utilizar el SDK correspondiente al
+objetivo x86 y verificar firmas, orden de vtable, tipos y convenciones
+de llamada.
+
+23. Herramientas utiles:
+    -   OLE/COM Object Viewer (oleview.exe), incluido en herramientas
+        del SDK.
+    -   OLE-COM Object Viewer para inspeccionar interfaces, coclasses y
+        type libs.
+    -   Regedit, Process Explorer y herramientas de diagnostico de
+        Windows.
+    -   Visual Basic 6 IDE instalado legalmente para crear casos de
+        referencia.
+    -   Un compilador C++ Win32 para un host COM de prueba.
+    -   Un depurador que permita inspeccionar HRESULT, llamadas,
+        ventanas y errores de activacion.
+    -   OleViewDotNet es una herramienta comunitaria util para
+        exploracion; verificar su repositorio y licencia antes de
+        incorporarla a un flujo.
+
+Las paginas web son fuentes vivas. Verificar las firmas y versiones del
+SDK instalado antes de codificar. Los enlaces archivados de VB6 pueden
+variar.
+
+===============================================================================
+3. CONCEPTOS COM QUE EL IDE DEBE DOMINAR
+===============================================================================
+
+3.1 Objeto e interfaces COM no identifica un objeto por el nombre de una
+clase C++ ni por su direccion de memoria. Un objeto expone interfaces
+identificadas por IID. Un puntero de interfaz debe tratarse como una
+referencia COM, no como un puntero de memoria generico que el host pueda
+inspeccionar arbitrariamente.
+
+IUnknown define: - QueryInterface(riid, ppvObject): solicita otra
+interfaz. - AddRef(): incrementa el contador de referencias. -
+Release(): decrementa el contador.
+
+Reglas practicas: - Cada interfaz obtenida correctamente debe liberarse
+siguiendo el contrato de propiedad de la API usada. - No asumir que un
+objeto soporta una interfaz: consultar QueryInterface. - No guardar
+punteros COM en archivos de proyecto. Los punteros solo existen en el
+proceso y durante la vida del objeto. - No llamar metodos sobre un
+puntero despues de Release. - Evitar ciclos de referencias entre el
+host, el control y los sinks de eventos. - Tratar los HRESULT; S_FALSE
+no equivale necesariamente a un error y FAILED(hr) es la macro estandar
+para fallos HRESULT.
+
+3.2 CLSID, ProgID, IID y LIBID - CLSID: identifica la clase COM que se
+desea instanciar. - ProgID: identificador textual legible, por ejemplo
+Vendor.Control.1. - IID: identifica una interfaz especifica. - LIBID:
+identifica una biblioteca de tipos. - Version de TypeLib: version
+mayor/menor; no asumir que versiones diferentes tienen exactamente el
+mismo contrato. - DISPID: identifica un miembro de Automation dentro de
+una interfaz dispatch.
+
+El archivo de proyecto debe conservar identidad estable, idealmente
+CLSID y referencias de tipo/version. El ProgID puede conservarse como
+dato auxiliar, pero no debe ser la unica identidad porque puede cambiar
+o faltar.
+
+3.3 IDispatch y Automation IDispatch proporciona: - GetTypeInfoCount -
+GetTypeInfo - GetIDsOfNames - Invoke
+
+Sirve para descubrir y llamar propiedades/metodos expuestos por
+Automation. No reemplaza las interfaces OLE de alojamiento visual. Un
+control puede soportar IDispatch y aun asi requerir un contenedor OLE
+completo para funcionar visualmente.
+
+Un inspector de propiedades debe consultar TypeInfo cuando este
+disponible: - nombres y DISPIDs - tipos de parametros - tipos de
+retorno - flags de propiedad/metodo - enumeraciones y constantes -
+interfaces por defecto - interfaces de eventos/outgoing - atributos de
+lectura/escritura y descripciones cuando existan
+
+No todos los componentes exponen metadatos completos ni de la misma
+forma. Prever nombres no disponibles, tipos no compatibles y propiedades
+que no pueden editarse genericamente.
+
+3.4 Tipos Automation y propiedad de memoria Aprender y respetar: -
+VARIANT y VARIANTARG - BSTR y SysAllocString/SysFreeString - SAFEARRAY y
+SafeArrayDestroy - VARIANT_BOOL (TRUE suele ser -1 en Automation) -
+HRESULT - DISPPARAMS y EXCEPINFO - IErrorInfo - tipos de enumeracion y
+aliases definidos por TypeLib
+
+Errores frecuentes: - liberar BSTR con free/delete en vez de
+SysFreeString; - destruir un SAFEARRAY que pertenece a otro objeto sin
+transferir propiedad; - olvidar VariantClear; - interpretar VARIANT_BOOL
+como un bool nativo sin conversion; - asumir que todos los parametros de
+Invoke estan en orden visual de izquierda a derecha: los argumentos de
+DISPPARAMS se representan en orden inverso en el arreglo rgvarg para
+llamadas Automation convencionales; - no considerar VT_BYREF, valores
+opcionales, parametros nombrados y valores de error.
+
+3.5 Diferencia entre ventana, objeto COM y vista Un control puede: -
+crear su propia ventana Win32; - operar en modo windowless si soporta
+las interfaces apropiadas; - dibujarse mediante una interfaz de vista; -
+delegar ciertas funciones al contenedor; - combinar mas de una
+estrategia segun su estado.
+
+No se debe asumir que cada control equivale a un HWND simple. La ventana
+principal del OCX, las ventanas hijas internas y la vista OLE son
+conceptos distintos. Un host robusto debe coordinar el clipping, el
+foco, los mensajes, el orden de apilamiento y la activacion.
+
+===============================================================================
+4. ARQUITECTURA DEL CONTENEDOR OLE
+===============================================================================
+
+4.1 Interfaces del lado del control y del sitio
+
+Interfaces comunes que conviene estudiar e implementar/probar:
+
+-   IUnknown: identidad y vida del objeto.
+
+-   IOleObject: interfaz central de objeto incrustado; conecta el objeto
+    con su client site, negocia verbos/activacion, estado y otras
+    funciones OLE.
+
+-   IOleClientSite: interfaz que implementa el host y entrega al control
+    su sitio en el documento/contenedor.
+
+-   IOleInPlaceObject: activa/desactiva en el lugar, ajusta rectangulos
+    y administra la parte visible.
+
+-   IOleInPlaceSite: implementada por el host; participa en la
+    activacion visual en el lugar, obtiene contextos de ventana y
+    coordina el frame.
+
+-   IOleInPlaceFrame / IOleInPlaceUIWindow: conectan el control con el
+    frame y la ventana de interfaz del contenedor; pueden intervenir
+    menus y barras de herramientas durante UI activation.
+
+-   IOleInPlaceActiveObject: permite al control participar en la
+    traduccion de mensajes de teclado y comandos del frame mientras esta
+    activo.
+
+-   IOleControl: notificaciones de control, mnemonics, cambios de
+    propiedades ambientales y congelacion de eventos.
+
+-   IOleControlSite: sitio del control: foco, aceleradores, propiedades
+    del control extendido, coordenadas y otras colaboraciones.
+
+-   IAdviseSink: recibe notificaciones de cambios de vista/estado cuando
+    el objeto usa este mecanismo.
+
+-   IViewObject / IViewObject2: dibujo de representaciones OLE y
+    notificaciones de cambios de vista.
+
+-   IDataObject: intercambio de datos y operaciones relacionadas con
+    clipboard/drag-and-drop, cuando el control lo soporta.
+
+-   IConnectionPointContainer / IConnectionPoint: suscripcion a eventos
+    COM.
+
+-   IPersist*: persistencia del estado del objeto.
+
+-   IQuickActivate: optimiza un subconjunto de la inicializacion de
+    controles; es una interfaz opcional y no debe ser requisito
+    universal.
+
+-   ISimpleFrameSite: soporte de ciertos escenarios de controles
+    contenidos/anidados.
+
+No todas son obligatorias para cada OCX. La documentacion oficial
+recalca que el host debe detectar interfaces con QueryInterface y
+manejar la ausencia de forma segura. Implementar primero el conjunto
+minimo para los controles de referencia y ampliar la cobertura en base a
+fallos reales.
+
+4.2 Activacion de un control: secuencia conceptual La secuencia exacta
+varia segun el control y sus interfaces. Un flujo de referencia para el
+host es:
+
+1.  Leer del formulario la identidad del control y su estado persistido.
+2.  Resolver el CLSID y verificar arquitectura x86.
+3.  Inicializar COM/OLE en el hilo UI del IDE.
+4.  Crear el objeto con CoCreateInstance o el mecanismo apropiado.
+5.  Consultar IOleObject y otras interfaces necesarias.
+6.  Crear un objeto Site propio que implemente las interfaces requeridas
+    por el contenedor.
+7.  Llamar SetClientSite en IOleObject.
+8.  Establecer el rectangulo de posicion/tamaño mediante el protocolo
+    OLE correspondiente.
+9.  Restaurar estado persistido mediante la interfaz de persistencia
+    soportada.
+10. Negociar activacion visual y crear/activar la vista en el sitio.
+11. Conectar eventos usando connection points.
+12. Sincronizar propiedades ambientales y el contexto del contenedor.
+13. Redibujar y mantener el foco/teclado.
+14. Al cerrar, desconectar eventos, desactivar, guardar y liberar en
+    orden.
+
+No fijar esta lista como un algoritmo rigido para todos los controles.
+Consultar los contratos de las interfaces y manejar el orden exigido por
+cada una. Implementar un registro de trazas de cada llamada HRESULT
+ayuda a entender controles que se comportan de forma no trivial.
+
+4.3 El objeto Site El sitio no es solo un HWND. Es un objeto COM
+proporcionado por el contenedor que puede implementar varias interfaces.
+Una arquitectura habitual separa: - ControlSite: identidad, propiedades
+ambientales, referencia al control. - OLEClientSite: IOleClientSite. -
+InPlaceSite: IOleInPlaceSite y, segun el caso, interfaces
+relacionadas. - ControlSite: IOleControlSite. - FrameSite:
+IOleInPlaceFrame / IOleInPlaceUIWindow. - EventSink: implementacion de
+la interfaz de eventos requerida por el control. - PersistenceAdapter:
+adapta las interfaces de persistencia detectadas. Se pueden implementar
+varias interfaces en una misma clase COM del host, pero mantenerlas
+separadas conceptualmente ayuda a depurar y probar.
+
+4.4 Implementacion real del host La implementacion C++ Win32 suele ser
+la ruta mas directa para controlar interfaces nativas y ventanas. Un
+host administrado tambien es posible, pero el interop COM, el threading
+y la gestion de callbacks deben ser explicitos. No mezclar un host de
+pruebas x64 con OCX x86: un servidor in-process debe tener la misma
+arquitectura del proceso cliente.
+
+Esqueleto conceptual de creacion C++ (no es un host completo):
+
+    HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+    // Si se usa OleInitialize, respetar su contrato y llamar OleUninitialize.
+    if (FAILED(hr)) {
+        // Diagnosticar CO_E_NOTINITIALIZED / RPC_E_CHANGED_MODE, etc.
+        return hr;
+    }
+
+    CComPtr<IUnknown> unk;
+    hr = CoCreateInstance(
+        clsidControl,
+        nullptr,
+        CLSCTX_INPROC_SERVER,
+        IID_IUnknown,
+        reinterpret_cast<void**>(&unk));
+
+    if (SUCCEEDED(hr)) {
+        CComPtr<IOleObject> oleObject;
+        hr = unk->QueryInterface(IID_PPV_ARGS(&oleObject));
+        if (SUCCEEDED(hr)) {
+            // Crear Site COM y ejecutar protocolo de alojamiento OLE.
+        }
+    }
+
+    // Antes de finalizar: liberar objetos y cerrar el host.
+    // CoUninitialize debe corresponder a la inicializacion de este hilo.
+
+Notas: - CComPtr requiere ATL; no es una API COM del sistema por si
+misma. - El ejemplo no crea la interfaz Site, no activa la vista, no
+restaura estado, no conecta eventos y no debe usarse como host de
+produccion. - Para un host visual normalmente se estudian OleCreate,
+OleLoad, los verbos OLE, IOleObject y las interfaces de sitio, no solo
+CoCreateInstance. - Verificar el resultado de cada llamada y registrar
+el HRESULT hexadecimal.
+
+===============================================================================
+5. DISEÑADOR: COMPORTAMIENTO ESPERADO
+===============================================================================
+
+5.1 Modelo de formulario independiente de objetos vivos No serializar
+directamente punteros COM ni depender de que un control este activado
+para representar el formulario. Mantener un modelo de documento con: -
+identidad de clase (CLSID/ProgID como datos); - identificador/nombre de
+instancia en el formulario; - posicion y tamaño en unidades de diseño; -
+orden visual y orden de tabulacion; - propiedades persistidas por el
+host; - blob/stream de persistencia opaco del control cuando
+corresponda; - estado de recursos externos (imagenes, iconos, etc.); -
+metadatos y version de TypeLib conocidos; - eventos conectados y nombres
+de procedimientos del proyecto; - estado de control
+ausente/incompatible/activacion fallida; - datos desconocidos
+preservados sin modificacion cuando sea posible.
+
+5.2 Seleccion y manipuladores El host debe distinguir entre: - seleccion
+de la instancia en el diseñador; - foco de entrada dentro del control; -
+UI activation OLE; - edicion de propiedades; - modo ejecucion.
+
+Un click puede seleccionar el control sin activar su UI. Doble click
+puede activar el control o abrir el editor de codigo de evento,
+dependiendo del comportamiento de VB6 y del control. La politica debe
+ser explicita y testeada.
+
+5.3 Movimiento y redimensionamiento El contenedor determina geometria.
+Debe coordinar: - rectangulo de diseño y rectangulo de ventana; -
+escalado de unidades VB6 a pixeles; - clipping y z-order; - bordes de
+seleccion y handles; - redimensionamiento de controles hijos; -
+notificaciones al control mediante el protocolo OLE; - DPI, zoom del
+diseñador y cambios de tamaño del formulario.
+
+Evitar que el movimiento del control dependa de manipular directamente
+el HWND sin notificar a la interfaz OLE. El control puede tener una
+ventana hija propia o ser windowless.
+
+5.4 Propiedades La ventana Properties necesita una capa de metadatos y
+un adaptador de acceso. Debe distinguir: - propiedades propias del
+control; - propiedades de instancia/Extender que pertenecen al
+contenedor (por ejemplo Name, Left, Top, Width, Height, Index, TabIndex
+o Visible segun el modelo); - propiedades ambientales del contenedor; -
+propiedades de solo lectura; - propiedades ocultas/no explorables; -
+propiedades con editor especial; - propiedades persistidas por el OCX y
+propiedades persistidas por el IDE.
+
+No asumir que todas las propiedades visibles en VB6 provienen de
+IDispatch. Parte de la experiencia del diseñador se origina en metadatos
+TypeLib, propiedades del contenedor y editores especializados.
+
+5.5 Eventos y codigo Para exponer eventos en el editor de codigo: 1.
+Obtener interfaces outgoing desde la TypeLib cuando existan. 2.
+Determinar la interfaz de eventos por defecto segun los metadatos. 3.
+Crear un EventSink compatible con la interfaz COM exacta. 4. Suscribirse
+con IConnectionPoint::Advise. 5. Mapear DISPID de evento a nombre y
+firma. 6. Generar o asociar procedimientos de evento en el proyecto. 7.
+Desconectar con Unadvise antes de destruir el sink o el control. 8.
+Manejar reentrancia: un evento puede provocar que el codigo usuario
+cambie propiedades o destruya el control durante la llamada.
+
+No basta con usar IDispatch::Invoke de forma generica para recibir
+eventos: la interfaz outgoing puede ser dispinterface o interfaz vtable
+personalizada. La implementacion del sink debe respetar el contrato
+exacto.
+
+5.6 Paginas de propiedades Algunos controles exponen paginas de
+propiedades OLE. Investigar ISpecifyPropertyPages y
+OleCreatePropertyFrame. El host debe: - consultar si la interfaz esta
+disponible; - obtener CLSIDs de paginas; - presentar el editor en el
+contexto correcto; - comunicar errores de cancelacion o aplicacion; -
+preservar el estado si el usuario cancela; - no asumir que todo control
+tiene paginas de propiedades.
+
+Un PropertyGrid propio es util, pero no reemplaza automaticamente
+paginas de propiedades que son especificas del fabricante.
+
+===============================================================================
+6. PERSISTENCIA: FORM, FRX Y ESTADO DEL CONTROL
+===============================================================================
+
+6.1 No existe una sola interfaz de persistencia universal Un objeto
+puede implementar una o mas interfaces: - IPersist: identidad de clase y
+estado general. - IPersistStream: guarda/carga en IStream. -
+IPersistStreamInit: persistencia en stream con inicializacion nueva. -
+IPersistPropertyBag: persistencia por nombres de propiedad. -
+IPersistStorage: persistencia en IStorage. - IPersistMemory:
+persistencia en memoria. - IPersistMoniker: persistencia ligada a
+monikers en escenarios especificos.
+
+La lista es de capacidades posibles, no una lista de interfaces que
+todos los OCX deban implementar. El host consulta QueryInterface y
+escoge una estrategia compatible con el contrato que soporte el control.
+
+6.2 Guardar estado Separar tres capas: A. Estado del contenedor: nombre,
+posicion, tamaño, tab order, z-order, referencia a eventos, etc. B.
+Propiedades editadas que el IDE serializa como propiedades de
+formulario. C. Estado interno persistido por el control:
+stream/storage/property bag y datos binarios propios.
+
+En VB6, .frm y .frx son parte de la experiencia de persistencia de
+formularios. El archivo .frm es texto en muchos casos y puede
+referenciar datos binarios en .frx. No asumir que un blob arbitrario de
+un control se puede convertir a texto ni que un formato binario sea
+intercambiable entre versiones del componente.
+
+6.3 Preservar controles desconocidos Si un OCX falta o no se puede
+activar: - mostrar un marcador de control ausente; - conservar CLSID,
+nombre, geometria, propiedades textuales y blobs originales; - no
+eliminar el control al guardar; - no sobrescribir un blob desconocido
+con datos vacios; - permitir reabrir el proyecto cuando el OCX vuelva a
+estar disponible; - indicar claramente que no se ha podido verificar el
+estado interno.
+
+Esta regla es crucial: una herramienta de edicion que destruye datos
+desconocidos puede corromper proyectos incluso si visualmente parece
+funcionar.
+
+6.4 PropertyBag y controles VB6 Para UserControls VB6, PropertyBag suele
+ser el mecanismo habitual de ReadProperties/WriteProperties. El control
+decide que propiedades persistir y con que valores predeterminados. El
+host no debe asumir que puede recrear la logica interna leyendo todos
+los campos del archivo de formulario.
+
+Ejemplo ilustrativo VB6 (dentro de un proyecto de control ActiveX):
+
+    Private Sub UserControl_InitProperties()
+        ' Valores iniciales para una instancia nueva.
+        BackColor = vbButtonFace
+        Caption = "MiControl"
+    End Sub
+
+    Private Sub UserControl_ReadProperties(PropBag As PropertyBag)
+        Caption = PropBag.ReadProperty("Caption", "MiControl")
+        BackColor = PropBag.ReadProperty("BackColor", vbButtonFace)
+    End Sub
+
+    Private Sub UserControl_WriteProperties(PropBag As PropertyBag)
+        Call PropBag.WriteProperty("Caption", Caption, "MiControl")
+        Call PropBag.WriteProperty("BackColor", BackColor, vbButtonFace)
+    End Sub
+
+Este ejemplo es esquematico: las propiedades Caption y BackColor deben
+existir en el control y la sintaxis exacta debe verificarse con el
+compilador VB6. La llamada a WriteProperty normalmente se usa como una
+sentencia; se evita depender del valor de retorno. El PropertyBag no
+convierte por si solo al UserControl en un OCX compatible: tambien
+intervienen la clase COM, typelib, eventos, interfaces de control y el
+entorno de compilacion.
+
+===============================================================================
+7. EVENTOS COM Y CONNECTION POINTS
+===============================================================================
+
+7.1 Modelo Un control puede publicar una interfaz de salida (outgoing
+interface). El contenedor implementa un objeto sink que cumple esa
+interfaz y se registra mediante IConnectionPoint::Advise. El control
+retiene una referencia al sink mientras la suscripcion esta activa. Al
+terminar, el host llama Unadvise.
+
+7.2 Secuencia de trabajo 1.
+QueryInterface(IID_IConnectionPointContainer). 2. Enumerar connection
+points o usar FindConnectionPoint con el IID de eventos. 3. Obtener
+IConnectionPoint. 4. Crear sink con la interfaz exacta que solicita el
+control. 5. Advise(sink, &cookie). 6. Guardar el cookie asociado a la
+instancia y al connection point. 7. Recibir eventos y traducirlos a los
+manejadores del proyecto. 8. Antes de destruir control/sink, llamar
+Unadvise(cookie). 9. Liberar referencias y prevenir callbacks
+posteriores al cierre.
+
+Pseudocodigo C++ orientativo:
+
+    CComPtr<IConnectionPointContainer> cpc;
+    HRESULT hr = control->QueryInterface(IID_PPV_ARGS(&cpc));
+
+    if (SUCCEEDED(hr)) {
+        CComPtr<IConnectionPoint> cp;
+        hr = cpc->FindConnectionPoint(iidEventos, &cp);
+        if (SUCCEEDED(hr)) {
+            DWORD cookie = 0;
+            hr = cp->Advise(eventSink, &cookie);
+            // Guardar cp + cookie para llamar Unadvise al cerrar.
+        }
+    }
+
+El pseudocodigo presupone que eventSink implementa la interfaz exacta de
+eventos. No basta un IDispatch generico en todos los casos. En una
+implementacion real, la clase sink debe tener QueryInterface correcto,
+conteo de referencias y firmas ABI compatibles.
+
+7.3 Reentrancia y seguridad de ciclo de vida Un manejador puede cerrar
+el formulario, destruir la instancia o cambiar el estado del control
+mientras el control todavia esta notificando el evento. Usar un estado
+de cierre, referencias temporales y un orden de desconexion cuidadoso.
+Nunca destruir un sink antes de desconectarlo. Evitar que el sink
+retenga el contenedor de forma circular sin una estrategia de ruptura
+del ciclo.
+
+===============================================================================
+8. ACTIVACION VISUAL, VENTANAS, FOCO Y TECLADO
+===============================================================================
+
+Un control puede estar: - inactivo; - visible pero no UI-activo; -
+activo en el lugar; - UI-activo, con acceso al teclado y a menus/barras
+del frame; - en un estado especial windowless si lo soporta.
+
+La activacion OLE no es equivalente a ShowWindow. Hay negociacion entre
+control y sitio, y el control puede solicitar contexto de ventana,
+rectangulos y servicios del frame.
+
+Aspectos que debe manejar el host: - HWND del formulario anfitrion y su
+ciclo de vida; - ventanas hijas creadas por el OCX; - clipping contra
+los limites del control; - z-order de ventanas y objetos windowless; -
+WM_SETFOCUS / WM_KILLFOCUS y navegacion con Tab; - teclas aceleradoras y
+mnemonics; - traduccion de mensajes para IOleInPlaceActiveObject cuando
+corresponda; - activacion/desactivacion al seleccionar otro control; -
+menus compartidos durante UI activation; - cambio de tamaño y
+posicion; - invalidacion y repintado; - cierre cuando el control tiene
+foco; - modal dialogs que el control pueda mostrar.
+
+No interceptar todos los mensajes y reenviarlos ciegamente. Los mensajes
+deben seguir las reglas de Windows y OLE. Una mala politica de foco o
+aceleradores puede causar dobles pulsaciones, teclas perdidas o que el
+formulario no responda.
+
+Los controles windowless requieren especial atencion porque no tienen
+una ventana propia para recibir todos los mensajes. No implementar
+windowless como requisito inicial universal; comenzar con controles de
+ventana y añadir soporte cuando las pruebas demuestren que es necesario.
+
+===============================================================================
+9. TYPE LIBRARIES, OBJECT BROWSER E INTELLISENSE
+===============================================================================
+
+La TypeLib es una fuente central de informacion de diseño. Puede
+describir: - coclasses y CLSID; - interfaces e IID; - metodos y
+propiedades; - DISPIDs; - tipos de argumentos y retorno; - enumeraciones
+y constantes; - atributos de parametros; - interfaz default y de
+eventos; - descripciones de miembros; - version y locale.
+
+API clave para investigar: - LoadTypeLib / LoadTypeLibEx; -
+ITypeLib::GetTypeInfoCount, GetTypeInfo, GetTypeInfoOfGuid; -
+ITypeInfo::GetTypeAttr, GetFuncDesc, GetVarDesc, GetNames; -
+ITypeInfo::GetDocumentation; - ITypeInfo::GetImplTypeFlags y
+GetRefTypeOfImplType; - ITypeInfo::Invoke cuando se use invocacion
+guiada por metadatos.
+
+Liberar TYPEATTR, FUNCDESC y VARDESC con los metodos ReleaseTypeAttr,
+ReleaseFuncDesc y ReleaseVarDesc correspondientes. No liberar estos
+bloques con free/delete.
+
+Diferenciar: - TypeLib registrada en el sistema; - TypeLib cargada desde
+un archivo; - interfaces realmente implementadas por la instancia; -
+metadatos de la instancia y de la clase; - propiedades que el host
+agrega como Extender; - interfaces de eventos outgoing.
+
+No dar por hecho que el orden en TypeLib equivale al orden de
+propiedades mostrado por VB6. El IDE puede tener reglas de orden,
+filtros y editores propios.
+
+===============================================================================
+10. REGISTRO, DESCUBRIMIENTO Y ARQUITECTURA X86
+===============================================================================
+
+10.1 Registro habitual Los controles se registran normalmente bajo una
+ruta similar a: HKEY_CLASSES_ROOT{CLSID} con el valor predeterminado
+apuntando al servidor DLL/OCX y, frecuentemente, ThreadingModel.
+
+Puede haber registros de: - ProgID y VersionIndependentProgID; - TypeLib
+y version; - Control; - Implemented Categories; - ToolboxBitmap32 u
+otros metadatos historicos; - paginas de propiedades; - licensing; -
+interfaces y proxy/stub.
+
+Las rutas exactas varian con el tipo de servidor y el sistema operativo.
+El host debe usar APIs COM y no depender exclusivamente de leer una sola
+clave de registro. La vista de registro de 32 bits es importante en
+Windows de 64 bits; una aplicacion x86 debe descubrir y activar
+componentes x86 correctamente.
+
+10.2 Registro no es prueba de compatibilidad Un CLSID puede estar
+registrado y aun asi: - la DLL fue eliminada; - faltan dependencias; -
+el componente tiene una version incompatible; - falla
+DllGetClassObject; - no se puede crear una instancia; - requiere
+licencia; - necesita una interfaz de sitio no implementada por el
+host; - falla al restaurar el estado persistido.
+
+Mostrar errores concretos y registrar HRESULT. No marcar como
+“compatible” un control solo porque aparece en la lista de componentes.
+
+10.3 Activacion CoCreateInstance es el mecanismo general de activacion;
+CLSCTX_INPROC_SERVER pide un servidor dentro del proceso. Un OCX x86
+debe activarse desde un proceso x86. La activacion puede fallar por
+REGDB_E_CLASSNOTREG, CLASS_E_CLASSNOTAVAILABLE, E_NOINTERFACE, errores
+de licencia o errores privados del servidor.
+
+No ejecutar regsvr32 automaticamente sin consentimiento. Registrar o
+desregistrar componentes afecta al sistema. Proporcionar diagnosticos y
+documentar permisos, instaladores y dependencias. Para desarrollo usar
+una maquina virtual o entorno de pruebas controlado.
+
+10.4 Componentes con licencia Algunos controles implementan
+IClassFactory2 u otro mecanismo de licencia. No todos lo hacen. La
+licencia de diseño puede diferir de la licencia de ejecucion. El IDE
+debe respetar el mecanismo oficial del fabricante y no intentar eludir
+controles de licencia. Si no hay licencia, mostrar un mensaje claro y
+permitir cancelar sin corromper el proyecto.
+
+===============================================================================
+11. DIFERENCIAS ENTRE DISEÑO Y EJECUCION
+===============================================================================
+
+No tratar el diseñador como si fuera simplemente el formulario en
+ejecucion.
+
+En diseño: - se seleccionan instancias; - se muestran handles y guias; -
+se editan propiedades; - se guardan valores de diseño; - se generan
+procedimientos de evento; - el control puede tener estado especial de
+diseño; - algunas operaciones del usuario no deben disparar logica de
+aplicacion.
+
+En ejecucion: - se crean instancias segun el proyecto; - se restauran
+propiedades; - se conectan eventos al codigo compilado; - se ejecuta la
+logica de negocio; - se libera el control al descargar el formulario; -
+se respetan las reglas de licencia y dependencias.
+
+VB6 ofrece servicios especificos para UserControls en tiempo de diseño.
+Un OCX de terceros puede detectar modo de diseño mediante mecanismos
+propios. No simular ese estado solo con una variable si el control
+espera el comportamiento del contenedor OLE.
+
+Una arquitectura aconsejada separa: - ActiveXDesignerHost; -
+ActiveXRuntimeHost; - Project/FormSerializer; - TypeLibraryInspector; -
+PropertyInspector; - EventBindingService; - ComponentCatalog; -
+DiagnosticLog.
+
+Se puede compartir infraestructura COM, pero las politicas de diseño y
+ejecucion deben ser diferentes.
+
+===============================================================================
+12. USERCONTROLS VB6 Y CREACION DE CONTROLES
+===============================================================================
+
+Un UserControl creado en VB6 no es solo un modulo con una rutina de
+dibujo. El compilador y runtime de VB6 generan la clase COM, TypeLib,
+interfaces, eventos, persistencia y otros elementos necesarios para que
+se comporte como control ActiveX.
+
+Elementos que deben investigarse en la documentacion de VB6: - proyecto
+ActiveX Control; - UserControl y su ciclo de vida; - Initialize,
+InitProperties, ReadProperties, WriteProperties, Terminate; - Property
+Get / Let / Set; - eventos Public Event y RaiseEvent; - PropertyBag; -
+controles internos y contenedor; - propiedades Extender; - propiedades
+ambientales; - recursos .ctx y archivos relacionados; -
+compilacion/registro del OCX; - versiones binarias y compatibilidad de
+interfaces; - paginas de propiedades; - licencias; - distribucion y
+dependencias.
+
+Ejemplo conceptual de propiedad y evento VB6:
+
+    Public Event ValueChanged(ByVal NewValue As Long)
+
+    Private m_Value As Long
+
+    Public Property Get Value() As Long
+        Value = m_Value
+    End Property
+
+    Public Property Let Value(ByVal NewValue As Long)
+        If m_Value <> NewValue Then
+            m_Value = NewValue
+            RaiseEvent ValueChanged(m_Value)
+        End If
+    End Property
+
+Es un ejemplo ilustrativo de una propiedad/evento de clase VB6; no
+demuestra por si solo toda la infraestructura requerida para un
+UserControl visual.
+
+Si el IDE debe crear UserControls que funcionen exactamente como los de
+VB6, no basta con guardar codigo fuente: debe soportar el proyecto de
+control, la compilacion x86, el registro/identidad COM, las interfaces,
+la TypeLib, el contrato de persistencia y el modelo de diseño. Si se
+pretende usar el compilador/runtime original de VB6, debe respetarse su
+flujo de construccion y sus limitaciones.
+
+No confundir esto con la estrategia del futuro IDE x64 del proyecto:
+para x64 se puede definir un modelo nativo de controles propios
+integrados en el ejecutable, sin generar OCX ni registrar cada control.
+Esa estrategia no es equivalente a crear un ActiveX VB6 x86.
+
+===============================================================================
+13. MEMORIA, RECURSOS Y CICLO DE VIDA
+===============================================================================
+
+Problemas que deben cubrirse desde el prototipo: - referencias COM no
+liberadas; - referencias circulares host <-> control <-> event sink; -
+BSTR/VARIANT/SAFEARRAY liberados con la funcion equivocada; - ventanas
+hijas que sobreviven al formulario; - timers y hooks no eliminados; -
+GDI objects, DCs, fuentes, iconos y bitmaps sin liberar; - callbacks que
+llegan durante el cierre; - persistencia invocada mientras el control
+esta en un estado no valido; - destruccion en un hilo/apartamento
+incorrecto; - cierre del IDE con controles activos; - errores durante
+activacion parcial.
+
+Cada instancia debe tener una maquina de estados clara, por ejemplo:
+Created -> Sited -> Loaded -> Visible -> InPlaceActive -> UIActive y una
+secuencia de cierre compatible con el estado alcanzado. Esta es una
+representacion interna del host, no una enumeracion oficial de estados
+COM.
+
+No llamar Release como sustituto de la desactivacion OLE. La destruccion
+debe seguir las interfaces y el estado del control. En caso de error
+durante la activacion, ejecutar limpieza parcial segura.
+
+Registrar contadores de: - instancias activas; - interfaces y connection
+points; - ventanas asociadas; - handles GDI relevantes; - blobs/streams
+de persistencia; - errores HRESULT; - suscripciones Advise activas.
+
+Realizar ciclos repetidos de abrir formulario, crear controles, activar,
+guardar, cerrar y reabrir. Comparar memoria/handles antes y despues. Una
+sola ejecucion correcta no prueba que no existan fugas.
+
+===============================================================================
+14. APARTAMENTOS COM Y BUCLE DE MENSAJES
+===============================================================================
+
+Para un diseñador visual, el punto de partida mas seguro suele ser un
+hilo UI STA que procese mensajes de Windows. Muchos controles ActiveX
+esperan un contexto STA y message pump.
+
+Reglas: - Inicializar COM/OLE en cada hilo que use COM segun la API
+elegida. - No llamar CoInitializeEx con un modelo incompatible en un
+hilo ya inicializado. - Mantener un message loop funcional. - No
+bloquear indefinidamente el hilo STA esperando un worker sin bombear
+mensajes; puede provocar deadlocks. - No compartir punteros de interfaz
+directamente entre apartamentos. - Si se necesita otro hilo, usar
+marshaling COM documentado o IPC. - No llamar interfaces de un control
+STA desde un worker como si fueran thread-safe. - Balancear
+CoInitializeEx/CoUninitialize u OleInitialize/OleUninitialize.
+
+La documentacion oficial de Microsoft sobre STA y threading COM debe
+considerarse lectura obligatoria antes de añadir multihilo al diseñador.
+
+===============================================================================
+15. FORMATO DE PROYECTO Y COMPATIBILIDAD CON VB6
+===============================================================================
+
+Para replicar VB6, inspeccionar proyectos reales y observar que guarda
+el IDE. No inventar un formato parecido y asumir que sera compatible.
+
+Archivos que pueden aparecer: - .vbp: proyecto VB6; - .frm: formulario y
+descripcion textual de controles/propiedades; - .frx: datos binarios
+asociados a formularios; - .ctl: fuente de UserControl; - .ctx: recursos
+binarios asociados a UserControl; - .cls: clases; - .bas: modulos; -
+.res: recursos; - .pag/.dob u otros archivos segun tipo de proyecto; -
+referencias a OCX/DLL/TypeLib externas.
+
+No todos los proyectos contienen todos estos archivos. La semantica
+exacta de cada campo debe verificarse con muestras creadas por VB6 y
+documentacion archivada.
+
+Plan de analisis: 1. Crear en VB6 un proyecto minimo. 2. Agregar un
+control intrinseco. 3. Agregar un OCX de referencia. 4. Cambiar una
+propiedad, guardar y comparar el .frm/.frx. 5. Añadir un evento y
+guardar. 6. Cerrar y reabrir. 7. Modificar version o retirar el OCX en
+un entorno de prueba. 8. Registrar que datos se conservan cuando falta
+el componente. 9. Crear un UserControl simple y observar .ctl/.ctx y
+referencias del proyecto. 10. Crear casos con imagenes, fuentes,
+colores, enumeraciones y objetos.
+
+La preservacion de datos desconocidos debe ser una regla de diseño del
+serializador. No normalizar ni reescribir innecesariamente blobs opacos.
+
+===============================================================================
+16. MATRIZ DE INTERFACES POR CAPACIDAD
+===============================================================================
+
+Capacidad: identidad y vida COM - Interfaz: IUnknown - Uso:
+QueryInterface/AddRef/Release - Obligatorio para objetos COM.
+
+Capacidad: Automation - Interfaz: IDispatch, ITypeInfo, ITypeLib - Uso:
+propiedades/metodos, introspeccion y Object Browser. - Opcional segun el
+control y sus interfaces.
+
+Capacidad: alojamiento OLE - Interfaces: IOleObject, IOleClientSite y
+las interfaces in-place/site - Uso: incrustacion y activacion visual. -
+Debe implementarse el protocolo necesario para los controles objetivo.
+
+Capacidad: dibujo - Interfaces: IViewObject/IViewObject2, ventanas
+propias y/o soporte windowless - Uso: representacion visual y
+actualizacion. - La estrategia depende del control.
+
+Capacidad: eventos - Interfaces:
+IConnectionPointContainer/IConnectionPoint + interfaz outgoing - Uso:
+suscripcion y entrega de eventos. - No todos los controles tienen
+eventos.
+
+Capacidad: persistencia - Interfaces:
+IPersistStreamInit/IPersistStream/IPersistPropertyBag/ IPersistStorage u
+otras. - Uso: guardar y restaurar estado. - Detectar la interfaz
+realmente soportada.
+
+Capacidad: propiedades avanzadas - Interfaces: ISpecifyPropertyPages y
+pagina(s) de propiedades - Uso: abrir editores especificos. - Opcional.
+
+Capacidad: teclado - Interfaces: IOleControl/IOleControlSite,
+IOleInPlaceActiveObject y mecanismos asociados. - Uso: accelerators,
+mnemonics y coordinacion con el frame.
+
+Capacidad: licencias - Interfaz: IClassFactory2 en controles que la
+implementan. - Uso: obtener/validar licencia. - Opcional y sujeto al
+fabricante.
+
+Capacidad: transferencia de datos - Interfaces: IDataObject y contratos
+OLE de drag/drop. - Uso: clipboard, transferencia y drag-and-drop. -
+Opcional; puede ser requisito practico de controles especificos.
+
+===============================================================================
+17. CODIGO Y EJEMPLOS: COMO USARLOS CORRECTAMENTE
+===============================================================================
+
+17.1 Diagnostico de activacion Registrar: - CLSID solicitado; - ruta del
+servidor si se conoce; - contexto CLSCTX; - HRESULT de
+CoCreateInstance; - interfaces obtenidas o E_NOINTERFACE; - errores de
+persistencia; - resultado de SetClientSite/DoVerb; - eventos
+Advise/Unadvise; - estado del control al fallar.
+
+17.2 Prueba de QueryInterface Pseudocodigo C++:
+
+    HRESULT TryGetInterface(IUnknown* object, REFIID iid, void** result)
+    {
+        if (!object || !result) return E_POINTER;
+        *result = nullptr;
+        return object->QueryInterface(iid, result);
+    }
+
+En codigo real se recomienda usar wrappers RAII como CComPtr o WRL
+ComPtr cuando corresponda. La funcion solo ilustra que el resultado debe
+inicializarse y verificarse; no implementa politicas de compatibilidad
+ni diagnosticos.
+
+17.3 Invocar propiedad por Automation No construir un PropertyGrid que
+invoque nombres sin resolver tipos y DISPIDs. El flujo general: 1.
+Consultar IDispatch. 2. Resolver nombre a DISPID con GetIDsOfNames o
+usar el DISPID conocido de TypeInfo. 3. Preparar DISPPARAMS y VARIANTARG
+con tipos correctos. 4. Invocar con DISPATCH_PROPERTYGET o
+DISPATCH_PROPERTYPUT/PUTREF segun caso. 5. Manejar HRESULT, EXCEPINFO y
+puArgErr. 6. Limpiar VARIANT y cadenas de acuerdo con las reglas de
+propiedad.
+
+Los detalles de PROPERTYPUT pueden requerir un argumento nombrado
+especial DISPID_PROPERTYPUT. Consultar la documentacion oficial de
+IDispatch/Invoke.
+
+17.4 Persistencia No escribir un blob de persistencia propio si el
+control define su formato. Usar la interfaz IPersist* soportada y el
+stream/storage que requiere. El serializador del IDE puede envolver esos
+bytes en su propio contenedor, pero debe conservarlos sin alterar la
+semantica. Para depuracion, guardar la version del formato interno del
+IDE y la identidad del control junto al blob.
+
+17.5 Event sink La implementacion concreta debe reflejar la interfaz
+outgoing real: - si es dispinterface, procesar Invoke con el DISPID y
+los tipos exactos; - si es una interfaz vtable personalizada,
+implementar los metodos con el orden y ABI exactos; - responder
+correctamente a QueryInterface para IID_IUnknown y el IID de eventos; -
+mantener AddRef/Release correctos; - evitar llamadas al proyecto una vez
+que el formulario esta cerrando.
+
+===============================================================================
+18. PLAN DE IMPLEMENTACION POR HITOS
+===============================================================================
+
+HITO 0 - Alcance y banco de pruebas Entregables: - matriz de controles
+de referencia; - lista de escenarios de compatibilidad; - Windows
+x86/entorno de pruebas controlado; - proyecto VB6 minimo de
+comparacion; - registro de llamadas HRESULT y logs.
+
+Criterio de salida: Se puede reproducir el comportamiento de un caso de
+prueba en VB6 y registrar sus archivos y eventos observables.
+
+HITO 1 - Catalogo y activacion COM Entregables: - catalogo de
+CLSID/ProgID/TypeLib; - filtro x86; - activacion de un objeto de
+prueba; - diagnosticos para control ausente o no registrable; -
+liberacion correcta.
+
+Criterio: El host identifica y crea objetos de prueba sin fugas ni
+excepciones no controladas. Esto no significa aun que pueda alojar un
+control visual.
+
+HITO 2 - Host OLE minimo Entregables: - ventana anfitriona; - Site
+COM; - IOleObject y activacion in-place; - posicionamiento y tamaño; -
+desactivacion y cierre; - pruebas con uno o dos controles sencillos.
+
+Criterio: El control se ve, recibe interaccion basica y se puede
+cerrar/reabrir.
+
+HITO 3 - Propiedades y persistencia Entregables: - inspeccion de
+TypeLib; - lectura/escritura de propiedades de prueba; - deteccion de
+IPersist*; - guardado/carga de estado; - preservacion de controles
+ausentes.
+
+Criterio: Cambiar una propiedad, guardar, cerrar, reabrir y verificar
+que el estado persiste correctamente.
+
+HITO 4 - Eventos y foco Entregables: - EventSink real; -
+Advise/Unadvise; - eventos de prueba conectados a codigo; - tab order,
+aceleradores y foco; - proteccion contra reentrancia.
+
+Criterio: Eventos repetidos funcionan; al cerrar no quedan sinks o
+referencias vivos.
+
+HITO 5 - Integracion en diseñador Entregables: - seleccion, movimiento,
+redimensionamiento; - ventana Properties; - insercion desde Toolbox; -
+menu de propiedades; - edicion de eventos; - undo/redo basico; -
+serializador .frm/.frx segun alcance definido.
+
+Criterio: El diseñador puede abrir y guardar el proyecto de referencia
+sin perder informacion no reconocida.
+
+HITO 6 - Paginas de propiedades y controles complejos Entregables: -
+ISpecifyPropertyPages cuando exista; - controles con ventanas
+internas; - imagenes/fuentes/colores; - drag/drop/clipboard si es
+requisito; - controles con requisitos especiales.
+
+Criterio: La matriz de controles aprobados crece y cada limitacion queda
+documentada.
+
+HITO 7 - UserControls VB6 Entregables: - soporte de proyecto ActiveX
+Control; - compilacion x86 o integracion con toolchain VB6 segun
+decision; - TypeLib, eventos, persistencia y registro; - compatibilidad
+de versiones; - pruebas de despliegue/licencia.
+
+Criterio: Un UserControl creado por el IDE puede compilarse/activarse en
+el alcance definido y ser usado en otro proyecto de prueba.
+
+HITO 8 - Robustez y compatibilidad Entregables: - pruebas repetidas de
+apertura/cierre; - diagnostico de memoria y handles; - controles
+ausentes; - diferentes versiones de OCX; - errores de licencia y
+dependencias; - suite de regresion automatizada.
+
+Criterio: No se pierden datos ante fallos de activacion y los escenarios
+aprobados pasan de forma reproducible.
+
+===============================================================================
+19. PLAN DE PRUEBAS Y CRITERIOS DE ACEPTACION
+===============================================================================
+
+Para cada control de referencia probar:
+
+Descubrimiento: [ ] Aparece si esta instalado y es x86. [ ] Muestra
+CLSID, ProgID, TypeLib y version cuando estan disponibles. [ ] No se
+ofrece como utilizable si la activacion falla de forma conocida.
+
+Activacion: [ ] Se crea el objeto. [ ] SetClientSite y activacion visual
+terminan correctamente. [ ] No se bloquea el IDE. [ ] Los errores
+muestran HRESULT y etapa.
+
+Visualizacion: [ ] Se dibuja correctamente. [ ] El redimensionamiento no
+deja artefactos. [ ] El control respeta limites y clipping. [ ] Los
+controles hijos no quedan por encima de otros incorrectamente.
+
+Interaccion: [ ] Recibe mouse y teclado. [ ] El foco entra y sale
+correctamente. [ ] Tab y aceleradores funcionan. [ ] La UI activation y
+desactivacion no rompen el frame.
+
+Propiedades: [ ] Se leen las propiedades disponibles. [ ] Se escriben
+propiedades compatibles. [ ] Enumeraciones, colores, fuentes, imagenes y
+valores especiales se tratan mediante editores adecuados o se marcan
+como no editables. [ ] Los errores de escritura no dejan el control en
+un estado corrupto.
+
+Eventos: [ ] Los eventos correctos se reciben. [ ] Los argumentos tienen
+tipos y valores esperados. [ ] Advise se balancea con Unadvise. [ ]
+Cerrar desde un manejador no causa use-after-free.
+
+Persistencia: [ ] Guardar y reabrir conserva geometria. [ ] Conserva
+propiedades. [ ] Conserva el estado binario. [ ] Si el control falta, se
+preserva la informacion desconocida. [ ] Una version incompatible
+produce diagnostico claro.
+
+Ciclo de vida: [ ] Crear/destruir 100 veces no aumenta indefinidamente
+handles. [ ] No quedan ventanas hijas tras cerrar. [ ] No quedan eventos
+conectados. [ ] El IDE puede salir con controles creados sin colgarse. [
+] Los fallos parciales se limpian correctamente.
+
+Compatibilidad de proyecto: [ ] El formato guardado se compara con un
+caso VB6 equivalente. [ ] No se eliminan campos desconocidos. [ ] El
+proyecto sigue abriendo en el entorno de referencia cuando ese sea un
+criterio explicito de compatibilidad.
+
+Registrar resultados por control y version. No usar una sola prueba de
+un control sencillo como evidencia de compatibilidad general.
+
+===============================================================================
+20. ERRORES FRECUENTES Y MITOS
+===============================================================================
+
+Mito: “Si puedo crear el objeto con CoCreateInstance, ya soporte
+ActiveX”. Realidad: eso solo prueba activacion COM; no demuestra
+alojamiento OLE visual, eventos, persistencia ni teclado.
+
+Mito: “Todos los OCX usan IDispatch para los eventos”. Realidad: la
+interfaz outgoing puede ser una dispinterface o una interfaz vtable
+personalizada.
+
+Mito: “Todos los controles tienen las mismas interfaces”. Realidad:
+muchas interfaces son opcionales. El host debe detectar capacidades.
+
+Mito: “Puedo guardar el puntero del objeto en el .frm”. Realidad: los
+punteros solo tienen sentido dentro del proceso y vida del objeto. Se
+guarda identidad y estado persistente, no direcciones de memoria.
+
+Mito: “Un control es solo un HWND”. Realidad: puede tener multiples
+ventanas, ser windowless o usar interfaces de vista OLE.
+
+Mito: “El registro confirma que el control funciona”. Realidad: la DLL
+puede faltar, fallar la activacion, requerir licencia o exigir
+interfaces que el host no soporta.
+
+Mito: “Todos los datos de un OCX se pueden leer desde la TypeLib”.
+Realidad: TypeLib describe interfaces y miembros, pero no necesariamente
+el estado interno, los editores ni el formato persistente completo.
+
+Mito: “Basta con implementar una clase UserControl visual”. Realidad: un
+UserControl VB6 incluye runtime, COM, TypeLib, persistencia, eventos y
+reglas de diseño/ejecucion.
+
+Mito: “Los OCX x86 pueden cargarse directamente en un IDE x64”.
+Realidad: un servidor COM in-process debe tener la arquitectura
+compatible con el proceso. Para x64 se requiere una implementacion x64,
+un proceso puente o un reemplazo nativo.
+
+===============================================================================
+21. DECISIONES DE ARQUITECTURA RECOMENDADAS PARA ESTE IDE
+===============================================================================
+
+1.  Mantener el host ActiveX x86 aislado como subsistema claro.
+2.  Construir un harness OLE de prueba antes de integrar el diseñador
+    completo.
+3.  Separar el modelo neutral del formulario de los objetos COM vivos.
+4.  Crear una capa de diagnostico de HRESULT y trazas de interfaces.
+5.  Consultar QueryInterface en cada capacidad opcional.
+6.  Usar TypeLib para introspeccion, no como sustituto del contrato OLE.
+7.  Usar interfaces IPersist* para estado interno; no inventar
+    serializacion de datos que pertenecen al control.
+8.  Preservar blobs y propiedades desconocidas cuando falta un OCX.
+9.  Implementar EventSink con firmas correctas y desconexion robusta.
+10. Mantener UI en STA con message pump.
+11. No activar controles en segundo plano sin un diseño explicito de
+    marshaling.
+12. Crear pruebas de compatibilidad con controles reales, con licencia y
+    versiones conocidas.
+13. Documentar por control las interfaces y funciones soportadas.
+14. Definir un alcance de compatibilidad: controles intrinsecos VB6, OCX
+    comunes, paginas de propiedades, windowless, data binding,
+    drag/drop, etc.
+15. Para el IDE x64, no arrastrar automaticamente todo el modelo
+    ActiveX. La estrategia indicada para ese entorno es un modelo nativo
+    de controles propios integrado en el ejecutable, salvo que aparezca
+    un requisito real de interoperabilidad COM x64.
+
+===============================================================================
+22. GLOSARIO
+===============================================================================
+
+ActiveX: nombre historico de tecnologias basadas en COM/OLE para
+componentes. OCX: extension habitual de un servidor COM que ofrece
+controles ActiveX. COM: Component Object Model. OLE: Object Linking and
+Embedding y su familia de interfaces/servicios. CLSID: identificador de
+clase COM. IID: identificador de interfaz COM. LIBID: identificador de
+Type Library. ProgID: identificador textual de una clase COM. TypeLib:
+biblioteca de tipos que describe interfaces y miembros. DISPID:
+identificador de un miembro Automation. HRESULT: codigo de resultado de
+una llamada COM. IUnknown: interfaz base COM. IDispatch: interfaz de
+Automation. Site: objeto del contenedor que representa el lugar donde se
+aloja el control. In-place activation: activacion de la interfaz del
+control dentro del contenedor. UI activation: estado activo para entrada
+y colaboracion con la interfaz del host. Connection point: mecanismo COM
+de suscripcion a interfaces de salida/eventos. Sink: objeto receptor de
+eventos. PropertyBag: mecanismo de persistencia por nombre usado por
+controles VB. STA: Single-Threaded Apartment. MTA: Multithreaded
+Apartment. Windowless control: control que puede funcionar sin ventana
+Win32 propia. Persistence: contrato para guardar y restaurar estado.
+HRESULT E_NOINTERFACE: la interfaz solicitada no esta disponible.
+REGDB_E_CLASSNOTREG: clase no registrada en el contexto solicitado.
+
+===============================================================================
+23. BIBLIOGRAFIA WEB AGRUPADA
+===============================================================================
+
+ARQUITECTURA -
+https://learn.microsoft.com/en-us/windows/win32/com/activex-controls-architecture -
+https://learn.microsoft.com/en-us/windows/win32/com/activex-controls -
+https://learn.microsoft.com/en-us/windows/win32/com/activex-controls-interfaces -
+https://learn.microsoft.com/en-us/windows/win32/com/overview-of-control-and-control-container-guidelines -
+https://learn.microsoft.com/en-us/windows/win32/com/using-the-container-s-functionality -
+https://learn.microsoft.com/en-us/windows/win32/com/interfaces-odt
+
+COM Y ACTIVACION -
+https://learn.microsoft.com/en-us/windows/win32/com/component-object-model–com- -
+https://learn.microsoft.com/en-us/windows/win32/learnwin32/creating-an-object-in-com -
+https://learn.microsoft.com/en-us/windows/win32/com/com-class-objects-and-clsids -
+https://learn.microsoft.com/en-us/windows/win32/com/registering-com-servers -
+https://learn.microsoft.com/en-us/windows/win32/com/inprocserver32 -
+https://learn.microsoft.com/en-us/windows/win32/com/the-com-library -
+https://learn.microsoft.com/en-us/windows/win32/com/registering-a-class-at-installation
+
+AUTOMATION -
+https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nn-oaidl-idispatch -
+https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-idispatch-getidsofnames -
+https://learn.microsoft.com/en-us/windows/win32/api/oaidl/nf-oaidl-itypeinfo-invoke
+
+PERSISTENCIA Y EVENTOS -
+https://learn.microsoft.com/en-us/windows/win32/com/persistence -
+https://learn.microsoft.com/en-us/windows/win32/com/using-iconnectionpointcontainer
+
+THREADING -
+https://learn.microsoft.com/en-us/windows/win32/com/processes–threads–and-apartments -
+https://learn.microsoft.com/en-us/windows/win32/com/single-threaded-apartments -
+https://learn.microsoft.com/en-us/windows/win32/com/in-process-server-threading-issues
+
+VB6 -
+https://learn.microsoft.com/en-us/previous-versions/visualstudio/visual-basic-6/
+
+===============================================================================
+24. CIERRE: QUE SIGNIFICA “COMPATIBLE CON VB6”
+===============================================================================
+
+Definir “compatibilidad” con criterios verificables. Por ejemplo:
+
+Nivel A - Catalogo: El IDE descubre controles x86 registrados y muestra
+sus metadatos.
+
+Nivel B - Activacion: Puede crear y destruir objetos COM x86 de forma
+segura.
+
+Nivel C - Alojamiento visual: Puede alojar controles sencillos en una
+ventana con movimiento, tamaño, foco y teclado basicos.
+
+Nivel D - Diseño: Permite insertar, seleccionar, configurar, guardar y
+reabrir controles.
+
+Nivel E - Eventos: Conecta correctamente eventos de controles con codigo
+de usuario.
+
+Nivel F - Persistencia: Conserva estado, recursos y datos desconocidos,
+incluidos escenarios de OCX ausente.
+
+Nivel G - Compatibilidad amplia: Soporta una matriz documentada de
+controles reales, property pages, ventanas internas, casos de teclado,
+licencias y persistencia compleja.
+
+Nivel H - Compatibilidad de proyecto VB6: Abre/guarda proyectos dentro
+del subconjunto definido sin perdida y con resultados contrastados con
+VB6.
+
+La expresion “tal cual funcionan en VB6” deberia reservarse para una
+matriz de pruebas amplia, no para una promesa general. El orden tecnico
+correcto es: primero interfaces COM/OLE, luego activacion visual,
+persistencia y eventos; despues integracion con el diseñador y,
+finalmente, ampliacion sistematica de compatibilidad.
+
+FIN DEL DOCUMENTO

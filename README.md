@@ -119,6 +119,8 @@ El IDE desacopla por completo la interfaz del proceso de generación de código 
 * **Detalles de Fin de Bloque (*Inlay Hints / Ghost Text*)**: Anotaciones descriptivas automáticas al final de bloques extensos (ej. `End If  ' [If total > 0]`).
 * **Operaciones de Edición Rápida**: Comentar/descomentar en bloque (<kbd>Ctrl+K, Ctrl+C</kbd> / <kbd>Ctrl+K, Ctrl+U</kbd>), inversión de asignaciones (`A = B` ⇄ `B = A`) y cambio de mayúsculas/minúsculas.
 
+<img width="750" height="590" alt="{D11B4C72-F02F-4B04-8413-963CCC874604}" src="https://github.com/user-attachments/assets/ecf6da00-015a-4ee0-a0bd-338dc70ccc28" />
+
 ---
 
 ### 🔍 Exploración y Navegación Avanzada

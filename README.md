@@ -7,8 +7,8 @@
 [![Version](https://img.shields.io/badge/Version-00.001.0576-informational.svg)](src/ViBa7.IDE/AppVersion.cs)
 [![Architecture](https://img.shields.io/badge/Architecture-Dual%20Toolchain%20(x32%20%7C%20x64)-orange.svg)](docs/TOOLCHAIN_SPEC.md)
 
-<p align="center">
-  <img width="800" height="600" alt="ViBa7-x86 IDE" src="https://github.com/user-attachments/assets/c0e8be77-11b8-4247-b2a9-55ed0bca5943" />
+<img width="800" height="600" alt="{63E68446-0F25-41F4-B23F-D057198AFB24}" src="https://github.com/user-attachments/assets/fb8d8b25-379c-426b-8690-f5a528af5f5a" />
+  
 </p>
 
 ---

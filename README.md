@@ -119,7 +119,7 @@ El IDE desacopla por completo la interfaz del proceso de generación de código 
 * **Detalles de Fin de Bloque (*Inlay Hints / Ghost Text*)**: Anotaciones descriptivas automáticas al final de bloques extensos (ej. `End If  ' [If total > 0]`).
 * **Operaciones de Edición Rápida**: Comentar/descomentar en bloque (<kbd>Ctrl+K, Ctrl+C</kbd> / <kbd>Ctrl+K, Ctrl+U</kbd>), inversión de asignaciones (`A = B` ⇄ `B = A`) y cambio de mayúsculas/minúsculas.
 
-<img width="750" height="590" alt="{D11B4C72-F02F-4B04-8413-963CCC874604}" src="https://github.com/user-attachments/assets/ecf6da00-015a-4ee0-a0bd-338dc70ccc28" />
+<img width="405" height="560" alt="{F3EE3937-B1D2-4FCE-8A25-9DDB1D69403E}" src="https://github.com/user-attachments/assets/468d4a4e-36c4-4358-b8db-c60fab850104" />
 
 ---
 
@@ -132,6 +132,7 @@ El IDE desacopla por completo la interfaz del proceso de generación de código 
   * Historial Atrás / Adelante (<kbd>Alt+←</kbd> / <kbd>Alt+→</kbd>).
   * Marcadores visuales en el margen (`🔖`) con navegación cíclica (<kbd>F2</kbd> / <kbd>Shift+F2</kbd>) y alternancia rápida (<kbd>Ctrl+F2</kbd>).
 * **Explorador de Tareas (*Task List*)**: Detección automática de directivas `' TODO:`, `' BUG:`, `' FIXME:`, `' NOTE:` y `' HACK:`.
+<img width="595" height="623" alt="{01E95DF5-CE1C-4676-8CEE-780BDEB583FD}" src="https://github.com/user-attachments/assets/181ee42f-efca-4972-8148-de8abc8a08ac" />
 
 ---
 
